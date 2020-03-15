@@ -26,7 +26,7 @@ pip install jaidedread
 For latest development release,
 
 ``` bash
-pip install git+git://github.com/jaided/jaidedread.git
+pip install git+git://github.com/jaidedai/jaidedread.git
 ```
 
 ## Usage
