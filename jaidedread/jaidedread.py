@@ -8,7 +8,7 @@ import os
 MODULE_PATH = os.path.dirname(__file__)
 
 # detector parameters
-detector_model = os.path.join(MODULE_PATH, 'model', 'craft_mlt_25k.pth')
+DETECTOR_PATH = os.path.join(MODULE_PATH, 'model', 'craft_mlt_25k.pth')
 text_threshold = 0.7
 low_text = 0.4
 link_threshold = 0.4
@@ -90,14 +90,18 @@ class Reader(object):
         
         MODEL_PATH = os.path.join(MODULE_PATH, 'model', model_file)
 
+        if os.path.isfile(DETECTOR_PATH) == False:
+            print('Downloading detection model, please wait')
+            urllib.request.urlretrieve('https://jaided.ai/read_download/craft_mlt_25k.pth' , DETECTOR_PATH)
+            print('Download complete')
+
         # check model file
         if os.path.isfile(MODEL_PATH) == False:
-            print('Downloading model, please wait')
-            # download
+            print('Downloading recognition model, please wait')
             urllib.request.urlretrieve('https://jaided.ai/read_download/' + model_file, MODEL_PATH)
             print('Download complete')
             
-        self.detector = get_detector(detector_model, self.device)
+        self.detector = get_detector(DETECTOR_PATH, self.device)
         self.recognizer, self.converter = get_recognizer(input_channel, output_channel,\
                                                          hidden_size, self.character, separator_list,\
                                                          dict_list, MODEL_PATH, device = self.device)
