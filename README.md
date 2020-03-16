@@ -2,6 +2,8 @@
 
 End-to-End Multilingual Optical Character Recognition (OCR) Solution
 
+![example](examples/example.png)
+
 ## Supported Languages
 
 We are currently supporting following 39 languages.
@@ -14,6 +16,10 @@ Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
 Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
 Turkish (tr), Uzbek (uz), Vietnamese (vi)
+
+List of characters is in folder jaidedread/character. If you are native speaker
+of any language and think we should add or remove any character,
+please create an issue.
 
 ## Installation
 
@@ -72,4 +78,4 @@ And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
 
 ## Citations
 
-For academic research, please cite the library as follows ... (link to be created)
+If you use `jaidedread` in your project/research, please consider citing the library as follows ... (link to be created)
