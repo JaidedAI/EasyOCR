@@ -33,7 +33,9 @@ class Reader(object):
     def __init__(self, lang_list, gpu = True):
         
         if gpu and torch.cuda.is_available(): self.device = 'cuda'
-        else: self.device = 'cpu'
+        else: 
+            self.device = 'cpu'
+            print('Using cpu, this module is much faster with gpu')
         
         # check available languages
         unknown_lang = set(lang_list) - set(all_lang_list)
