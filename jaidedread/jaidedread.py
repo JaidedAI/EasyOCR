@@ -85,7 +85,7 @@ class Reader(object):
         self.lang_char = []
         for lang in lang_list:
             char_file = os.path.join(MODULE_PATH, 'character', lang + "_char.txt")
-            with open(char_file, "r") as input_file:
+            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 char_list =  input_file.read().splitlines()
             self.lang_char += char_list
         self.lang_char = set(self.lang_char)
