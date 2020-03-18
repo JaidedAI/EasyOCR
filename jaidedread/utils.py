@@ -236,13 +236,13 @@ class CTCLabelConverter(object):
         if len(separator_list) == 0:
             dict_list = []
             for lang, dict_path in dict_pathlist.items(): 
-                with open(dict_path, "r") as input_file:
+                with open(dict_path, "r", encoding = "utf-8-sig") as input_file:
                     word_count =  input_file.read().splitlines()
                 dict_list += word_count   
         else:
             dict_list = {}
             for lang, dict_path in dict_pathlist.items(): 
-                with open(dict_path, "r") as input_file:
+                with open(dict_path, "r", encoding = "utf-8-sig") as input_file:
                     word_count =  input_file.read().splitlines()
                 dict_list[lang] = word_count
 
