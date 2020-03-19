@@ -14,7 +14,7 @@ setup(
     description='End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution',
     author='Rakpong Kittinaradorn',
     author_email='r.kittinaradorn@gmail.com',
-    url='https://github.com/jaided/jaidedread',
+    url='https://github.com/jaidedai/jaidedread',
     download_url='https://github.com/jaided/jaidedread.git',
     keywords=['ocr optical character recognition deep learning neural network'],
     classifiers=[
