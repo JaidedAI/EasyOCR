@@ -35,6 +35,8 @@ For latest development release,
 pip install git+git://github.com/jaidedai/jaidedread.git
 ```
 
+Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
+
 ## Usage
 
 ``` python

@@ -3,4 +3,5 @@ torchvision
 opencv-python
 scipy
 numpy
-Pillow
+Pillow<7.0
+scikit-image

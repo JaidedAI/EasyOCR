@@ -9,7 +9,7 @@ setup(
     packages=['jaidedread'],
     include_package_data=True,
     version='0.9',
-    install_requires=['torch', 'torchvision','opencv-python', 'scipy', 'numpy','Pillow'],
+    install_requires=['torch', 'torchvision','opencv-python', 'scipy', 'numpy','Pillow<7.0','scikit-image'],
     license='Apache License 2.0',
     description='End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution',
     author='Rakpong Kittinaradorn',
