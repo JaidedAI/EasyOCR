@@ -1,0 +1,6 @@
+include LICENSE.txt
+include README.md
+
+include jaidedread/model/*
+include jaidedread/character/*
+include jaidedread/dict/*

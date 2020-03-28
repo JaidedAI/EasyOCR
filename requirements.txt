@@ -1,0 +1,7 @@
+torch
+torchvision
+opencv-python
+scipy
+numpy
+Pillow<7.0
+scikit-image

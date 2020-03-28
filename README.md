@@ -2,6 +2,8 @@
 
 End-to-End Multilingual Optical Character Recognition (OCR) Solution
 
+![example](examples/example.png)
+
 ## Supported Languages
 
 We are currently supporting following 39 languages.
@@ -14,6 +16,10 @@ Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
 Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
 Turkish (tr), Uzbek (uz), Vietnamese (vi)
+
+List of characters is in folder jaidedread/character. If you are native speaker
+of any language and think we should add or remove any character,
+please create an issue.
 
 ## Installation
 
@@ -28,6 +34,8 @@ For latest development release,
 ``` bash
 pip install git+git://github.com/jaidedai/jaidedread.git
 ```
+
+Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
 
 ## Usage
 
@@ -47,6 +55,8 @@ Output will be in list format, each item represents bounding box, text and confi
 [([[1344, 439], [2168, 439], [2168, 580], [1344, 580]], 'ใจเด็ด', 0.4542357623577118),
  ([[1333, 562], [2169, 562], [2169, 709], [1333, 709]], 'Project', 0.9557611346244812)]
 ```
+
+There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set set `workers` and `batch_size`. Current version converts image into grey scale for recognition model. So contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`.
 
 See full documentation at https://jaided.ai/read/doc
 
@@ -72,4 +82,4 @@ And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
 
 ## Citations
 
-For academic research, please cite the library as follows ... (link to be created)
+If you use `jaidedread` in your project/research, please consider citing the library as follows ... (link to be created)
