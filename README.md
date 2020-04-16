@@ -1,23 +1,26 @@
-# Jaided Read
+# Easy OCR
 
-End-to-End Multilingual Optical Character Recognition (OCR) Solution
+Ready-to-use OCR with 40+ languages supported including Chinese, Japanese ,Korean and Thai.
+
+## Examples
 
 ![example](examples/example.png)
 
 ## Supported Languages
 
-We are currently supporting following 39 languages.
+We are currently supporting following 42 languages.
 
 Afrikaans (af), Azerbaijani (az), Bosnian (bs), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
 French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
-Icelandic (is), Italian (it), Kurdish (ku),  Latin (la), Lithuanian (lt),
+Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
+Latin (la), Lithuanian (lt),
 Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
 Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
-Turkish (tr), Uzbek (uz), Vietnamese (vi)
+Turkish (tr), Uzbek (uz), Vietnamese (vi), Chinese (zh)
 
-List of characters is in folder jaidedread/character. If you are native speaker
+List of characters is in folder easy_ocr/character. If you are native speaker
 of any language and think we should add or remove any character,
 please create an issue.
 
@@ -26,13 +29,13 @@ please create an issue.
 Install using `pip` for stable release,
 
 ``` bash
-pip install jaidedread
+pip install easy_ocr
 ```
 
 For latest development release,
 
 ``` bash
-pip install git+git://github.com/jaidedai/jaidedread.git
+pip install git+git://github.com/jaidedai/easy_ocr.git
 ```
 
 Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
@@ -40,8 +43,8 @@ Note: for Windows, please install torch and torchvision first by following offic
 ## Usage
 
 ``` python
-import jaidedread
-reader = jaidedread.Reader(['th','en'])
+import easy_ocr
+reader = easy_ocr.Reader(['th','en'])
 reader.readtext('test.jpg')
 ```
 
@@ -56,14 +59,11 @@ Output will be in list format, each item represents bounding box, text and confi
  ([[1333, 562], [2169, 562], [2169, 709], [1333, 709]], 'Project', 0.9557611346244812)]
 ```
 
-There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set set `workers` and `batch_size`. Current version converts image into grey scale for recognition model. So contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`.
-
-See full documentation at https://jaided.ai/read/doc
+There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set `workers` and `batch_size`. Current version converts image into grey scale for recognition model, so contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`.
 
 ## To be implemented
 
-1. Language packs: Chinese, Japanese, Korean group + Russian-based languages +
-Arabic + etc.
+1. Language packs: Russian-based languages + Arabic + etc.
 2. Language model for better decoding
 3. Better documentation and api
 
@@ -82,4 +82,4 @@ And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
 
 ## Citations
 
-If you use `jaidedread` in your project/research, please consider citing the library as follows ... (link to be created)
+If you use `easy_ocr` in your project/research, please consider citing the library as follows ... (link to be created)
