@@ -241,7 +241,7 @@ class CTCLabelConverter(object):
                         word_count =  input_file.read().splitlines()
                     dict_list += word_count
                 except:
-                    pass 
+                    pass
         else:
             dict_list = {}
             for lang, dict_path in dict_pathlist.items():
@@ -438,7 +438,7 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
                         x_max = box[1]
                         merged_box.append(new_box)
                         new_box = [box]
-            merged_box.append(new_box)
+            if len(new_box) >0: merged_box.append(new_box)
 
             for mbox in merged_box:
                 if len(mbox) != 1: # adjacent box in same line

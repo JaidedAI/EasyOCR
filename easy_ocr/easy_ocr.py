@@ -12,7 +12,7 @@ DETECTOR_PATH = os.path.join(MODULE_PATH, 'model', 'craft_mlt_25k.pth')
 text_threshold = 0.7
 low_text = 0.4
 link_threshold = 0.4
-canvas_size = 1280
+canvas_size = 2560
 mag_ratio = 1.
 poly = False
 
@@ -156,11 +156,8 @@ class Reader(object):
 
         ignore_char = ''.join(set(self.character)-self.lang_char-set(number)-set(symbol))
 
-        if len(image_list) == 0:
-            result = []
-        else:
-            if self.model_lang in ['chinese', 'japanese', 'korean']: decoder = 'greedy'
-            result = get_text(self.character, imgH, max_width, self.recognizer, self.converter, image_list,\
-                          ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
-                          workers, self.device)
+        if self.model_lang in ['chinese', 'japanese', 'korean']: decoder = 'greedy'
+        result = get_text(self.character, imgH, max_width, self.recognizer, self.converter, image_list,\
+                      ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
+                      workers, self.device)
         return result
