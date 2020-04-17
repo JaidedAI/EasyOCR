@@ -1,6 +1,6 @@
 # Easy OCR
 
-Ready-to-use OCR with 40+ languages supported including Chinese, Japanese ,Korean and Thai.
+Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## Examples
 
@@ -26,7 +26,7 @@ please create an issue.
 
 ## Installation
 
-Install using `pip` for stable release,
+Install using `pip` for stable release, (to be published soon)
 
 ``` bash
 pip install easy_ocr
