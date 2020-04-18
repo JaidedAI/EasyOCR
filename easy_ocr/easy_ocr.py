@@ -83,7 +83,7 @@ class Reader(object):
                 ja_list =  input_file.read().splitlines()
                 ja_char = ''.join(ja_list)
             self.character = number + symbol + en_char + ja_char
-            model_file = 'chinese.pth'
+            model_file = 'japanese.pth'
 
         elif  self.model_lang == 'korean':
             char_file = os.path.join(MODULE_PATH, 'character', "ko_char.txt")
@@ -91,7 +91,7 @@ class Reader(object):
                 ko_list =  input_file.read().splitlines()
                 ko_char = ''.join(ko_list)
             self.character = number + symbol + en_char + ko_char
-            model_file = 'chinese.pth'
+            model_file = 'korean.pth'
 
         elif self.model_lang == 'thai':
             separator_list = {
