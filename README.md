@@ -6,6 +6,8 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 ![example](examples/example.png)
 
+![example2](examples/example2.png)
+
 ## Supported Languages
 
 We are currently supporting following 42 languages.
