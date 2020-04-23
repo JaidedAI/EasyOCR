@@ -31,7 +31,7 @@ please create an issue.
 Install using `pip` for stable release, (to be published soon)
 
 ``` bash
-pip install easy_ocr
+pip install easyocr
 ```
 
 For latest development release,
@@ -45,8 +45,8 @@ Note: for Windows, please install torch and torchvision first by following offic
 ## Usage
 
 ``` python
-import easy_ocr
-reader = easy_ocr.Reader(['th','en'])
+import easyocr
+reader = easyocr.Reader(['th','en'])
 reader.readtext('test.jpg')
 ```
 
