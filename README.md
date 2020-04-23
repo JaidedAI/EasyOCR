@@ -28,7 +28,7 @@ please create an issue.
 
 ## Installation
 
-Install using `pip` for stable release, (to be published soon)
+Install using `pip` for stable release,
 
 ``` bash
 pip install easyocr
@@ -37,7 +37,7 @@ pip install easyocr
 For latest development release,
 
 ``` bash
-pip install git+git://github.com/jaidedai/easy_ocr.git
+pip install git+git://github.com/jaidedai/easyocr.git
 ```
 
 Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
