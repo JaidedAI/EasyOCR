@@ -22,7 +22,7 @@ Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
 Turkish (tr), Uzbek (uz), Vietnamese (vi), Chinese (zh)
 
-List of characters is in folder easy_ocr/character. If you are native speaker
+List of characters is in folder easyocr/character. If you are native speaker
 of any language and think we should add or remove any character,
 please create an issue.
 
@@ -84,4 +84,4 @@ And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
 
 ## Citations
 
-If you use `easy_ocr` in your project/research, please consider citing the library as follows ... (link to be created)
+If you use `easyocr` in your project/research, please consider citing the library as follows ... (link to be created)
