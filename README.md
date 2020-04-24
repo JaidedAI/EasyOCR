@@ -61,6 +61,12 @@ Output will be in list format, each item represents bounding box, text and confi
  ([[1333, 562], [2169, 562], [2169, 709], [1333, 709]], 'Project', 0.9557611346244812)]
 ```
 
+In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
+
+``` python
+reader = easyocr.Reader(['th','en'], gpu = False)
+```
+
 There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set `workers` and `batch_size`. Current version converts image into grey scale for recognition model, so contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`.
 
 ## To be implemented
