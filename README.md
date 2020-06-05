@@ -51,8 +51,21 @@ reader.readtext('test.jpg')
 ```
 
 Model weight for chosen language will be automatically downloaded or you can
-download it manually from  https://jaided.ai/read_download and put it
-in 'model' folder.
+download it manually from the following links and put it in 'model' folder
+
+[text detecion model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
+
+[latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
+
+[chinese model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
+
+[japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
+
+[korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
+
+[thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
+
+
 
 Output will be in list format, each item represents bounding box, text and confident level, respectively.
 
