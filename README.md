@@ -20,11 +20,11 @@ Latin (la), Lithuanian (lt),
 Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
 Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
-Turkish (tr), Uzbek (uz), Vietnamese (vi), Chinese (zh)
+Turkish (tr), Uzbek (uz), Vietnamese (vi), Traditional Chinese (zh)
 
 List of characters is in folder easyocr/character. If you are native speaker
 of any language and think we should add or remove any character,
-please create an issue.
+please create an issue and/or pull request (like [this one](https://github.com/JaidedAI/EasyOCR/pull/15)). 
 
 ## Installation
 
@@ -84,7 +84,7 @@ There are optional arguments for readtext function, `decoder` can be 'greedy'(de
 
 ## To be implemented
 
-1. Language packs: Russian-based languages + Arabic + etc.
+1. Language packs: Simplified Chinese, Russian-based languages + Arabic + etc.
 2. Language model for better decoding
 3. Better documentation and api
 
