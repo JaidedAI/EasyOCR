@@ -29,14 +29,25 @@ number = '0123456789'
 symbol  = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
 en_char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+model_url = {
+    'detector': 'https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing',
+    'latin.pth': 'https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing',
+    'chinese.pth': 'https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing',
+    'japanese.pth': 'https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing',
+    'korean.pth': 'https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing',
+    'thai.pth': 'https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing',
+}
+
+
 class Reader(object):
 
     def __init__(self, lang_list, gpu = True):
 
-        if gpu and torch.cuda.is_available(): self.device = 'cuda'
-        else:
+        if gpu == True and torch.cuda.is_available(): self.device = 'cuda'
+        elif gpu == False:
             self.device = 'cpu'
             print('Using cpu, this module is much faster with gpu')
+        else: self.device = gpu
 
         # check available languages
         unknown_lang = set(lang_list) - set(all_lang_list)
@@ -130,13 +141,13 @@ class Reader(object):
 
         if os.path.isfile(DETECTOR_PATH) == False:
             print('Downloading detection model, please wait')
-            urllib.request.urlretrieve('https://jaided.ai/read_download/craft_mlt_25k.pth' , DETECTOR_PATH)
+            urllib.request.urlretrieve(model_url['detector'] , DETECTOR_PATH)
             print('Download complete')
 
         # check model file
         if os.path.isfile(MODEL_PATH) == False:
             print('Downloading recognition model, please wait')
-            urllib.request.urlretrieve('https://jaided.ai/read_download/' + model_file, MODEL_PATH)
+            urllib.request.urlretrieve(model_url[model_file], MODEL_PATH)
             print('Download complete')
 
         self.detector = get_detector(DETECTOR_PATH, self.device)

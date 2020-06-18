@@ -1,6 +1,6 @@
 include LICENSE.txt
 include README.md
 
-include easy_ocr/model/*
-include easy_ocr/character/*
-include easy_ocr/dict/*
+include easyocr/model/*
+include easyocr/character/*
+include easyocr/dict/*
