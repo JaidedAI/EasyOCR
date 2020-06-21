@@ -12,7 +12,8 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 We are currently supporting following 42 languages.
 
-Afrikaans (af), Azerbaijani (az), Bosnian (bs), Czech (cs), Welsh (cy),
+Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
+Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
 French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
 Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
@@ -20,11 +21,11 @@ Latin (la), Lithuanian (lt),
 Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
 Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
-Turkish (tr), Uzbek (uz), Vietnamese (vi), Traditional Chinese (zh)
+Turkish (tr), Uzbek (uz), Vietnamese (vi)
 
 List of characters is in folder easyocr/character. If you are native speaker
 of any language and think we should add or remove any character,
-please create an issue and/or pull request (like [this one](https://github.com/JaidedAI/EasyOCR/pull/15)). 
+please create an issue and/or pull request (like [this one](https://github.com/JaidedAI/EasyOCR/pull/15)).
 
 ## Installation
 
@@ -57,15 +58,15 @@ download it manually from the following links and put it in 'model' folder
 
 [latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
 
-[chinese model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
+[chinese (traditional) model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
+
+[chinese (simplified) model](https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing)
 
 [japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
 
 [korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
 
 [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
-
-
 
 Output will be in list format, each item represents bounding box, text and confident level, respectively.
 
@@ -84,7 +85,7 @@ There are optional arguments for readtext function, `decoder` can be 'greedy'(de
 
 ## To be implemented
 
-1. Language packs: Simplified Chinese, Russian-based languages + Arabic + etc.
+1. Language packs: Russian-based languages + Arabic + etc.
 2. Language model for better decoding
 3. Better documentation and api
 
@@ -99,8 +100,3 @@ Recognition model is CRNN ([paper](https://arxiv.org/abs/1507.05717)). It is com
 Beam search code is based on this [repository](https://github.com/githubharald/CTCDecoder) and his [blog](https://towardsdatascience.com/beam-search-decoding-in-ctc-trained-neural-networks-5a889a3d85a7).
 
 And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
-
-
-## Citations
-
-If you use `easyocr` in your project/research, please consider citing the library as follows ... (link to be created)

@@ -19,7 +19,7 @@ poly = False
 # recognizer parameters
 latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga','hr','hu','id','is','it','ku',\
             'la','lt','lv','mi','ms','mt','nl','no','pl','pt','ro','sk','sl','sq','sv','sw','tl','tr','uz','vi']
-all_lang_list = latin_lang_list + ['th','zh','ja','ko']
+all_lang_list = latin_lang_list + ['th','ch_sim','ch_tra','ja','ko']
 imgH = 64
 input_channel = 1
 output_channel = 512
@@ -33,6 +33,7 @@ model_url = {
     'detector': 'https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing',
     'latin.pth': 'https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing',
     'chinese.pth': 'https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing',
+    'chinese_sim.pth': 'https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing',
     'japanese.pth': 'https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing',
     'korean.pth': 'https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing',
     'thai.pth': 'https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing',
@@ -59,9 +60,13 @@ class Reader(object):
             self.model_lang = 'thai'
             if set(lang_list) - set(['th','en']) != set():
                 raise ValueError('Thai is only compatible with English')
-        elif 'zh' in lang_list:
-            self.model_lang = 'chinese'
-            if set(lang_list) - set(['zh','en']) != set():
+        elif 'ch_tra' in lang_list:
+            self.model_lang = 'chinese_tra'
+            if set(lang_list) - set(['ch_tra','en']) != set():
+                raise ValueError('Chinese is only compatible with English')
+        elif 'ch_sim' in lang_list:
+            self.model_lang = 'chinese_sim'
+            if set(lang_list) - set(['ch_sim','en']) != set():
                 raise ValueError('Chinese is only compatible with English')
         elif 'ja' in lang_list:
             self.model_lang = 'japanese'
@@ -80,13 +85,21 @@ class Reader(object):
             self.character = number+ symbol + all_char
             model_file = 'latin.pth'
 
-        elif  self.model_lang == 'chinese':
-            char_file = os.path.join(MODULE_PATH, 'character', "zh_char.txt")
+        elif  self.model_lang == 'chinese_tra':
+            char_file = os.path.join(MODULE_PATH, 'character', "ch_tra_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                zh_list =  input_file.read().splitlines()
-                zh_char = ''.join(zh_list)
-            self.character = number + symbol + en_char + zh_char
+                ch_tra_list =  input_file.read().splitlines()
+                ch_tra_char = ''.join(ch_tra_list)
+            self.character = number + symbol + en_char + ch_tra_char
             model_file = 'chinese.pth'
+
+        elif  self.model_lang == 'chinese_sim':
+            char_file = os.path.join(MODULE_PATH, 'character', "ch_sim_char.txt")
+            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
+                ch_sim_list =  input_file.read().splitlines()
+                ch_sim_char = ''.join(ch_sim_list)
+            self.character = number + symbol + en_char + ch_sim_char
+            model_file = 'chinese_sim.pth'
 
         elif  self.model_lang == 'japanese':
             char_file = os.path.join(MODULE_PATH, 'character', "ja_char.txt")
@@ -167,7 +180,7 @@ class Reader(object):
 
         ignore_char = ''.join(set(self.character)-self.lang_char-set(number)-set(symbol))
 
-        if self.model_lang in ['chinese', 'japanese', 'korean']: decoder = 'greedy'
+        if self.model_lang in ['chinese_tra','chinese_sim', 'japanese', 'korean']: decoder = 'greedy'
         result = get_text(self.character, imgH, max_width, self.recognizer, self.converter, image_list,\
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                       workers, self.device)
