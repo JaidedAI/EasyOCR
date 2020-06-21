@@ -30,13 +30,13 @@ symbol  = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
 en_char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 model_url = {
-    'detector': 'https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing',
-    'latin.pth': 'https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing',
-    'chinese.pth': 'https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing',
-    'chinese_sim.pth': 'https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing',
-    'japanese.pth': 'https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing',
-    'korean.pth': 'https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing',
-    'thai.pth': 'https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing',
+    'detector': 'https://www.jaided.ai/read_download/craft_mlt_25k.pth',
+    'latin.pth': 'https://www.jaided.ai/read_download/latin.pth',
+    'chinese.pth': 'https://www.jaided.ai/read_download/chinese.pth',
+    'chinese_sim.pth': 'https://www.jaided.ai/read_download/chinese_sim.pth',
+    'japanese.pth': 'https://www.jaided.ai/read_download/japanese.pth',
+    'korean.pth': 'https://www.jaided.ai/read_download/korean.pth',
+    'thai.pth': 'https://www.jaided.ai/read_download/thai.pth',
 }
 
 
@@ -59,23 +59,23 @@ class Reader(object):
         if 'th' in lang_list:
             self.model_lang = 'thai'
             if set(lang_list) - set(['th','en']) != set():
-                raise ValueError('Thai is only compatible with English')
+                raise ValueError('Thai is only compatible with English, try lang_list=["th","en"]')
         elif 'ch_tra' in lang_list:
             self.model_lang = 'chinese_tra'
             if set(lang_list) - set(['ch_tra','en']) != set():
-                raise ValueError('Chinese is only compatible with English')
+                raise ValueError('Chinese is only compatible with English, try lang_list=["ch_tra","en"]')
         elif 'ch_sim' in lang_list:
             self.model_lang = 'chinese_sim'
             if set(lang_list) - set(['ch_sim','en']) != set():
-                raise ValueError('Chinese is only compatible with English')
+                raise ValueError('Chinese is only compatible with English, try lang_list=["ch_sim","en"]')
         elif 'ja' in lang_list:
             self.model_lang = 'japanese'
             if set(lang_list) - set(['ja','en']) != set():
-                raise ValueError('Japanese is only compatible with English')
+                raise ValueError('Japanese is only compatible with English, try lang_list=["ja","en"]')
         elif 'ko' in lang_list:
             self.model_lang = 'korean'
             if set(lang_list) - set(['ko','en']) != set():
-                raise ValueError('Korean is only compatible with English')
+                raise ValueError('Korean is only compatible with English, try lang_list=["ko","en"]')
         else: self.model_lang = 'latin'
 
         separator_list = {}
