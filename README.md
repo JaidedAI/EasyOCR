@@ -85,7 +85,7 @@ There are optional arguments for readtext function, `decoder` can be 'greedy'(de
 
 ## To be implemented
 
-1. Language packs: Hindi, Russian-based languages + Arabic + etc.
+1. Language packs: Hindi, Arabic, Cyrillic alphabet, etc.
 2. Language model for better decoding
 3. Better documentation and api
 
