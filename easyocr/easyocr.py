@@ -42,13 +42,18 @@ model_url = {
 
 class Reader(object):
 
-    def __init__(self, lang_list, gpu = True):
+    def __init__(self, lang_list, gpu=True):
 
-        if gpu == True and torch.cuda.is_available(): self.device = 'cuda'
-        elif gpu == False:
+        if gpu is False:
             self.device = 'cpu'
-            print('Using cpu, this module is much faster with gpu')
-        else: self.device = gpu
+            print('Using CPU. Note: This module is much faster with a GPU.')
+        elif not torch.cuda.is_available():
+            self.device = 'cpu'
+            print('CUDA not available - defaulting to CPU. Note: This module is much faster with a GPU.')
+        elif gpu is True:
+            self.device = 'cuda'
+        else:
+            self.device = gpu
 
         # check available languages
         unknown_lang = set(lang_list) - set(all_lang_list)
