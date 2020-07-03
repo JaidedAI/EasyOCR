@@ -54,7 +54,7 @@ reader.readtext('test.jpg')
 Model weight for chosen language will be automatically downloaded or you can
 download it manually from the following links and put it in 'model' folder
 
-[text detecion model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
+[text detection model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
 
 [latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
 
@@ -85,7 +85,7 @@ There are optional arguments for readtext function, `decoder` can be 'greedy'(de
 
 ## To be implemented
 
-1. Language packs: Russian-based languages + Arabic + etc.
+1. Language packs: Hindi, Russian-based languages + Arabic + etc.
 2. Language model for better decoding
 3. Better documentation and api
 
