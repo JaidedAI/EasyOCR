@@ -2,6 +2,8 @@ from .detection import get_detector, get_textbox, textbox_from_image
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
 from .utils import group_text_box, get_image_list,image_list_from_array
+import numpy as np
+import cv2
 import torch
 import urllib.request
 import os
