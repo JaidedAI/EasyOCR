@@ -76,4 +76,14 @@ def get_textbox(detector, image_path, canvas_size, mag_ratio, text_threshold, li
         result.append(poly)
     
     return result
+
+def textbox_from_image(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device):
+    result = []
+
+    bboxes, polys = test_net(canvas_size, mag_ratio, detector, image, text_threshold, link_threshold, low_text, poly, device)
+
+    for i, box in enumerate(polys):
+        poly = np.array(box).astype(np.int32).reshape((-1))
+        result.append(poly)
     
+    return result
