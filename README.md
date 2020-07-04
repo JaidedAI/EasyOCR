@@ -19,7 +19,7 @@ French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
 Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
 Latin (la), Lithuanian (lt),
 Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
-Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
+Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk) (need revisit), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
 Turkish (tr), Uzbek (uz), Vietnamese (vi)
 
