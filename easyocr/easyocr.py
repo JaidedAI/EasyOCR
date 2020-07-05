@@ -177,7 +177,7 @@ class Reader(object):
                                                          dict_list, MODEL_PATH, device = self.device)
 
     def readtext(self, file_name, decoder = 'greedy', beamWidth= 5, batch_size = 1, contrast_ths = 0.1,\
-                 adjust_contrast = 0.5, filter_ths = 0.003, workers = 1):
+                 adjust_contrast = 0.5, filter_ths = 0.003, workers = 0):
         text_box = get_textbox(self.detector, file_name, canvas_size, mag_ratio, text_threshold,\
                                link_threshold, low_text, poly, self.device)
         horizontal_list, free_list = group_text_box(text_box, width_ths = 0.5, add_margin = 0.1)
@@ -195,7 +195,7 @@ class Reader(object):
         return result
 
     def read_from_image(self, file, decoder = 'greedy', beamWidth= 5, batch_size = 1, contrast_ths = 0.1,\
-                 adjust_contrast = 0.5, filter_ths = 0.003, workers = 1):
+                 adjust_contrast = 0.5, filter_ths = 0.003, workers = 0):
 
         '''
         Parameters:
