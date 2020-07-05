@@ -100,3 +100,11 @@ Recognition model is CRNN ([paper](https://arxiv.org/abs/1507.05717)). It is com
 Beam search code is based on this [repository](https://github.com/githubharald/CTCDecoder) and his [blog](https://towardsdatascience.com/beam-search-decoding-in-ctc-trained-neural-networks-5a889a3d85a7).
 
 And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
+
+## Want To Contribute?
+
+Let's advance humanity together by making AI available to everyone!
+
+Please create issue to report bug or suggest new feature. Pull requests are welcome. Or if you found this library useful, just tell your friend about it.
+
+
