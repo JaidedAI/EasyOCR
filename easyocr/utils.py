@@ -459,51 +459,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
     # may need to check if box is really in image
     return merged_list, free_list
 
-def get_image_list(horizontal_list, free_list, img_path, model_height = 64):
+def get_image_list(horizontal_list, free_list, img, model_height = 64):
     image_list = []
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    maximum_y,maximum_x = img.shape
-
-    max_ratio_hori, max_ratio_free = 1,1
-    for box in free_list:
-        rect = np.array(box, dtype = "float32")
-        transformed_img = four_point_transform(img, rect)
-        ratio = transformed_img.shape[1]/transformed_img.shape[0]
-        crop_img = cv2.resize(transformed_img, (int(model_height*ratio), model_height), interpolation =  Image.ANTIALIAS)
-        image_list.append( (box,crop_img) ) # box = [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
-        max_ratio_free = max(ratio, max_ratio_free)
-
-    max_ratio_free = math.ceil(max_ratio_free)
-
-    for box in horizontal_list:
-        x_min = max(0,box[0])
-        x_max = min(box[1],maximum_x)
-        y_min = max(0,box[2])
-        y_max = min(box[3],maximum_y)
-        crop_img = img[y_min : y_max, x_min:x_max]
-        width = x_max - x_min
-        height = y_max - y_min
-        ratio = width/height
-        crop_img = cv2.resize(crop_img, (int(model_height*ratio), model_height), interpolation =  Image.ANTIALIAS)
-        image_list.append( ( [[x_min,y_min],[x_max,y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
-        max_ratio_hori = max(ratio, max_ratio_hori)
-
-    max_ratio_hori = math.ceil(max_ratio_hori)
-    max_ratio = max(max_ratio_hori, max_ratio_free)
-    max_width = math.ceil(max_ratio)*model_height
-
-    image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
-    return image_list, max_width
-
-def image_list_from_array(horizontal_list, free_list, image, model_height = 64):
-    '''
-    Parameters:
-    image: numpy array of shape (h,w,c)
-    '''
-
-    image_list = []
-    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
     maximum_y,maximum_x = img.shape
 
     max_ratio_hori, max_ratio_free = 1,1

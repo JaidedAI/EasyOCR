@@ -7,7 +7,7 @@ from collections import OrderedDict
 import cv2
 import numpy as np
 from .craft_utils import getDetBoxes, adjustResultCoordinates
-from .imgproc import resize_aspect_ratio, normalizeMeanVariance, loadImage
+from .imgproc import resize_aspect_ratio, normalizeMeanVariance
 from .craft import CRAFT
 
 def copyStateDict(state_dict):
@@ -53,37 +53,24 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     return boxes, polys
 
 def get_detector(trained_model, device='cpu'):
-    net = CRAFT()  
-    
+    net = CRAFT()
+
     if device == 'cpu':
         net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device)))
     else:
         net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device)))
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = False
-    
-    net.eval()    
+
+    net.eval()
     return net
 
-def get_textbox(detector, image_path, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device):
+def get_textbox(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device):
     result = []
-    image = loadImage(image_path)
-    
     bboxes, polys = test_net(canvas_size, mag_ratio, detector, image, text_threshold, link_threshold, low_text, poly, device)
 
     for i, box in enumerate(polys):
         poly = np.array(box).astype(np.int32).reshape((-1))
         result.append(poly)
-    
-    return result
 
-def textbox_from_image(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device):
-    result = []
-
-    bboxes, polys = test_net(canvas_size, mag_ratio, detector, image, text_threshold, link_threshold, low_text, poly, device)
-
-    for i, box in enumerate(polys):
-        poly = np.array(box).astype(np.int32).reshape((-1))
-        result.append(poly)
-    
     return result

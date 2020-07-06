@@ -1,7 +1,7 @@
-from .detection import get_detector, get_textbox, textbox_from_image
+from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list,image_list_from_array
+from .utils import group_text_box, get_image_list
 import numpy as np
 import cv2
 import torch
@@ -176,43 +176,33 @@ class Reader(object):
                                                          hidden_size, self.character, separator_list,\
                                                          dict_list, MODEL_PATH, device = self.device)
 
-    def readtext(self, file_name, decoder = 'greedy', beamWidth= 5, batch_size = 1, contrast_ths = 0.1,\
+    def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1, contrast_ths = 0.1,\
                  adjust_contrast = 0.5, filter_ths = 0.003, workers = 0):
-        text_box = get_textbox(self.detector, file_name, canvas_size, mag_ratio, text_threshold,\
-                               link_threshold, low_text, poly, self.device)
-        horizontal_list, free_list = group_text_box(text_box, width_ths = 0.5, add_margin = 0.1)
-
-        # should add filter to screen small box out
-
-        image_list, max_width = get_image_list(horizontal_list, free_list, file_name, model_height = imgH)
-
-        ignore_char = ''.join(set(self.character)-self.lang_char-set(number)-set(symbol))
-
-        if self.model_lang in ['chinese_tra','chinese_sim', 'japanese', 'korean']: decoder = 'greedy'
-        result = get_text(self.character, imgH, max_width, self.recognizer, self.converter, image_list,\
-                      ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
-                      workers, self.device)
-        return result
-
-    def read_from_image(self, file, decoder = 'greedy', beamWidth= 5, batch_size = 1, contrast_ths = 0.1,\
-                 adjust_contrast = 0.5, filter_ths = 0.003, workers = 0):
-
         '''
         Parameters:
-        file: a byte stream object
+        file: file path or numpy-array or a byte stream object
         '''
-        
-        nparr = np.frombuffer(file, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        text_box = textbox_from_image(self.detector, image, canvas_size, mag_ratio, text_threshold,\
+        if type(image) == str:
+            img = loadImage(image)
+            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+        elif type(image) == bytes:
+            nparr = np.frombuffer(image, np.uint8)
+            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        elif type(image) == np.ndarray:
+            img = image
+            img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        text_box = get_textbox(self.detector, img, canvas_size, mag_ratio, text_threshold,\
                                link_threshold, low_text, poly, self.device)
-
         horizontal_list, free_list = group_text_box(text_box, width_ths = 0.5, add_margin = 0.1)
 
         # should add filter to screen small box out
-        image_list, max_width = image_list_from_array(horizontal_list, free_list, image, model_height = imgH)
+
+        image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
 
         ignore_char = ''.join(set(self.character)-self.lang_char-set(number)-set(symbol))
 
