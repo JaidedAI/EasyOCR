@@ -51,7 +51,7 @@ reader = easyocr.Reader(['th','en'])
 reader.readtext('test.jpg')
 ```
 
-Note: Instead of filepath 'test.jpg', you can also pass Opencv image object or image file as bytes.
+Note: Instead of filepath 'test.jpg', you can also pass OpenCV image object or image file as bytes.
 
 Model weight for chosen language will be automatically downloaded or you can
 download it manually from the following links and put it in 'model' folder
