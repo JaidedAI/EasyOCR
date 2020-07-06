@@ -1,7 +1,7 @@
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list
+from .utils import group_text_box, get_image_list, calculate_md5
 import numpy as np
 import cv2
 import torch
@@ -33,13 +33,13 @@ symbol  = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
 en_char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 model_url = {
-    'detector': 'https://www.jaided.ai/read_download/craft_mlt_25k.pth',
-    'latin.pth': 'https://www.jaided.ai/read_download/latin.pth',
-    'chinese.pth': 'https://www.jaided.ai/read_download/chinese.pth',
-    'chinese_sim.pth': 'https://www.jaided.ai/read_download/chinese_sim.pth',
-    'japanese.pth': 'https://www.jaided.ai/read_download/japanese.pth',
-    'korean.pth': 'https://www.jaided.ai/read_download/korean.pth',
-    'thai.pth': 'https://www.jaided.ai/read_download/thai.pth',
+    'detector': ('https://www.jaided.ai/read_download/craft_mlt_25k.pth', '2f8227d2def4037cdb3b34389dcf9ec1'),
+    'latin.pth': ('https://www.jaided.ai/read_download/latin.pth', 'fb91b9abf65aeeac95a172291b4a6176'),
+    'chinese.pth': ('https://www.jaided.ai/read_download/chinese.pth', 'dfba8e364cd98ed4fed7ad54d71e3965'),
+    'chinese_sim.pth': ('https://www.jaided.ai/read_download/chinese_sim.pth', '0e19a9d5902572e5237b04ee29bdb636'),
+    'japanese.pth': ('https://www.jaided.ai/read_download/japanese.pth', '6d891a4aad9cb7f492809515e4e9fd2e'),
+    'korean.pth': ('https://www.jaided.ai/read_download/korean.pth', '45b3300e0f04ce4d03dda9913b20c336'),
+    'thai.pth': ('https://www.jaided.ai/read_download/thai.pth', '40a06b563a2b3d7897e2d19df20dc709'),
 }
 
 
@@ -159,16 +159,30 @@ class Reader(object):
         self.lang_char = set(self.lang_char)
 
         MODEL_PATH = os.path.join(MODULE_PATH, 'model', model_file)
-
+        CORRUPT_MSG = 'MD5 hash mismatch, possible file corruption'
         if os.path.isfile(DETECTOR_PATH) == False:
             print('Downloading detection model, please wait')
-            urllib.request.urlretrieve(model_url['detector'] , DETECTOR_PATH)
+            urllib.request.urlretrieve(model_url['detector'][0] , DETECTOR_PATH)
+            assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
             print('Download complete')
-
+        elif calculate_md5(DETECTOR_PATH) != model_url['detector'][1]:
+            print(CORRUPT_MSG)
+            os.remove(DETECTOR_PATH)
+            print('Re-downloading the detection model, please wait')
+            urllib.request.urlretrieve(model_url['detector'][0], DETECTOR_PATH)
+            assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
         # check model file
         if os.path.isfile(MODEL_PATH) == False:
             print('Downloading recognition model, please wait')
-            urllib.request.urlretrieve(model_url[model_file], MODEL_PATH)
+            urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
+            assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
+            print('Download complete')
+        elif calculate_md5(MODEL_PATH) != model_url[model_file][1]:
+            print(CORRUPT_MSG)
+            os.remove(MODEL_PATH)
+            print('Re-downloading the recognition model, please wait')
+            urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
+            assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
             print('Download complete')
 
         self.detector = get_detector(DETECTOR_PATH, self.device)
