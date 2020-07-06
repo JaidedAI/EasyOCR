@@ -4,6 +4,7 @@ import numpy as np
 import math
 import cv2
 from PIL import Image
+import hashlib
 
 def consecutive(data, mode ='first', stepsize=1):
     group = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
@@ -493,3 +494,10 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64):
 
     image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
+
+def calculate_md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
