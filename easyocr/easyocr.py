@@ -175,14 +175,14 @@ class Reader(object):
         if os.path.isfile(MODEL_PATH) == False:
             print('Downloading recognition model, please wait')
             urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
-            assert calculate_md5(MODEL_PATH) != model_url[model_file][1], CORRUPT_MSG
+            assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
             print('Download complete')
         elif calculate_md5(MODEL_PATH) != model_url[model_file][1]:
             print(CORRUPT_MSG)
             os.remove(MODEL_PATH)
             print('Re-downloading the recognition model, please wait')
             urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
-            assert calculate_md5(MODEL_PATH) != model_url[model_file][1], CORRUPT_MSG
+            assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
             print('Download complete')
 
         self.detector = get_detector(DETECTOR_PATH, self.device)
