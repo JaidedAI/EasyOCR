@@ -8,7 +8,8 @@ import torch
 import urllib.request
 import os
 
-MODULE_PATH = os.path.dirname(__file__)
+MODULE_PATH = os.environ.get("MODULE_PATH", default=
+                             os.path.expanduser("~/.EasyOCR/"))
 
 # detector parameters
 DETECTOR_PATH = os.path.join(MODULE_PATH, 'model', 'craft_mlt_25k.pth')
