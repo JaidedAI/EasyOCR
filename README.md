@@ -54,7 +54,7 @@ reader.readtext('test.jpg')
 Note: Instead of filepath 'test.jpg', you can also pass OpenCV image object or image file as bytes.
 
 Model weight for chosen language will be automatically downloaded or you can
-download it manually from the following links and put it in 'model' folder
+download it manually from the following links and put it in '~/.EasyOCR/model' folder
 
 [text detection model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
 
