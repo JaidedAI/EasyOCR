@@ -8,6 +8,7 @@ import torch
 import urllib.request
 import os
 
+BASE_PATH = os.path.dirname(__file__)
 MODULE_PATH = os.environ.get("MODULE_PATH", default=
                              os.path.expanduser("~/.EasyOCR/"))
 
@@ -95,7 +96,7 @@ class Reader(object):
             model_file = 'latin.pth'
 
         elif  self.model_lang == 'chinese_tra':
-            char_file = os.path.join(MODULE_PATH, 'character', "ch_tra_char.txt")
+            char_file = os.path.join(BASE_PATH, 'character', "ch_tra_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 ch_tra_list =  input_file.read().splitlines()
                 ch_tra_char = ''.join(ch_tra_list)
@@ -103,7 +104,7 @@ class Reader(object):
             model_file = 'chinese.pth'
 
         elif  self.model_lang == 'chinese_sim':
-            char_file = os.path.join(MODULE_PATH, 'character', "ch_sim_char.txt")
+            char_file = os.path.join(BASE_PATH, 'character', "ch_sim_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 ch_sim_list =  input_file.read().splitlines()
                 ch_sim_char = ''.join(ch_sim_list)
@@ -111,7 +112,7 @@ class Reader(object):
             model_file = 'chinese_sim.pth'
 
         elif  self.model_lang == 'japanese':
-            char_file = os.path.join(MODULE_PATH, 'character', "ja_char.txt")
+            char_file = os.path.join(BASE_PATH, 'character', "ja_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 ja_list =  input_file.read().splitlines()
                 ja_char = ''.join(ja_list)
@@ -119,7 +120,7 @@ class Reader(object):
             model_file = 'japanese.pth'
 
         elif  self.model_lang == 'korean':
-            char_file = os.path.join(MODULE_PATH, 'character', "ko_char.txt")
+            char_file = os.path.join(BASE_PATH, 'character', "ko_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 ko_list =  input_file.read().splitlines()
                 ko_char = ''.join(ko_list)
@@ -149,11 +150,11 @@ class Reader(object):
 
         dict_list = {}
         for lang in lang_list:
-            dict_list[lang] = os.path.join(MODULE_PATH, 'dict', lang + ".txt")
+            dict_list[lang] = os.path.join(BASE_PATH, 'dict', lang + ".txt")
 
         self.lang_char = []
         for lang in lang_list:
-            char_file = os.path.join(MODULE_PATH, 'character', lang + "_char.txt")
+            char_file = os.path.join(BASE_PATH, 'character', lang + "_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 char_list =  input_file.read().splitlines()
             self.lang_char += char_list
