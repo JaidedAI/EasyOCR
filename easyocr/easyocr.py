@@ -7,10 +7,12 @@ import cv2
 import torch
 import urllib.request
 import os
+from pathlib import Path
 
 BASE_PATH = os.path.dirname(__file__)
 MODULE_PATH = os.environ.get("MODULE_PATH", default=
                              os.path.expanduser("~/.EasyOCR/"))
+Path(MODULE_PATH+'/model').mkdir(parents=True, exist_ok=True)
 
 # detector parameters
 DETECTOR_PATH = os.path.join(MODULE_PATH, 'model', 'craft_mlt_25k.pth')

@@ -8,7 +8,7 @@ setup(
     name='easyocr',
     packages=['easyocr'],
     include_package_data=True,
-    version='1.1.2',
+    version='1.1.3',
     install_requires=['torch', 'torchvision','opencv-python', 'scipy', 'numpy','Pillow<7.0','scikit-image'],
     license='Apache License 2.0',
     description='End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution',
