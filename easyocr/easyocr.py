@@ -158,7 +158,8 @@ class Reader(object):
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 char_list =  input_file.read().splitlines()
             self.lang_char += char_list
-        self.lang_char = set(self.lang_char)
+        self.lang_char = set(self.lang_char).union(set(number+symbol))
+        self.lang_char = ''.join(self.lang_char)
 
         MODEL_PATH = os.path.join(MODULE_PATH, 'model', model_file)
         CORRUPT_MSG = 'MD5 hash mismatch, possible file corruption'
@@ -192,8 +193,9 @@ class Reader(object):
                                                          hidden_size, self.character, separator_list,\
                                                          dict_list, MODEL_PATH, device = self.device)
 
-    def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1, contrast_ths = 0.1,\
-                 adjust_contrast = 0.5, filter_ths = 0.003, workers = 0):
+    def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
+                 contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
+                 workers = 0, whitelist = None, blacklist = None):
         '''
         Parameters:
         file: file path or numpy-array or a byte stream object
@@ -220,7 +222,12 @@ class Reader(object):
 
         image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
 
-        ignore_char = ''.join(set(self.character)-self.lang_char-set(number)-set(symbol))
+        if whitelist:
+            ignore_char = ''.join(set(self.character)-set(whitelist))
+        elif blacklist:
+            ignore_char = ''.join(set(blacklist))
+        else:
+            ignore_char = ''.join(set(self.character)-set(self.lang_char))
 
         if self.model_lang in ['chinese_tra','chinese_sim', 'japanese', 'korean']: decoder = 'greedy'
         result = get_text(self.character, imgH, max_width, self.recognizer, self.converter, image_list,\
