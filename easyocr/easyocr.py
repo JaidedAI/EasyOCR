@@ -1,7 +1,7 @@
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5
+from .utils import group_text_box, get_image_list, calculate_md5, eprint
 import numpy as np
 import cv2
 import torch
@@ -53,10 +53,10 @@ class Reader(object):
 
         if gpu is False:
             self.device = 'cpu'
-            print('Using CPU. Note: This module is much faster with a GPU.')
+            eprint('Using CPU. Note: This module is much faster with a GPU.')
         elif not torch.cuda.is_available():
             self.device = 'cpu'
-            print('CUDA not available - defaulting to CPU. Note: This module is much faster with a GPU.')
+            eprint('CUDA not available - defaulting to CPU. Note: This module is much faster with a GPU.')
         elif gpu is True:
             self.device = 'cuda'
         else:
@@ -148,7 +148,7 @@ class Reader(object):
             self.character = ''.join(separator_char) + symbol + en_char + th_char + th_number
             model_file = 'thai.pth'
         else:
-            print('invalid language')
+            eprint('invalid language')
 
         dict_list = {}
         for lang in lang_list:
@@ -166,29 +166,29 @@ class Reader(object):
         MODEL_PATH = os.path.join(MODULE_PATH, 'model', model_file)
         CORRUPT_MSG = 'MD5 hash mismatch, possible file corruption'
         if os.path.isfile(DETECTOR_PATH) == False:
-            print('Downloading detection model, please wait')
+            eprint('Downloading detection model, please wait')
             urllib.request.urlretrieve(model_url['detector'][0] , DETECTOR_PATH)
             assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
-            print('Download complete')
+            eprint('Download complete')
         elif calculate_md5(DETECTOR_PATH) != model_url['detector'][1]:
-            print(CORRUPT_MSG)
+            eprint(CORRUPT_MSG)
             os.remove(DETECTOR_PATH)
-            print('Re-downloading the detection model, please wait')
+            eprint('Re-downloading the detection model, please wait')
             urllib.request.urlretrieve(model_url['detector'][0], DETECTOR_PATH)
             assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
         # check model file
         if os.path.isfile(MODEL_PATH) == False:
-            print('Downloading recognition model, please wait')
+            eprint('Downloading recognition model, please wait')
             urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
             assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
-            print('Download complete')
+            eprint('Download complete')
         elif calculate_md5(MODEL_PATH) != model_url[model_file][1]:
-            print(CORRUPT_MSG)
+            eprint(CORRUPT_MSG)
             os.remove(MODEL_PATH)
-            print('Re-downloading the recognition model, please wait')
+            eprint('Re-downloading the recognition model, please wait')
             urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
             assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
-            print('Download complete')
+            eprint('Download complete')
 
         self.detector = get_detector(DETECTOR_PATH, self.device)
         self.recognizer, self.converter = get_recognizer(input_channel, output_channel,\
