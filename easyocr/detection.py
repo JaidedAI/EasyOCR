@@ -33,6 +33,7 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     x = Variable(x.unsqueeze(0))                # [c, h, w] to [b, c, h, w]
     x = x.to(device)
 
+
     # forward pass
     with torch.no_grad():
         y, feature = net(x)

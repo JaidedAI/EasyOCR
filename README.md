@@ -1,6 +1,6 @@
 # Easy OCR
 
-Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
+Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean, and Thai.
 
 ## Examples
 
@@ -41,7 +41,7 @@ For latest development release,
 pip install git+git://github.com/jaidedai/easyocr.git
 ```
 
-Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
+Note: For Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
 
 ## Usage
 
