@@ -21,7 +21,7 @@ Latin (la), Lithuanian (lt),
 Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
 Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk) (need revisit), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
-Turkish (tr), Uzbek (uz), Vietnamese (vi)
+Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
 
 List of characters is in folder easyocr/character. If you are native speaker
 of any language and think we should add or remove any character,
@@ -113,7 +113,7 @@ Please create issue to report bug or suggest new feature. Pull requests are welc
 
 To request a new language support, I need you to send a PR with 2 following files
 
-1. In folder easyocr/character, We need 'yourlanguagecode_char.txt' that contains list of all Arabic characters. Please see format/example from other files in that folder.
+1. In folder easyocr/character, We need 'yourlanguagecode_char.txt' that contains list of all characters. Please see format/example from other files in that folder.
 2. In folder easyocr/dict, We need 'yourlanguagecode.txt' that contains list of words in your language. On average we have ~30000 words per language with more than 50000 words for popular one. More is better in this file.
 
 If your language has unique elements (such as 1. Arabic: characters change form when attach to each other + write from right to left 2. Thai: Some characters need to be above the line and some below), please educate me with your best ability and/or give useful links. It is important to take care of the detail to achieve a system that really works.
