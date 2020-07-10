@@ -7,8 +7,14 @@ MIT License
 import numpy as np
 from skimage import io
 import cv2
+from urllib.request import urlretrieve
 
 def loadImage(img_file):
+    """
+    Load a local file or a URL
+    """
+    if img_file.startswith('http://') or img_file.startswith('https://'):
+        img_file, _ = urlretrieve(img_file)
     img = io.imread(img_file)           # RGB order
     if img.shape[0] == 2: img = img[0]
     if len(img.shape) == 2 : img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
