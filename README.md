@@ -4,6 +4,9 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 ## Examples
 
+See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)
+
 ![example](examples/example.png)
 
 ![example2](examples/example2.png)
