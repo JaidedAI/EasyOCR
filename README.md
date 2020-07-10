@@ -125,3 +125,5 @@ To request a new language support, I need you to send a PR with 2 following file
 If your language has unique elements (such as 1. Arabic: characters change form when attach to each other + write from right to left 2. Thai: Some characters need to be above the line and some below), please educate me with your best ability and/or give useful links. It is important to take care of the detail to achieve a system that really works.
 
 Lastly, please understand that my priority will have to go to popular language or set of languages that share most of characters together (also tell me if your language share a lot of characters with other). It takes me at least a week to work for new model. You may have to wait a while for new model to be released.
+
+See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issues/91)
