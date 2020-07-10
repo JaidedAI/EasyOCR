@@ -204,8 +204,13 @@ class Reader(object):
         '''
 
         if type(image) == str:
-            img = loadImage(image)
-            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+            img = loadImage(image)  # can accept URL
+            if image.startswith('http://') or image.startswith('https://'):
+                tmp, _ = urllib.request.urlretrieve(image)
+                img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
+                os.remove(tmp)
+            else:
+                img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
         elif type(image) == bytes:
             nparr = np.frombuffer(image, np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
