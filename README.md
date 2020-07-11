@@ -1,38 +1,47 @@
-# Jaided Read
+# Easy OCR
 
-End-to-End Multilingual Optical Character Recognition (OCR) Solution
+Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
+
+## Examples
+
+See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)
 
 ![example](examples/example.png)
 
+![example2](examples/example2.png)
+
 ## Supported Languages
 
-We are currently supporting following 39 languages.
+We are currently supporting following 42 languages.
 
-Afrikaans (af), Azerbaijani (az), Bosnian (bs), Czech (cs), Welsh (cy),
+Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
+Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
 French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
-Icelandic (is), Italian (it), Kurdish (ku),  Latin (la), Lithuanian (lt),
+Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
+Latin (la), Lithuanian (lt),
 Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
-Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk), Slovenian (sl),
+Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk) (need revisit), Slovenian (sl),
 Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
-Turkish (tr), Uzbek (uz), Vietnamese (vi)
+Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
 
-List of characters is in folder jaidedread/character. If you are native speaker
+List of characters is in folder easyocr/character. If you are native speaker
 of any language and think we should add or remove any character,
-please create an issue.
+please create an issue and/or pull request (like [this one](https://github.com/JaidedAI/EasyOCR/pull/15)).
 
 ## Installation
 
 Install using `pip` for stable release,
 
 ``` bash
-pip install jaidedread
+pip install easyocr
 ```
 
 For latest development release,
 
 ``` bash
-pip install git+git://github.com/jaidedai/jaidedread.git
+pip install git+git://github.com/jaidedai/easyocr.git
 ```
 
 Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
@@ -40,30 +49,55 @@ Note: for Windows, please install torch and torchvision first by following offic
 ## Usage
 
 ``` python
-import jaidedread
-reader = jaidedread.Reader(['th','en'])
-reader.readtext('test.jpg')
+import easyocr
+reader = easyocr.Reader(['ch_tra','en'])
+reader.readtext('chinese.jpg')
 ```
-
-Model weight for chosen language will be automatically downloaded or you can
-download it manually from  https://jaided.ai/read_download and put it
-in 'model' folder.
 
 Output will be in list format, each item represents bounding box, text and confident level, respectively.
 
 ``` bash
-[([[1344, 439], [2168, 439], [2168, 580], [1344, 580]], 'ใจเด็ด', 0.4542357623577118),
- ([[1333, 562], [2169, 562], [2169, 709], [1333, 709]], 'Project', 0.9557611346244812)]
+[([[189, 75], [469, 75], [469, 165], [189, 165]], '愚園路', 0.97784423828125),
+ ([[86, 80], [134, 80], [134, 128], [86, 128]], '西', 0.9951117038726807),
+ ([[517, 81], [565, 81], [565, 123], [517, 123]], '東', 0.9558971524238586),
+ ([[78, 126], [136, 126], [136, 156], [78, 156]], '315', 0.6018078923225403),
+ ([[514, 126], [574, 126], [574, 156], [514, 156]], '309', 0.8362029194831848),
+ ([[226, 170], [414, 170], [414, 220], [226, 220]], 'Yuyuan Rd.', 0.8912249207496643),
+ ([[79, 173], [125, 173], [125, 213], [79, 213]], 'W', 0.9854364395141602),
+ ([[529, 173], [569, 173], [569, 213], [529, 213]], 'E', 0.5593774318695068)]
 ```
 
-There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set set `workers` and `batch_size`. Current version converts image into grey scale for recognition model. So contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`.
+Note: Instead of filepath 'chinese.jpg', you can also pass OpenCV image object (numpy array) or image file as bytes.
 
-See full documentation at https://jaided.ai/read/doc
+Model weight for chosen language will be automatically downloaded or you can
+download it manually from the following links and put it in '~/.EasyOCR/model' folder
+
+[text detection model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
+
+[latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
+
+[chinese (traditional) model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
+
+[chinese (simplified) model](https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing)
+
+[japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
+
+[korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
+
+[thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
+
+
+In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
+
+``` python
+reader = easyocr.Reader(['th','en'], gpu = False)
+```
+
+There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set `workers` and `batch_size`. Current version converts image into grey scale for recognition model, so contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`. `whitelist` and `blacklist` accept input in string (like this blacklist = '!&$%').
 
 ## To be implemented
 
-1. Language packs: Chinese, Japanese, Korean group + Russian-based languages +
-Arabic + etc.
+1. Language packs: Hindi, Arabic, Cyrillic alphabet, etc.
 2. Language model for better decoding
 3. Better documentation and api
 
@@ -79,7 +113,21 @@ Beam search code is based on this [repository](https://github.com/githubharald/C
 
 And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
 
+## Want To Contribute?
 
-## Citations
+Let's advance humanity together by making AI available to everyone!
 
-If you use `jaidedread` in your project/research, please consider citing the library as follows ... (link to be created)
+Please create issue to report bug or suggest new feature. Pull requests are welcome. Or if you found this library useful, just tell your friend about it.
+
+## Guideline for new language request
+
+To request a new language support, I need you to send a PR with 2 following files
+
+1. In folder easyocr/character, We need 'yourlanguagecode_char.txt' that contains list of all characters. Please see format/example from other files in that folder.
+2. In folder easyocr/dict, We need 'yourlanguagecode.txt' that contains list of words in your language. On average we have ~30000 words per language with more than 50000 words for popular one. More is better in this file.
+
+If your language has unique elements (such as 1. Arabic: characters change form when attach to each other + write from right to left 2. Thai: Some characters need to be above the line and some below), please educate me with your best ability and/or give useful links. It is important to take care of the detail to achieve a system that really works.
+
+Lastly, please understand that my priority will have to go to popular language or set of languages that share most of characters together (also tell me if your language share a lot of characters with other). It takes me at least a week to work for new model. You may have to wait a while for new model to be released.
+
+See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issues/91)

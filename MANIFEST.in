@@ -1,6 +1,6 @@
 include LICENSE.txt
 include README.md
 
-include jaidedread/model/*
-include jaidedread/character/*
-include jaidedread/dict/*
+include easyocr/model/*
+include easyocr/character/*
+include easyocr/dict/*
