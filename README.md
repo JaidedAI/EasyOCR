@@ -54,6 +54,19 @@ reader = easyocr.Reader(['ch_tra','en'])
 reader.readtext('chinese.jpg')
 ```
 
+Output will be in list format, each item represents bounding box, text and confident level, respectively.
+
+``` bash
+[([[189, 75], [469, 75], [469, 165], [189, 165]], '愚園路', 0.97784423828125),
+ ([[86, 80], [134, 80], [134, 128], [86, 128]], '西', 0.9951117038726807),
+ ([[517, 81], [565, 81], [565, 123], [517, 123]], '東', 0.9558971524238586),
+ ([[78, 126], [136, 126], [136, 156], [78, 156]], '315', 0.6018078923225403),
+ ([[514, 126], [574, 126], [574, 156], [514, 156]], '309', 0.8362029194831848),
+ ([[226, 170], [414, 170], [414, 220], [226, 220]], 'Yuyuan Rd.', 0.8912249207496643),
+ ([[79, 173], [125, 173], [125, 213], [79, 213]], 'W', 0.9854364395141602),
+ ([[529, 173], [569, 173], [569, 213], [529, 213]], 'E', 0.5593774318695068)]
+```
+
 Note: Instead of filepath 'chinese.jpg', you can also pass OpenCV image object (numpy array) or image file as bytes.
 
 Model weight for chosen language will be automatically downloaded or you can
@@ -73,18 +86,6 @@ download it manually from the following links and put it in '~/.EasyOCR/model' f
 
 [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
 
-Output will be in list format, each item represents bounding box, text and confident level, respectively.
-
-``` bash
-[([[189, 75], [469, 75], [469, 165], [189, 165]], '愚園路', 0.97784423828125),
- ([[86, 80], [134, 80], [134, 128], [86, 128]], '西', 0.9951117038726807),
- ([[517, 81], [565, 81], [565, 123], [517, 123]], '東', 0.9558971524238586),
- ([[78, 126], [136, 126], [136, 156], [78, 156]], '315', 0.6018078923225403),
- ([[514, 126], [574, 126], [574, 156], [514, 156]], '309', 0.8362029194831848),
- ([[226, 170], [414, 170], [414, 220], [226, 220]], 'Yuyuan Rd.', 0.8912249207496643),
- ([[79, 173], [125, 173], [125, 213], [79, 213]], 'W', 0.9854364395141602),
- ([[529, 173], [569, 173], [569, 213], [529, 213]], 'E', 0.5593774318695068)]
-```
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
