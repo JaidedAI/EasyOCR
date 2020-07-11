@@ -5,6 +5,7 @@ import math
 import cv2
 from PIL import Image
 import hashlib
+import sys
 
 def consecutive(data, mode ='first', stepsize=1):
     group = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
@@ -501,3 +502,6 @@ def calculate_md5(fname):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+def eprint(str):
+    print(str, file=sys.stderr)
