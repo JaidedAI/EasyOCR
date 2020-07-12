@@ -13,21 +13,21 @@ See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
 
 ## Supported Languages
 
-We are currently supporting following 42 languages.
+We are currently supporting the following 45 languages.
 
 Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
 Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
 French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
 Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
-Latin (la), Lithuanian (lt),
-Latvian (lv), Maori (mi), Malay (ms), Maltese (mt), Dutch (nl), Norwegian (no),
-Polish (pl), Portuguese (pt),Romanian (ro), Slovak (sk) (need revisit), Slovenian (sl),
-Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
-Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
+Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Malay (ms), Maltese (mt),
+Dutch (nl), Norwegian (no), Occitan (oc), Polish (pl), Portuguese (pt),
+Romanian (ro), Serbian (latin)(rs_latin), Slovak (sk) (need revisit),
+Slovenian (sl), Albanian (sq), Swedish (sv),Swahili (sw), Thai (th),
+Tagalog (tl), Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
 
-List of characters is in folder easyocr/character. If you are native speaker
-of any language and think we should add or remove any character,
+List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
+If you are native speaker of any language and think we should add or remove any character,
 please create an issue and/or pull request (like [this one](https://github.com/JaidedAI/EasyOCR/pull/15)).
 
 ## Installation
@@ -50,42 +50,38 @@ Note: for Windows, please install torch and torchvision first by following offic
 
 ``` python
 import easyocr
-reader = easyocr.Reader(['ch_tra','en'])
+reader = easyocr.Reader(['ch_sim','en'])
 reader.readtext('chinese.jpg')
 ```
 
 Output will be in list format, each item represents bounding box, text and confident level, respectively.
 
 ``` bash
-[([[189, 75], [469, 75], [469, 165], [189, 165]], '愚園路', 0.97784423828125),
- ([[86, 80], [134, 80], [134, 128], [86, 128]], '西', 0.9951117038726807),
- ([[517, 81], [565, 81], [565, 123], [517, 123]], '東', 0.9558971524238586),
- ([[78, 126], [136, 126], [136, 156], [78, 156]], '315', 0.6018078923225403),
- ([[514, 126], [574, 126], [574, 156], [514, 156]], '309', 0.8362029194831848),
- ([[226, 170], [414, 170], [414, 220], [226, 220]], 'Yuyuan Rd.', 0.8912249207496643),
- ([[79, 173], [125, 173], [125, 213], [79, 213]], 'W', 0.9854364395141602),
- ([[529, 173], [569, 173], [569, 213], [529, 213]], 'E', 0.5593774318695068)]
+[([[189, 75], [469, 75], [469, 165], [189, 165]], '愚园路', 0.3754989504814148),
+ ([[86, 80], [134, 80], [134, 128], [86, 128]], '西', 0.40452659130096436),
+ ([[517, 81], [565, 81], [565, 123], [517, 123]], '东', 0.9989598989486694),
+ ([[78, 126], [136, 126], [136, 156], [78, 156]], '315', 0.8125889301300049),
+ ([[514, 126], [574, 126], [574, 156], [514, 156]], '309', 0.4971577227115631),
+ ([[226, 170], [414, 170], [414, 220], [226, 220]], 'Yuyuan Rd.', 0.8261902332305908),
+ ([[79, 173], [125, 173], [125, 213], [79, 213]], 'W', 0.9848111271858215),
+ ([[529, 173], [569, 173], [569, 213], [529, 213]], 'E', 0.8405593633651733)]
 ```
+Note 1: `['ch_sim','en']` is the list of languages you want to read. You can pass
+several languages at once but not all languages can be used together.
+English is compatible with every languages. Languages that share common characters are usually compatible with each other.
 
-Note: Instead of filepath 'chinese.jpg', you can also pass OpenCV image object (numpy array) or image file as bytes.
+Note 2: Instead of filepath `chinese.jpg`, you can also pass OpenCV image object (numpy array) or image file as bytes. URL to raw image is also acceptable.
 
 Model weight for chosen language will be automatically downloaded or you can
 download it manually from the following links and put it in '~/.EasyOCR/model' folder
 
-[text detection model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
-
-[latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
-
-[chinese (traditional) model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
-
-[chinese (simplified) model](https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing)
-
-[japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
-
-[korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
-
-[thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
-
+- [text detection model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
+- [latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
+- [chinese (traditional) model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
+- [chinese (simplified) model](https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing)
+- [japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
+- [korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
+- [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
@@ -93,7 +89,7 @@ In case you do not have GPU or your GPU has low memory, you can run it in CPU mo
 reader = easyocr.Reader(['th','en'], gpu = False)
 ```
 
-There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set `workers` and `batch_size`. Current version converts image into grey scale for recognition model, so contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`. `whitelist` and `blacklist` accept input in string (like this blacklist = '!&$%').
+There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set `workers` and `batch_size`. Current version converts image into grey scale for recognition model, so contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`. `allowlist` and `blocklist` accept input in string (like this blocklist = '!&$%').
 
 ## To be implemented
 
@@ -123,8 +119,12 @@ Please create issue to report bug or suggest new feature. Pull requests are welc
 
 To request a new language support, I need you to send a PR with 2 following files
 
-1. In folder easyocr/character, We need 'yourlanguagecode_char.txt' that contains list of all characters. Please see format/example from other files in that folder.
-2. In folder easyocr/dict, We need 'yourlanguagecode.txt' that contains list of words in your language. On average we have ~30000 words per language with more than 50000 words for popular one. More is better in this file.
+1. In folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character),
+we need 'yourlanguagecode_char.txt' that contains list of all characters. Please see format example from other files in that folder.
+2. In folder [easyocr/dict](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/dict),
+we need 'yourlanguagecode.txt' that contains list of words in your language.
+On average we have ~30000 words per language with more than 50000 words for popular one.
+More is better in this file.
 
 If your language has unique elements (such as 1. Arabic: characters change form when attach to each other + write from right to left 2. Thai: Some characters need to be above the line and some below), please educate me with your best ability and/or give useful links. It is important to take care of the detail to achieve a system that really works.
 
