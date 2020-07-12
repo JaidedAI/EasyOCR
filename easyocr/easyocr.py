@@ -232,9 +232,9 @@ class Reader(object):
         image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
 
         if allowlist:
-            ignore_char = ''.join(set(self.character)-set(whitelist))
+            ignore_char = ''.join(set(self.character)-set(allowlist))
         elif blocklist:
-            ignore_char = ''.join(set(blacklist))
+            ignore_char = ''.join(set(blocklist))
         else:
             ignore_char = ''.join(set(self.character)-set(self.lang_char))
 
