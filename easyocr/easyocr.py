@@ -24,8 +24,10 @@ mag_ratio = 1.
 poly = False
 
 # recognizer parameters
-latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga','hr','hu','id','is','it','ku',\
-            'la','lt','lv','mi','ms','mt','nl','no','pl','pt','ro','sk','sl','sq','sv','sw','tl','tr','uz','vi']
+latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
+                   'hr','hu','id','is','it','ku','la','lt','lv','mi','ms','mt',\
+                   'nl','no','oc','pl','pt','ro','rs_latin','sk','sl','sq',\
+                   'sv','sw','tl','tr','uz','vi']
 all_lang_list = latin_lang_list + ['th','ch_sim','ch_tra','ja','ko']
 imgH = 64
 input_channel = 1
@@ -197,7 +199,7 @@ class Reader(object):
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                 workers = 0, whitelist = None, blacklist = None):
+                 workers = 0, allowlist = None, blocklist = None):
         '''
         Parameters:
         file: file path or numpy-array or a byte stream object
@@ -229,10 +231,10 @@ class Reader(object):
 
         image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
 
-        if whitelist:
-            ignore_char = ''.join(set(self.character)-set(whitelist))
-        elif blacklist:
-            ignore_char = ''.join(set(blacklist))
+        if allowlist:
+            ignore_char = ''.join(set(self.character)-set(allowlist))
+        elif blocklist:
+            ignore_char = ''.join(set(blocklist))
         else:
             ignore_char = ''.join(set(self.character)-set(self.lang_char))
 
