@@ -192,7 +192,7 @@ class Reader(object):
                                                          dict_list, MODEL_PATH, device = self.device)
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\                
+                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1., poly = False,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1):
