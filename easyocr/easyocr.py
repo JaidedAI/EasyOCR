@@ -16,12 +16,6 @@ Path(MODULE_PATH+'/model').mkdir(parents=True, exist_ok=True)
 
 # detector parameters
 DETECTOR_PATH = os.path.join(MODULE_PATH, 'model', 'craft_mlt_25k.pth')
-text_threshold = 0.7
-low_text = 0.4
-link_threshold = 0.4
-canvas_size = 2560
-mag_ratio = 1.
-poly = False
 
 # recognizer parameters
 latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
@@ -198,6 +192,8 @@ class Reader(object):
                                                          dict_list, MODEL_PATH, device = self.device)
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
+                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\                
+                 canvas_size = 2560, mag_ratio = 1., poly = False,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1):
         '''
