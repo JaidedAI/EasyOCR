@@ -72,6 +72,16 @@ English is compatible with every languages. Languages that share common characte
 
 Note 2: Instead of filepath `chinese.jpg`, you can also pass OpenCV image object (numpy array) or image file as bytes. URL to raw image is also acceptable.
 
+You can also set `detail` = 0 for simpler output.
+
+``` python
+reader.readtext('chinese.jpg', detail = 0)
+```
+Result:
+``` bash
+['愚园路', '西', '东', '315', '309', 'Yuyuan Rd.', 'W', 'E']
+```
+
 Model weight for chosen language will be automatically downloaded or you can
 download it manually from the following links and put it in '~/.EasyOCR/model' folder
 

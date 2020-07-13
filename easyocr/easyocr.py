@@ -199,7 +199,7 @@ class Reader(object):
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                 workers = 0, allowlist = None, blocklist = None):
+                 workers = 0, allowlist = None, blocklist = None, detail = 1):
         '''
         Parameters:
         file: file path or numpy-array or a byte stream object
@@ -242,4 +242,8 @@ class Reader(object):
         result = get_text(self.character, imgH, max_width, self.recognizer, self.converter, image_list,\
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                       workers, self.device)
-        return result
+
+        if detail == 0: 
+            return [item[1] for item in result]
+        else:
+            return result
