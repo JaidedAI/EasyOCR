@@ -101,10 +101,10 @@ reader = easyocr.Reader(['th','en'], gpu = False)
 
 There are optional arguments for readtext function, `decoder` can be 'greedy'(default), 'beamsearch', or 'wordbeamsearch'. For 'beamsearch' and 'wordbeamsearch', you can also set `beamWidth` (default=5). Bigger number will be slower but can be more accurate. For multiprocessing, you can set `workers` and `batch_size`. Current version converts image into grey scale for recognition model, so contrast can be an issue. You can try playing with `contrast_ths`, `adjust_contrast` and `filter_ths`. `allowlist` and `blocklist` accept input in string (like this blocklist = '!&$%').
 
-### cli
+### Run on command line
 
 ```shell
-$ easyocr -l ch_sim en -f ./examples/chinese.jpg --detail=1 --gpu=0
+$ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 ```
 
 ## To be implemented
