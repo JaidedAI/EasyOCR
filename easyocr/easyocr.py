@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
@@ -5,12 +7,19 @@ from .utils import group_text_box, get_image_list, calculate_md5, eprint
 import numpy as np
 import cv2
 import torch
-import urllib.request
 import os
-from pathlib import Path
+import sys
+
+if sys.version_info[0] == 2:
+    from io import open
+    from six.moves.urllib.request import urlretrieve
+    from pathlib2 import Path
+else:
+    from urllib.request import urlretrieve
+    from pathlib import Path
 
 BASE_PATH = os.path.dirname(__file__)
-MODULE_PATH = os.environ.get("MODULE_PATH", default=
+MODULE_PATH = os.environ.get("MODULE_PATH",
                              os.path.expanduser("~/.EasyOCR/"))
 Path(MODULE_PATH+'/model').mkdir(parents=True, exist_ok=True)
 
@@ -163,26 +172,26 @@ class Reader(object):
         CORRUPT_MSG = 'MD5 hash mismatch, possible file corruption'
         if os.path.isfile(DETECTOR_PATH) == False:
             eprint('Downloading detection model, please wait')
-            urllib.request.urlretrieve(model_url['detector'][0] , DETECTOR_PATH)
+            urlretrieve(model_url['detector'][0] , DETECTOR_PATH)
             assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
             eprint('Download complete')
         elif calculate_md5(DETECTOR_PATH) != model_url['detector'][1]:
             eprint(CORRUPT_MSG)
             os.remove(DETECTOR_PATH)
             eprint('Re-downloading the detection model, please wait')
-            urllib.request.urlretrieve(model_url['detector'][0], DETECTOR_PATH)
+            urlretrieve(model_url['detector'][0], DETECTOR_PATH)
             assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
         # check model file
         if os.path.isfile(MODEL_PATH) == False:
             eprint('Downloading recognition model, please wait')
-            urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
+            urlretrieve(model_url[model_file][0], MODEL_PATH)
             assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
             eprint('Download complete')
         elif calculate_md5(MODEL_PATH) != model_url[model_file][1]:
             eprint(CORRUPT_MSG)
             os.remove(MODEL_PATH)
             eprint('Re-downloading the recognition model, please wait')
-            urllib.request.urlretrieve(model_url[model_file][0], MODEL_PATH)
+            urlretrieve(model_url[model_file][0], MODEL_PATH)
             assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
             eprint('Download complete')
 
@@ -204,7 +213,7 @@ class Reader(object):
         if type(image) == str:
             img = loadImage(image)  # can accept URL
             if image.startswith('http://') or image.startswith('https://'):
-                tmp, _ = urllib.request.urlretrieve(image)
+                tmp, _ = urlretrieve(image)
                 img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
                 os.remove(tmp)
             else:
@@ -235,7 +244,7 @@ class Reader(object):
             ignore_char = ''.join(set(self.character)-set(self.lang_char))
 
         if self.model_lang in ['chinese_tra','chinese_sim', 'japanese', 'korean']: decoder = 'greedy'
-        result = get_text(self.character, imgH, max_width, self.recognizer, self.converter, image_list,\
+        result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                       workers, self.device)
 
