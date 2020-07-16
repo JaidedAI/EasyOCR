@@ -201,10 +201,12 @@ class Reader(object):
                                                          dict_list, MODEL_PATH, device = self.device)
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
-                 canvas_size = 2560, mag_ratio = 1., poly = False,\
+                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                 workers = 0, allowlist = None, blocklist = None, detail = 1):
+                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
+                 canvas_size = 2560, mag_ratio = 1.,\
+                 slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
+                 width_ths = 0.5, add_margin = 0.1):
         '''
         Parameters:
         file: file path or numpy-array or a byte stream object
@@ -229,8 +231,8 @@ class Reader(object):
             img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         text_box = get_textbox(self.detector, img, canvas_size, mag_ratio, text_threshold,\
-                               link_threshold, low_text, poly, self.device)
-        horizontal_list, free_list = group_text_box(text_box, width_ths = 0.5, add_margin = 0.1)
+                               link_threshold, low_text, False, self.device)
+        horizontal_list, free_list = group_text_box(text_box, slope_ths, ycenter_ths, height_ths, width_ths, add_margin)
 
         # should add filter to screen small box out
 
@@ -248,7 +250,7 @@ class Reader(object):
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                       workers, self.device)
 
-        if detail == 0: 
+        if detail == 0:
             return [item[1] for item in result]
         else:
             return result
