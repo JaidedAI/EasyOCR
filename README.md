@@ -103,7 +103,7 @@ In case you do not have GPU or your GPU has low memory, you can run it in CPU mo
 reader = easyocr.Reader(['th','en'], gpu = False)
 ```
 
-See [Documentation](#API_Documentation)
+See [Documentation](#API-Documentation)
 
 #### Run on command line
 
