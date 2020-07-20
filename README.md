@@ -20,7 +20,7 @@ See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
 
 We are currently supporting the following 45 languages.
 
-Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
+Afrikaans (af), Azerbaijani (az), Bosnian (bs), Bulgarian (bg), Simplified Chinese (ch_sim),
 Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
 French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
