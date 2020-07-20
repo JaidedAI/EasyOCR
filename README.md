@@ -203,24 +203,25 @@ Contrast, Text Detection and Bounding Box Merging.
 > * **detail** (int, default = 1) - Set this to 0 for simple output
 >
 > **Parameters 2: Contrast**
-> * **contrast_ths** (float, default = 0.1)
-> * **adjust_contrast** (float, default = 0.5)
-> * **filter_ths** (float, default = 0.003)
+> * **contrast_ths** (float, default = 0.1) - Text box with contrast lower than this value will be passed into model 2 times. First is with original image and second with contrast adjusted to 'adjust_contrast' value. The one with more confident level will be returned as a result.
+> * **adjust_contrast** (float, default = 0.5) - target contrast level for low contrast text box
 >
 > **Parameters 3: Text Detection (from CRAFT)**
-> * **text_threshold** (float, default = 0.7)
-> * **low_text** (float, default = 0.4)
-> * **link_threshold** (float, default = 0.4)
-> * **canvas_size** (int, default = 2560)
-> * **mag_ratio** (float, default = 1)
+> * **text_threshold** (float, default = 0.7) - Text confidence threshold
+> * **low_text** (float, default = 0.4) -  Text low-bound score
+> * **link_threshold** (float, default = 0.4) - Link confidence threshold
+> * **canvas_size** (int, default = 2560) - Maximum image size. Image bigger than this value will be resized down.  
+> * **mag_ratio** (float, default = 1) - Image magnification ratio
 >
 > **Parameters 4: Bounding Box Merging**
 >
+> This set of parameter controls when adjacent bounding boxes merge with each other. Every parameters except 'slope_ths' is in the unit of box height.
+>
 > ![width_ths](examples/width_ths.png)
-> * **slope_ths** (float, default = 0.1)
-> * **ycenter_ths** (float, default = 0.5)
-> * **height_ths** (float, default = 0.5)
-> * **width_ths** (float, default = 0.5)
-> * **add_margin** (float, default = 0.1)
+> * **slope_ths** (float, default = 0.1) - Maximum slope (delta y/delta x) to considered merging. Low value means tiled boxes will not be merged.
+> * **ycenter_ths** (float, default = 0.5) - Maximum shift in y direction. Boxes with different level should not be merged.
+> * **height_ths** (float, default = 0.5) - Maximum different in box height. Boxes with very different text size should not be merged.
+> * **width_ths** (float, default = 0.5) - Maximum horizontal distance to merge boxes.
+> * **add_margin** (float, default = 0.1) - Extend bounding boxes in all direction by certain value. This is important for language with complex script (E.g. Thai).
 >
 > **Return** (list)
