@@ -2,7 +2,8 @@
 
 [![PyPI Status](https://badge.fury.io/py/easyocr.svg)](https://badge.fury.io/py/easyocr)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/JaidedAI/EasyOCR/blob/master/LICENSE)
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)[![GitHub stars](https://img.shields.io/github/stars/JaidedAI/EasyOCR.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/JaidedAI/EasyOCR/stargazers/)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)
+[![GitHub stars](https://img.shields.io/github/stars/JaidedAI/EasyOCR.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/JaidedAI/EasyOCR/stargazers/)
 
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
 
@@ -115,7 +116,7 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 #### Phase 1 (Now - October, 2020)
 
-1. Language packs: Hindi, Arabic, Cyrillic alphabet, etc. Aiming to cover > 80-90% of world's population. See [current development list](https://github.com/JaidedAI/EasyOCR/issues/91).
+1. Language packs: Hindi, Arabic, Cyrillic alphabet, etc. Aiming to cover > 80-90% of world's population. See [current development list](https://github.com/JaidedAI/EasyOCR/issues/91). Also improve existing languages.
 2. Better documentation and api
 3. Language model for better decoding
 
@@ -123,7 +124,7 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 1. Handwritten support: Network architecture should not matter.
 The key is using GAN to generate realistic handwritten dataset.
-2. Faster processing time: model pruning/quantization/export to other platforms
+2. Faster processing time: model pruning (lite version) / quantization / export to other platforms
 3. Data generation script and model training pipeline
 4. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
@@ -150,7 +151,13 @@ And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
 
 Let's advance humanity together by making AI available to everyone!
 
-Please create issue to report bug or suggest new feature. Pull requests are welcome. Or if you found this library useful, just tell your friend about it.
+3 ways to contribute:
+
+**Coder:** Please send PR for small bug/improvement. For bigger one, discuss with us by open an issue first. There is a list of possible bug/improvement issue tagged with ['PR WELCOME'](https://github.com/JaidedAI/EasyOCR/issues?q=is%3Aissue+is%3Aopen+label%3A%22PR+WELCOME%22).
+
+**User:** Post success stories in [Book of Gratitude](https://github.com/JaidedAI/EasyOCR/issues/160) to encourage further development. Also post failure cases in [Book of Pain](https://github.com/JaidedAI/EasyOCR/issues/161) to help improving future model.
+
+**Tech leader/Guru:** If you found this library useful, please spread the word! (See [Yann Lecun's post](https://www.facebook.com/yann.lecun/posts/10157018122787143) about EasyOCR)
 
 ## Guideline for new language request
 
@@ -186,13 +193,13 @@ See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issue
 Contrast, Text Detection and Bounding Box Merging.
 >
 > **Parameters 1: General**
-> * **image** (string, numpy array, byte)
+> * **image** (string, numpy array, byte) - Input image
 > * **decoder** (string, default = 'greedy') - options are 'greedy', 'beamsearch' and 'wordbeamsearch'.
-> * **beamWidth** (int, default = 5)
+> * **beamWidth** (int, default = 5) - How many beam to keep when decoder = 'beamsearch' or 'wordbeamsearch'
 > * **batch_size** (int, default = 1) - batch_size>1 will make EasyOCR faster but use more memory
-> * **workers** (int, default = 0)
-> * **allowlist** (string) - Force EasyOCR to recognize only subset of characters
-> * **blocklist** (string) - Will be ignored if allowlist is given
+> * **workers** (int, default = 0) - Number thread used in of dataloader
+> * **allowlist** (string) - Force EasyOCR to recognize only subset of characters. Useful for specific problem (E.g. license plate, etc.)
+> * **blocklist** (string) - Block subset of character. This argument will be ignored if allowlist is given.
 > * **detail** (int, default = 1) - Set this to 0 for simple output
 >
 > **Parameters 2: Contrast**
@@ -208,6 +215,8 @@ Contrast, Text Detection and Bounding Box Merging.
 > * **mag_ratio** (float, default = 1)
 >
 > **Parameters 4: Bounding Box Merging**
+>
+> ![width_ths](examples/width_ths.png)
 > * **slope_ths** (float, default = 0.1)
 > * **ycenter_ths** (float, default = 0.5)
 > * **height_ths** (float, default = 0.5)
