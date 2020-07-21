@@ -30,6 +30,9 @@ has
 or
 first
 their
+bengali
+Bengali
+newest
 its
 It
 who
@@ -53,6 +56,7 @@ New
 This
 she
 new
+procastination
 such
 between
 where
@@ -78,6 +82,8 @@ three
 many
 under
 out
+hunger
+hungry
 including
 time
 being
@@ -28049,6 +28055,8 @@ Shelley
 Monetary
 euro
 eurozone
+bagel
+Hospital
 lingering
 euros
 GWh

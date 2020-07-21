@@ -1,9 +1,13 @@
+from __future__ import print_function
+
 import torch
 import pickle
 import numpy as np
 import math
 import cv2
 from PIL import Image
+import hashlib
+import sys
 
 def consecutive(data, mode ='first', stepsize=1):
     group = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
@@ -348,28 +352,13 @@ def four_point_transform(image, rect):
 
     return warped
 
-def contrast_grey(img):
-    high = np.percentile(img, 90)
-    low  = np.percentile(img, 10)
-    return (high-low)/(high+low), high, low
-
-def adjust_contrast_grey(img, target = 0.7):
-    contrast, high, low = contrast_grey(img)
-    if contrast < target:
-        img = img.astype(int)
-        ratio = 200./(high-low)
-        img = (img - low + 25)*ratio
-        img = np.maximum(np.full(img.shape, 0) ,np.minimum(np.full(img.shape, 255), img)).astype(np.uint8)
-    return img
-
 def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, width_ths = 1.0, add_margin = 0.05):
     # poly top-left, top-right, low-right, low-left
-
     horizontal_list, free_list,combined_list, merged_list = [],[],[],[]
 
     for poly in polys:
-        slope_up = (poly[3]-poly[1])/(poly[2]-poly[0])
-        slope_down = (poly[5]-poly[7])/(poly[4]-poly[6])
+        slope_up = (poly[3]-poly[1])/np.maximum(10, (poly[2]-poly[0]))
+        slope_down = (poly[5]-poly[7])/np.maximum(10, (poly[4]-poly[6]))
         if max(abs(slope_up), abs(slope_down)) < slope_ths:
             x_max = max([poly[0],poly[2],poly[4],poly[6]])
             x_min = min([poly[0],poly[2],poly[4],poly[6]])
@@ -380,8 +369,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             height = np.linalg.norm( [poly[6]-poly[0],poly[7]-poly[1]])
             margin = int(1.44*add_margin*height)
 
-            theta13 = abs(np.arctan( (poly[1]-poly[5])/(poly[0]-poly[4]) ))
-            theta24 = abs(np.arctan( (poly[3]-poly[7])/(poly[2]-poly[6]) ))
+            theta13 = abs(np.arctan( (poly[1]-poly[5])/np.maximum(10, (poly[0]-poly[4]))))
+            theta24 = abs(np.arctan( (poly[3]-poly[7])/np.maximum(10, (poly[2]-poly[6]))))
             # do I need to clip minimum, maximum value here?
             x1 = poly[0] - np.cos(theta13)*margin
             y1 = poly[1] - np.sin(theta13)*margin
@@ -459,9 +448,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
     # may need to check if box is really in image
     return merged_list, free_list
 
-def get_image_list(horizontal_list, free_list, img_path, model_height = 64):
+def get_image_list(horizontal_list, free_list, img, model_height = 64):
     image_list = []
-    img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     maximum_y,maximum_x = img.shape
 
     max_ratio_hori, max_ratio_free = 1,1
@@ -494,3 +482,13 @@ def get_image_list(horizontal_list, free_list, img_path, model_height = 64):
 
     image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
+
+def calculate_md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+def eprint(str):
+    print(str, file=sys.stderr)
