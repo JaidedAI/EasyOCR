@@ -3,14 +3,21 @@
 [![PyPI Status](https://badge.fury.io/py/easyocr.svg)](https://badge.fury.io/py/easyocr)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/JaidedAI/EasyOCR/blob/master/LICENSE)
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)
-[![GitHub stars](https://img.shields.io/github/stars/JaidedAI/EasyOCR.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/JaidedAI/EasyOCR/stargazers/)
+[![Tweet](https://img.shields.io/twitter/url/https/github.com/JaidedAI/EasyOCR.svg?style=social)](https://twitter.com/intent/tweet?text=Check out this awesome library: EasyOCR https://github.com/JaidedAI/EasyOCR)
+[![Twitter](https://img.shields.io/badge/twitter-@JaidedAI-blue.svg?style=flat)](https://twitter.com/JaidedAI)
 
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
+
+## What's new?
+- xx July 2020 - Version 1.1.5 - New language support for Hindi, Marathi, Nepali (Devanagari Script)
+
+## What's coming next?
+- Automatic word merging into sentence and paragraph analysis
+- [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
 
 ## Examples
 
 See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
-
 
 ![example](examples/example.png)
 
@@ -18,18 +25,19 @@ See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
 
 ## Supported Languages
 
-We are currently supporting the following 45 languages.
+We are currently supporting the following 48 languages.
 
 Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
 Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
-French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
-Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
-Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Malay (ms), Maltese (mt),
-Dutch (nl), Norwegian (no), Occitan (oc), Polish (pl), Portuguese (pt),
-Romanian (ro), Serbian (latin)(rs_latin), Slovak (sk) (need revisit),
-Slovenian (sl), Albanian (sq), Swedish (sv),Swahili (sw), Thai (th),
-Tagalog (tl), Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
+French (fr), Irish (ga), Hindi(hi), Croatian (hr), Hungarian (hu),
+Indonesian (id), Icelandic (is), Italian (it), Japanese (ja), Korean (ko),
+Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi),
+Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
+Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro),
+Serbian (latin)(rs_latin), Slovak (sk) (need revisit), Slovenian (sl),
+Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
+Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
 
 List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
 If you are native speaker of any language and think we should add or remove any character,
@@ -129,7 +137,7 @@ The key is using GAN to generate realistic handwritten dataset.
 4. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
-reader = easyocr.Reader(['en'], detection='pixellink', recognition = 'ReXNet_LSTM_Attention')
+reader = easyocr.Reader(['en'], detection='DB', recognition = 'ReXNet_LSTM_Attention')
 ```
 The idea is to be able to plug-in any state-of-the-art model into EasyOCR. There are a lot of geniuses trying to make better detection/recognition model. We are not trying to be a genius here, just make genius's works quickly accessible to the public ... for free. (well I believe most geniuses want their work to create positive impact as fast/big as possible) The pipeline should be something like below diagram. Grey slots are placeholders for changeable light blue modules.
 
