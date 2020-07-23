@@ -9,10 +9,11 @@
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new?
-- xx July 2020 - Version 1.1.5 - New language support for Hindi, Marathi, Nepali (Devanagari Script)
+- xx July 2020 - Version 1.1.5
+    1. New language support for Hindi, Marathi, Nepali (Devanagari Script)
+    2. Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
 
 ## What's coming next?
-- Automatic word merging into sentence and paragraph analysis
 - [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
 
 ## Examples
@@ -132,8 +133,8 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 1. Handwritten support: Network architecture should not matter.
 The key is using GAN to generate realistic handwritten dataset.
-2. Faster processing time: model pruning (lite version) / quantization / export to other platforms
-3. Data generation script and model training pipeline
+2. Faster processing time: model pruning (lite version) / quantization / export to other platforms (ONNX?)
+3. Open Dataset and model training pipeline
 4. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
@@ -163,7 +164,7 @@ Let's advance humanity together by making AI available to everyone!
 
 **Coder:** Please send PR for small bug/improvement. For bigger one, discuss with us by open an issue first. There is a list of possible bug/improvement issue tagged with ['PR WELCOME'](https://github.com/JaidedAI/EasyOCR/issues?q=is%3Aissue+is%3Aopen+label%3A%22PR+WELCOME%22).
 
-**User:** Post success stories in [Book of Gratitude](https://github.com/JaidedAI/EasyOCR/issues/160) to encourage further development. Also post failure cases in [Book of Pain](https://github.com/JaidedAI/EasyOCR/issues/161) to help improving future model.
+**User:** Tell us how EasyOCR benefit you/your organization in [Book of Gratitude](https://github.com/JaidedAI/EasyOCR/issues/160) to encourage further development. Also post failure cases in [Book of Pain](https://github.com/JaidedAI/EasyOCR/issues/161) to help improving future model.
 
 **Tech leader/Guru:** If you found this library useful, please spread the word! (See [Yann Lecun's post](https://www.facebook.com/yann.lecun/posts/10157018122787143) about EasyOCR)
 
@@ -209,6 +210,7 @@ Contrast, Text Detection and Bounding Box Merging.
 > * **allowlist** (string) - Force EasyOCR to recognize only subset of characters. Useful for specific problem (E.g. license plate, etc.)
 > * **blocklist** (string) - Block subset of character. This argument will be ignored if allowlist is given.
 > * **detail** (int, default = 1) - Set this to 0 for simple output
+> * **paragraph** (bool, default = False) - Combine result into paragraph
 >
 > **Parameters 2: Contrast**
 > * **contrast_ths** (float, default = 0.1) - Text box with contrast lower than this value will be passed into model 2 times. First is with original image and second with contrast adjusted to 'adjust_contrast' value. The one with more confident level will be returned as a result.

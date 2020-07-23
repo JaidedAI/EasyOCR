@@ -212,6 +212,7 @@ class Reader(object):
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                 paragraph = False,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
@@ -259,6 +260,9 @@ class Reader(object):
         result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                       workers, self.device)
+
+        if paragraph:
+            result = get_paragraph(result)
 
         if detail == 0:
             return [item[1] for item in result]
