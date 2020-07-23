@@ -82,7 +82,9 @@ You can also set `detail` = 0 for simpler output.
 ``` python
 reader.readtext('chinese.jpg', detail = 0)
 ```
+
 Result:
+
 ``` bash
 ['愚园路', '西', '东', '315', '309', 'Yuyuan Rd.', 'W', 'E']
 ```
