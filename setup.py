@@ -19,7 +19,7 @@ setup(
     name='easyocr',
     packages=['easyocr'],
     include_package_data=True,
-    version='1.1.4',
+    version='1.1.5',
     install_requires=requirements,
     entry_points={"console_scripts": ["easyocr= easyocr.cli:main"]},
     license='Apache License 2.0',

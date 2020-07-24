@@ -3,33 +3,44 @@
 [![PyPI Status](https://badge.fury.io/py/easyocr.svg)](https://badge.fury.io/py/easyocr)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/JaidedAI/EasyOCR/blob/master/LICENSE)
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)
-[![GitHub stars](https://img.shields.io/github/stars/JaidedAI/EasyOCR.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/JaidedAI/EasyOCR/stargazers/)
+[![Tweet](https://img.shields.io/twitter/url/https/github.com/JaidedAI/EasyOCR.svg?style=social)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20library:%20EasyOCR%20https://github.com/JaidedAI/EasyOCR)
+[![Twitter](https://img.shields.io/badge/twitter-@JaidedAI-blue.svg?style=flat)](https://twitter.com/JaidedAI)
 
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
+
+## What's new?
+- 24 July 2020 - Version 1.1.5
+    - New language support for Hindi, Marathi, Nepali (Devanagari Script)
+    - Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
+
+## What's coming next?
+- [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
 
 ## Examples
 
 See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
 
-
 ![example](examples/example.png)
 
 ![example2](examples/example2.png)
 
+![example3](examples/example3.png)
+
 ## Supported Languages
 
-We are currently supporting the following 45 languages.
+We are currently supporting the following 48 languages.
 
 Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
 Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
-French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
-Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
-Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Malay (ms), Maltese (mt),
-Dutch (nl), Norwegian (no), Occitan (oc), Polish (pl), Portuguese (pt),
-Romanian (ro), Serbian (latin)(rs_latin), Slovak (sk) (need revisit),
-Slovenian (sl), Albanian (sq), Swedish (sv),Swahili (sw), Thai (th),
-Tagalog (tl), Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
+French (fr), Irish (ga), Hindi(hi), Croatian (hr), Hungarian (hu),
+Indonesian (id), Icelandic (is), Italian (it), Japanese (ja), Korean (ko),
+Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi),
+Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
+Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro),
+Serbian (latin)(rs_latin), Slovak (sk) (need revisit), Slovenian (sl),
+Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
+Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
 
 List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
 If you are native speaker of any language and think we should add or remove any character,
@@ -97,6 +108,7 @@ download it manually from the following links and put it in '~/.EasyOCR/model' f
 - [japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
 - [korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
 - [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
+- [devanagari model](https://drive.google.com/file/d/1uCiMuBl8H8GAwapEjYUVYYdoOivyGzel/view?usp=sharing)
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
@@ -124,12 +136,12 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 1. Handwritten support: Network architecture should not matter.
 The key is using GAN to generate realistic handwritten dataset.
-2. Faster processing time: model pruning (lite version) / quantization / export to other platforms
-3. Data generation script and model training pipeline
+2. Faster processing time: model pruning (lite version) / quantization / export to other platforms (ONNX?)
+3. Open Dataset and model training pipeline
 4. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
-reader = easyocr.Reader(['en'], detection='pixellink', recognition = 'ReXNet_LSTM_Attention')
+reader = easyocr.Reader(['en'], detection='DB', recognition = 'ReXNet_LSTM_Attention')
 ```
 The idea is to be able to plug-in any state-of-the-art model into EasyOCR. There are a lot of geniuses trying to make better detection/recognition model. We are not trying to be a genius here, just make genius's works quickly accessible to the public ... for free. (well I believe most geniuses want their work to create positive impact as fast/big as possible) The pipeline should be something like below diagram. Grey slots are placeholders for changeable light blue modules.
 
@@ -155,7 +167,7 @@ Let's advance humanity together by making AI available to everyone!
 
 **Coder:** Please send PR for small bug/improvement. For bigger one, discuss with us by open an issue first. There is a list of possible bug/improvement issue tagged with ['PR WELCOME'](https://github.com/JaidedAI/EasyOCR/issues?q=is%3Aissue+is%3Aopen+label%3A%22PR+WELCOME%22).
 
-**User:** Post success stories in [Book of Gratitude](https://github.com/JaidedAI/EasyOCR/issues/160) to encourage further development. Also post failure cases in [Book of Pain](https://github.com/JaidedAI/EasyOCR/issues/161) to help improving future model.
+**User:** Tell us how EasyOCR benefit you/your organization in [Book of Gratitude](https://github.com/JaidedAI/EasyOCR/issues/160) to encourage further development. Also post failure cases in [Book of Pain](https://github.com/JaidedAI/EasyOCR/issues/161) to help improving future model.
 
 **Tech leader/Guru:** If you found this library useful, please spread the word! (See [Yann Lecun's post](https://www.facebook.com/yann.lecun/posts/10157018122787143) about EasyOCR)
 
@@ -201,6 +213,7 @@ Contrast, Text Detection and Bounding Box Merging.
 > * **allowlist** (string) - Force EasyOCR to recognize only subset of characters. Useful for specific problem (E.g. license plate, etc.)
 > * **blocklist** (string) - Block subset of character. This argument will be ignored if allowlist is given.
 > * **detail** (int, default = 1) - Set this to 0 for simple output
+> * **paragraph** (bool, default = False) - Combine result into paragraph
 >
 > **Parameters 2: Contrast**
 > * **contrast_ths** (float, default = 0.1) - Text box with contrast lower than this value will be passed into model 2 times. First is with original image and second with contrast adjusted to 'adjust_contrast' value. The one with more confident level will be returned as a result.

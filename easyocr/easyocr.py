@@ -3,7 +3,7 @@
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5, eprint
+from .utils import group_text_box, get_image_list, calculate_md5, eprint, get_paragraph
 import numpy as np
 import cv2
 import torch
@@ -31,7 +31,8 @@ latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
                    'hr','hu','id','is','it','ku','la','lt','lv','mi','ms','mt',\
                    'nl','no','oc','pl','pt','ro','rs_latin','sk','sl','sq',\
                    'sv','sw','tl','tr','uz','vi']
-all_lang_list = latin_lang_list + ['th','ch_sim','ch_tra','ja','ko']
+devanagari_lang_list = ['hi','mr','ne']
+all_lang_list = latin_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko']
 imgH = 64
 input_channel = 1
 output_channel = 512
@@ -49,8 +50,8 @@ model_url = {
     'japanese.pth': ('https://www.jaided.ai/read_download/japanese.pth', '6d891a4aad9cb7f492809515e4e9fd2e'),
     'korean.pth': ('https://www.jaided.ai/read_download/korean.pth', '45b3300e0f04ce4d03dda9913b20c336'),
     'thai.pth': ('https://www.jaided.ai/read_download/thai.pth', '40a06b563a2b3d7897e2d19df20dc709'),
+    'devanagari.pth': ('https://www.jaided.ai/read_download/devanagari.pth', 'db6b1f074fae3070f561675db908ac08'),
 }
-
 
 class Reader(object):
 
@@ -93,6 +94,10 @@ class Reader(object):
             self.model_lang = 'korean'
             if set(lang_list) - set(['ko','en']) != set():
                 raise ValueError('Korean is only compatible with English, try lang_list=["ko","en"]')
+        elif set(lang_list) & set(devanagari_lang_list):
+            self.model_lang = 'devanagari'
+            if set(lang_list) - set(devanagari_lang_list+['en']) != set():
+                raise ValueError('Devanagari is only compatible with English, try lang_list=["hi","mr","ne","en"]')
         else: self.model_lang = 'latin'
 
         separator_list = {}
@@ -101,6 +106,11 @@ class Reader(object):
             'ÀÁÂÃÄÅÆÇÈÉÊËÍÎÑÒÓÔÕÖØÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿąęĮįıŁłŒœŠšųŽž'
             self.character = number+ symbol + all_char
             model_file = 'latin.pth'
+
+        elif self.model_lang == 'devanagari':
+            devanagari_char = '.ँंःअअंअःआइईउऊऋएऐऑओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयरऱलळवशषसह़ािीुूृॅेैॉोौ्ॐ॒क़ख़ग़ज़ड़ढ़फ़ॠ।०१२३४५६७८९॰'
+            self.character = number+ symbol + en_char + devanagari_char
+            model_file = 'devanagari.pth'
 
         elif  self.model_lang == 'chinese_tra':
             char_file = os.path.join(BASE_PATH, 'character', "ch_tra_char.txt")
@@ -202,6 +212,7 @@ class Reader(object):
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                 paragraph = False,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
@@ -249,6 +260,9 @@ class Reader(object):
         result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                       workers, self.device)
+
+        if paragraph:
+            result = get_paragraph(result)
 
         if detail == 0:
             return [item[1] for item in result]
