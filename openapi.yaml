@@ -1,0 +1,75 @@
+
+openapi: 3.0.1
+info:
+  title: TextReader
+  description:  |
+    ## Upload some image then it will extract text from image.
+    ---
+    How to use:
+      * Pick image what you want to extract text
+      * Excute and wait until the result shows up
+    ---
+    You can also experiences easyOCR in
+    [Webpage](https://easyocrgpu-wook-2.endpoint.ainize.ai/)
+  version: 1.0.0
+  license:
+    name: "MIT"
+    url: ""
+servers:
+  - url: 'https://easyocrgpu-wook-2.endpoint.ainize.ai'
+
+paths:
+  /word_extraction:
+    post:
+      tags:
+      - TextReader
+      requestBody:
+        required: true
+        description: "Pick image"
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                base_image:
+                  description: Import Image Here
+                  type: string
+                  format: binary
+                language:
+                  description: |
+                    Please type proper language(ex. ko):
+
+                    lang | definition
+                    ----|------------
+                    ko  | Korean
+                    ja  | Japanese
+                    th  | Thai
+                    ch_tra| Chinese
+                    ch_sim| Simplified Chinese
+                    latin | Latin
+                  type: string
+                  enum: ['ko', 'ja', 'th', 'ch_tra', 'ch_sim', 'latin']
+                  default: 'ko'
+
+
+
+            encoding:
+              files:
+                contentType: image/*, string
+      responses:
+         '200':
+            description: success
+            content:
+              images/*:
+                  schema:
+                    type: string
+                    format: binary
+
+              string:
+                  schema:
+                    type: string
+                    format: binary
+         '400':
+            description: Bad request (Can not load images)
+         '500':
+            description: Server Side Error

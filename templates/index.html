@@ -1,0 +1,104 @@
+<!doctype html>
+    <head>
+    </head>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <!-- Project Title! -->
+        <title>EasyOCR</title>    
+    </head>
+    <script>
+        function onFileSelected(event){
+            var selectedFile = event.target.files[0];
+            var reader = new FileReader();
+
+            var imgtag = document.getElementById("myimage");
+            imgtag.title = selectedFile.name;
+
+            reader.onload = function(event) {
+                imgtag.src = event.target.result;
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+    </script>
+    <body>
+        <div class = "container">
+            <div class="jumbotron mt-3">
+                 <!-- Proejct Title -->
+                 
+                <h1>EasyOCR</h1>
+                <!-- Github link and Ainize link -->
+                <A>Git Hub repository : </A> <A href="https://github.com/Wook-2/EasyOCR">https://github.com/Wook-2/EasyOCR</A>
+                <br>
+                <A>Testing API : </A> <A href="https://ainize.ai/wook-2/easyocrgpu"> on Ainize </A>
+                <hr class="solid">
+                
+                
+            
+                    
+                    <div id = 'inputImage' style="float:left;width: 50%;">
+                        <h2>Upload </h2>
+                        <form action="" method="post" enctype="multipart/form-data">
+                            <p>Import Image:<br><input type=file onchange="onFileSelected(event)" name=file </p>
+                               <br><br>Choose Language:<br>
+                               <select name="lang">
+                                 <option value="ko">Korean</option>
+                                 <option value="ja">Japanese</option>
+                                 <option value="th">Thai</option>
+                                 <option value="ch_tra">Chinese</option>
+                                 <option value="ch_sim">Simplified Chinese</option>
+                                 <option value="af">Latin</option>
+                               </select>
+                               <input class="btn btn-primary btn-lg" style="margin-left: auto;" type=submit value=Upload>
+                        
+                          </form>
+                        <!-- <label for="label1">label1 : </label>
+                        <input type = 'file' id = 'input1' style="margin-right: 10px; margin-bottom: 10px;">
+                        <label for="label2">label2: </label>
+                        <input type = 'file' id = 'input2' style="margin-right: 10px; margin-bottom: 10px;">
+                        <button id = "submit" type='submit' class="btn btn-primary btn-lg" style="margin-left: auto;"> submit </button> -->
+                    
+                    
+                    </div>
+
+                    
+                <div style="float:left;width: 50%;">
+                <h2>Download sample image</h2>
+                [For Korean model] : <a href="/static/images/test_kor.png" target='blank'><button class='btn btn-default'>->Download<-</button></a><br>
+                [For Japanese model] : <a href="/static/images/test_ja.jpg" target='blank'><button class='btn btn-default'>->Download<-</button></a><br>
+                [For Thai model] : <a href="/static/images/test_thai.jpeg" target='blank'><button class='btn btn-default'>->Download<-</button></a><br>
+                [For Chinese model] : <a href="/static/images/test_ch.png" target='blank'><button class='btn btn-default'>->Download<-</button></a><br>
+                [For Latin model] : <a href="/static/images/test_latin.jpg" target='blank'><button class='btn btn-default'>->Download<-</button></a><br>
+                </div>
+                
+                
+
+                <!-- If your project have a input files -->
+                
+                
+                <!-- Result Box -->
+                <!-- <div id ='resultBox' style="margin-left: auto; margin-right: auto;"> -->
+                    
+
+                    {% if result %}
+                    <img src="data:image/jpg;base64,{{ rawimg|safe }}" style="height: 200px;">
+                    {% else %}
+                    <img id="myimage" alt="image not uploaded" style="height:200px;">
+                    
+                    {% endif %}
+                    <h2>Extracted words</h2>
+                    <h2>: {{ result }}</h2>
+                    <br><br>
+                    
+                <!-- </div> -->
+            </div>
+        </div>
+    </body>
+
+
