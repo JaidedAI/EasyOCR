@@ -9,7 +9,7 @@
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new?
-- xx July 2020 - Version 1.1.5
+- 24 July 2020 - Version 1.1.5
     1. New language support for Hindi, Marathi, Nepali (Devanagari Script)
     2. Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
 
@@ -106,6 +106,7 @@ download it manually from the following links and put it in '~/.EasyOCR/model' f
 - [japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
 - [korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
 - [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
+- [devanagari model](https://drive.google.com/file/d/1uCiMuBl8H8GAwapEjYUVYYdoOivyGzel/view?usp=sharing)
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 

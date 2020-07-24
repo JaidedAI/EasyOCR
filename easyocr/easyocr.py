@@ -3,7 +3,7 @@
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5, eprint
+from .utils import group_text_box, get_image_list, calculate_md5, eprint, get_paragraph
 import numpy as np
 import cv2
 import torch
@@ -50,7 +50,7 @@ model_url = {
     'japanese.pth': ('https://www.jaided.ai/read_download/japanese.pth', '6d891a4aad9cb7f492809515e4e9fd2e'),
     'korean.pth': ('https://www.jaided.ai/read_download/korean.pth', '45b3300e0f04ce4d03dda9913b20c336'),
     'thai.pth': ('https://www.jaided.ai/read_download/thai.pth', '40a06b563a2b3d7897e2d19df20dc709'),
-    'devanagari.pth': ('', ''),
+    'devanagari.pth': ('https://www.jaided.ai/read_download/devanagari.pth', 'db6b1f074fae3070f561675db908ac08'),
 }
 
 class Reader(object):
