@@ -85,7 +85,7 @@ def upload_file():
 
         # stateless image
         if requests_queue.qsize() >= BATCH_SIZE:
-            return render_template('index.html', result = 'TooMany requests try agin')
+            return render_template('index.html', result = 'TooMany requests try agin'), 429
 
         req = {
             'input': [file, lang]
