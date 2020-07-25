@@ -62,13 +62,13 @@ class Reader(object):
         """Create an EasyOCR Reader.
 
         Parameters:
-            lang_list (list): Language codes (ISO 639) for languages to recognized during analysis.
+            lang_list (list): Language codes (ISO 639) for languages to be recognized during analysis.
 
             gpu (bool): Enable GPU support (default)
 
             model_storage_directory (string): Path to directory for model data. If not specified,
             models will be read from a directory as defined by the environment variable
-            EASYOCR_MODULE_PATH (prefered), MODULE_PATH (if defined), or ~/.EasyOCR/.
+            EASYOCR_MODULE_PATH (preferred), MODULE_PATH (if defined), or ~/.EasyOCR/.
 
             download_enabled (bool): Enabled downloading of model data via HTTP (default).
         """
