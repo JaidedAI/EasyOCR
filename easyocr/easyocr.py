@@ -22,8 +22,9 @@ else:
 LOGGER = getLogger(__name__)
 
 BASE_PATH = os.path.dirname(__file__)
-MODULE_PATH = os.environ.get("MODULE_PATH",
-                             os.path.expanduser("~/.EasyOCR/"))
+MODULE_PATH = os.environ.get("EASYOCR_MODULE_PATH") or \
+              os.environ.get("MODULE_PATH") or \
+              os.path.expanduser("~/.EasyOCR/")
 Path(MODULE_PATH+'/model').mkdir(parents=True, exist_ok=True)
 
 # detector parameters
