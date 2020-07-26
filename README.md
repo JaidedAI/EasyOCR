@@ -60,7 +60,9 @@ For latest development release,
 pip install git+git://github.com/jaidedai/easyocr.git
 ```
 
-Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
+Note 1: for Windows, please install torch and torchvision first by following the official instruction here https://pytorch.org. On pytorch website, be sure to select the right CUDA version you have. If you intend to run on CPU mode only, select CUDA = None.
+
+Note 2: We also provide Dockerfile [here](https://github.com/JaidedAI/EasyOCR/blob/master/Dockerfile).
 
 ## Usage
 
