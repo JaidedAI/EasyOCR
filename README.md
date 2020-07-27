@@ -18,8 +18,6 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 ## Examples
 
-See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
-
 ![example](examples/example.png)
 
 ![example2](examples/example2.png)
@@ -63,6 +61,12 @@ pip install git+git://github.com/jaidedai/easyocr.git
 Note 1: for Windows, please install torch and torchvision first by following the official instruction here https://pytorch.org. On pytorch website, be sure to select the right CUDA version you have. If you intend to run on CPU mode only, select CUDA = None.
 
 Note 2: We also provide Dockerfile [here](https://github.com/JaidedAI/EasyOCR/blob/master/Dockerfile).
+
+#### Try Third-Party Demos
+
+1. [Google Colab](https://colab.fan/easyocr)
+2. [Dockerhub](https://hub.docker.com/r/challisa/easyocr)
+3. [Ainize](https://easyocrgpu-wook-2.endpoint.ainize.ai/)
 
 ## Usage
 
