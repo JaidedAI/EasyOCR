@@ -31,8 +31,10 @@ latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
                    'hr','hu','id','is','it','ku','la','lt','lv','mi','ms','mt',\
                    'nl','no','oc','pl','pt','ro','rs_latin','sk','sl','sq',\
                    'sv','sw','tl','tr','uz','vi']
+cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn']
 devanagari_lang_list = ['hi','mr','ne']
-all_lang_list = latin_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko']
+
+all_lang_list = latin_lang_list + cyrillic_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko']
 imgH = 64
 input_channel = 1
 output_channel = 512
@@ -51,6 +53,7 @@ model_url = {
     'korean.pth': ('https://www.jaided.ai/read_download/korean.pth', '45b3300e0f04ce4d03dda9913b20c336'),
     'thai.pth': ('https://www.jaided.ai/read_download/thai.pth', '40a06b563a2b3d7897e2d19df20dc709'),
     'devanagari.pth': ('https://www.jaided.ai/read_download/devanagari.pth', 'db6b1f074fae3070f561675db908ac08'),
+    'cyrillic.pth': ('https://www.jaided.ai/read_download/cyrillic.pth', '5a046f7be2a4f7da6ed50740f487efa8'),
 }
 
 class Reader(object):
@@ -98,6 +101,10 @@ class Reader(object):
             self.model_lang = 'devanagari'
             if set(lang_list) - set(devanagari_lang_list+['en']) != set():
                 raise ValueError('Devanagari is only compatible with English, try lang_list=["hi","mr","ne","en"]')
+        elif set(lang_list) & set(cyrillic_lang_list):
+            self.model_lang = 'cyrillic'
+            if set(lang_list) - set(cyrillic_lang_list+['en']) != set():
+                raise ValueError('Cyrillic is only compatible with English, try lang_list=["ru","rs_cyrillic","be","bg","uk","mn","en"]')
         else: self.model_lang = 'latin'
 
         separator_list = {}
@@ -106,12 +113,14 @@ class Reader(object):
             'ÀÁÂÃÄÅÆÇÈÉÊËÍÎÑÒÓÔÕÖØÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿąęĮįıŁłŒœŠšųŽž'
             self.character = number+ symbol + all_char
             model_file = 'latin.pth'
-
+        elif self.model_lang == 'cyrillic':
+            cyrillic_char = 'ЁЂЄІЇЈЉЊЋЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяёђєіїјљњћўџҐґҮүө'
+            self.character = number+ symbol + en_char + cyrillic_char
+            model_file = 'cyrillic.pth'
         elif self.model_lang == 'devanagari':
             devanagari_char = '.ँंःअअंअःआइईउऊऋएऐऑओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयरऱलळवशषसह़ािीुूृॅेैॉोौ्ॐ॒क़ख़ग़ज़ड़ढ़फ़ॠ।०१२३४५६७८९॰'
             self.character = number+ symbol + en_char + devanagari_char
             model_file = 'devanagari.pth'
-
         elif  self.model_lang == 'chinese_tra':
             char_file = os.path.join(BASE_PATH, 'character', "ch_tra_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
@@ -119,7 +128,6 @@ class Reader(object):
                 ch_tra_char = ''.join(ch_tra_list)
             self.character = number + symbol + en_char + ch_tra_char
             model_file = 'chinese.pth'
-
         elif  self.model_lang == 'chinese_sim':
             char_file = os.path.join(BASE_PATH, 'character', "ch_sim_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
@@ -127,7 +135,6 @@ class Reader(object):
                 ch_sim_char = ''.join(ch_sim_list)
             self.character = number + symbol + en_char + ch_sim_char
             model_file = 'chinese_sim.pth'
-
         elif  self.model_lang == 'japanese':
             char_file = os.path.join(BASE_PATH, 'character', "ja_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
@@ -135,7 +142,6 @@ class Reader(object):
                 ja_char = ''.join(ja_list)
             self.character = number + symbol + en_char + ja_char
             model_file = 'japanese.pth'
-
         elif  self.model_lang == 'korean':
             char_file = os.path.join(BASE_PATH, 'character', "ko_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
@@ -143,7 +149,6 @@ class Reader(object):
                 ko_char = ''.join(ko_list)
             self.character = number + symbol + en_char + ko_char
             model_file = 'korean.pth'
-
         elif self.model_lang == 'thai':
             separator_list = {
                 'th': ['\xa2', '\xa3'],

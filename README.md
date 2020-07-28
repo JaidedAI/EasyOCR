@@ -26,19 +26,20 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 ## Supported Languages
 
-We are currently supporting the following 48 languages.
+We are currently supporting the following 54 languages.
 
-Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
-Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
+Afrikaans (af), Azerbaijani (az), Belarusian (be), Bulgarian (bg), Bosnian (bs),
+Simplified Chinese (ch_sim), Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
 Danish (da), German (de), English (en), Spanish (es), Estonian (et),
 French (fr), Irish (ga), Hindi(hi), Croatian (hr), Hungarian (hu),
 Indonesian (id), Icelandic (is), Italian (it), Japanese (ja), Korean (ko),
-Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi),
+Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Mongolian (mn),
 Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
-Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro),
-Serbian (latin)(rs_latin), Slovak (sk) (need revisit), Slovenian (sl),
-Albanian (sq), Swedish (sv),Swahili (sw), Thai (th), Tagalog (tl),
-Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
+Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru),
+Serbian (cyrillic)(rs_cyrillic), Serbian (latin)(rs_latin), 
+Slovak (sk) (need revisit), Slovenian (sl), Albanian (sq), Swedish (sv),
+Swahili (sw), Thai (th), Tagalog (tl), Turkish (tr), Ukranian(uk), Uzbek (uz),
+Vietnamese (vi) (need revisit)
 
 List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
 If you are native speaker of any language and think we should add or remove any character,
