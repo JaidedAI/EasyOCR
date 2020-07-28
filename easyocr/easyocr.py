@@ -3,12 +3,13 @@
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5, eprint, get_paragraph
+from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph
 import numpy as np
 import cv2
 import torch
 import os
 import sys
+from logging import getLogger
 
 if sys.version_info[0] == 2:
     from io import open
@@ -18,13 +19,15 @@ else:
     from urllib.request import urlretrieve
     from pathlib import Path
 
+LOGGER = getLogger(__name__)
+
 BASE_PATH = os.path.dirname(__file__)
-MODULE_PATH = os.environ.get("MODULE_PATH",
-                             os.path.expanduser("~/.EasyOCR/"))
-Path(MODULE_PATH+'/model').mkdir(parents=True, exist_ok=True)
+MODULE_PATH = os.environ.get("EASYOCR_MODULE_PATH") or \
+              os.environ.get("MODULE_PATH") or \
+              os.path.expanduser("~/.EasyOCR/")
 
 # detector parameters
-DETECTOR_PATH = os.path.join(MODULE_PATH, 'model', 'craft_mlt_25k.pth')
+DETECTOR_FILENAME = 'craft_mlt_25k.pth'
 
 # recognizer parameters
 latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
@@ -55,14 +58,33 @@ model_url = {
 
 class Reader(object):
 
-    def __init__(self, lang_list, gpu=True):
+    def __init__(self, lang_list, gpu=True, model_storage_directory=None, download_enabled=True):
+        """Create an EasyOCR Reader.
+
+        Parameters:
+            lang_list (list): Language codes (ISO 639) for languages to be recognized during analysis.
+
+            gpu (bool): Enable GPU support (default)
+
+            model_storage_directory (string): Path to directory for model data. If not specified,
+            models will be read from a directory as defined by the environment variable
+            EASYOCR_MODULE_PATH (preferred), MODULE_PATH (if defined), or ~/.EasyOCR/.
+
+            download_enabled (bool): Enabled downloading of model data via HTTP (default).
+        """
+        self.download_enabled = download_enabled
+
+        self.model_storage_directory = MODULE_PATH + '/model'
+        if model_storage_directory:
+            self.model_storage_directory = model_storage_directory
+        Path(self.model_storage_directory).mkdir(parents=True, exist_ok=True)
 
         if gpu is False:
             self.device = 'cpu'
-            eprint('Using CPU. Note: This module is much faster with a GPU.')
+            LOGGER.warning('Using CPU. Note: This module is much faster with a GPU.')
         elif not torch.cuda.is_available():
             self.device = 'cpu'
-            eprint('CUDA not available - defaulting to CPU. Note: This module is much faster with a GPU.')
+            LOGGER.warning('CUDA not available - defaulting to CPU. Note: This module is much faster with a GPU.')
         elif gpu is True:
             self.device = 'cuda'
         else:
@@ -163,7 +185,7 @@ class Reader(object):
             self.character = ''.join(separator_char) + symbol + en_char + th_char + th_number
             model_file = 'thai.pth'
         else:
-            eprint('invalid language')
+            LOGGER.error('invalid language')
 
         dict_list = {}
         for lang in lang_list:
@@ -178,37 +200,50 @@ class Reader(object):
         self.lang_char = set(self.lang_char).union(set(number+symbol))
         self.lang_char = ''.join(self.lang_char)
 
-        MODEL_PATH = os.path.join(MODULE_PATH, 'model', model_file)
-        CORRUPT_MSG = 'MD5 hash mismatch, possible file corruption'
-        if os.path.isfile(DETECTOR_PATH) == False:
-            eprint('Downloading detection model, please wait')
-            urlretrieve(model_url['detector'][0] , DETECTOR_PATH)
-            assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
-            eprint('Download complete')
-        elif calculate_md5(DETECTOR_PATH) != model_url['detector'][1]:
-            eprint(CORRUPT_MSG)
-            os.remove(DETECTOR_PATH)
-            eprint('Re-downloading the detection model, please wait')
-            urlretrieve(model_url['detector'][0], DETECTOR_PATH)
-            assert calculate_md5(DETECTOR_PATH) == model_url['detector'][1], CORRUPT_MSG
+        model_path = os.path.join(self.model_storage_directory, model_file)
+        corrupt_msg = 'MD5 hash mismatch, possible file corruption'
+        detector_path = os.path.join(self.model_storage_directory, DETECTOR_FILENAME)
+        if os.path.isfile(detector_path) == False:
+            if not self.download_enabled:
+                raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
+            LOGGER.warning('Downloading detection model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
+            urlretrieve(model_url['detector'][0] , detector_path)
+            assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
+            LOGGER.info('Download complete')
+        elif calculate_md5(detector_path) != model_url['detector'][1]:
+            if not self.download_enabled:
+                raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % detector_path)
+            LOGGER.warning(corrupt_msg)
+            os.remove(detector_path)
+            LOGGER.warning('Re-downloading the detection model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
+            urlretrieve(model_url['detector'][0], detector_path)
+            assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
         # check model file
-        if os.path.isfile(MODEL_PATH) == False:
-            eprint('Downloading recognition model, please wait')
-            urlretrieve(model_url[model_file][0], MODEL_PATH)
-            assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
-            eprint('Download complete')
-        elif calculate_md5(MODEL_PATH) != model_url[model_file][1]:
-            eprint(CORRUPT_MSG)
-            os.remove(MODEL_PATH)
-            eprint('Re-downloading the recognition model, please wait')
-            urlretrieve(model_url[model_file][0], MODEL_PATH)
-            assert calculate_md5(MODEL_PATH) == model_url[model_file][1], CORRUPT_MSG
-            eprint('Download complete')
+        if os.path.isfile(model_path) == False:
+            if not self.download_enabled:
+                raise FileNotFoundError("Missing %s and downloads disabled" % model_path)
+            LOGGER.warning('Downloading recognition model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
+            urlretrieve(model_url[model_file][0], model_path)
+            assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
+            LOGGER.info('Download complete.')
+        elif calculate_md5(model_path) != model_url[model_file][1]:
+            if not self.download_enabled:
+                raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % model_path)
+            LOGGER.warning(corrupt_msg)
+            os.remove(model_path)
+            LOGGER.warning('Re-downloading the recognition model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
+            urlretrieve(model_url[model_file][0], model_path)
+            assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
+            LOGGER.info('Download complete')
 
-        self.detector = get_detector(DETECTOR_PATH, self.device)
+        self.detector = get_detector(detector_path, self.device)
         self.recognizer, self.converter = get_recognizer(input_channel, output_channel,\
                                                          hidden_size, self.character, separator_list,\
-                                                         dict_list, MODEL_PATH, device = self.device)
+                                                         dict_list, model_path, device = self.device)
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\

@@ -490,9 +490,6 @@ def calculate_md5(fname):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
-def eprint(str):
-    print(str, file=sys.stderr)
-
 def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
     # create basic attributes
     box_group = []
