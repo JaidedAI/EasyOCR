@@ -206,7 +206,8 @@ class Reader(object):
         if os.path.isfile(detector_path) == False:
             if not self.download_enabled:
                 raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
-            LOGGER.info('Downloading detection model, please wait')
+            LOGGER.warning('Downloading detection model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
             urlretrieve(model_url['detector'][0] , detector_path)
             assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
             LOGGER.info('Download complete')
@@ -215,23 +216,26 @@ class Reader(object):
                 raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % detector_path)
             LOGGER.warning(corrupt_msg)
             os.remove(detector_path)
-            LOGGER.info('Re-downloading the detection model, please wait')
+            LOGGER.warning('Re-downloading the detection model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
             urlretrieve(model_url['detector'][0], detector_path)
             assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
         # check model file
         if os.path.isfile(model_path) == False:
             if not self.download_enabled:
                 raise FileNotFoundError("Missing %s and downloads disabled" % model_path)
-            LOGGER.info('Downloading recognition model, please wait')
+            LOGGER.warning('Downloading recognition model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
             urlretrieve(model_url[model_file][0], model_path)
             assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
-            LOGGER.info('Download complete')
+            LOGGER.info('Download complete.')
         elif calculate_md5(model_path) != model_url[model_file][1]:
             if not self.download_enabled:
                 raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % model_path)
             LOGGER.warning(corrupt_msg)
             os.remove(model_path)
-            LOGGER.info('Re-downloading the recognition model, please wait')
+            LOGGER.warning('Re-downloading the recognition model, please wait. '
+                           'This may take several minutes depending upon your network connection.')
             urlretrieve(model_url[model_file][0], model_path)
             assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
             LOGGER.info('Download complete')
