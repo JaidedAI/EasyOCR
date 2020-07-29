@@ -116,6 +116,7 @@ download it manually from the following links and put it in '~/.EasyOCR/model' f
 - [korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
 - [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
 - [devanagari model](https://drive.google.com/file/d/1uCiMuBl8H8GAwapEjYUVYYdoOivyGzel/view?usp=sharing)
+- [cyrillic model](https://drive.google.com/file/d/1SBmKXV5dpN5Cekacqk3ms1xq3dGbDuu1/view?usp=sharing)
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
