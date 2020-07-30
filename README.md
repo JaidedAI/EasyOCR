@@ -149,7 +149,7 @@ The key is using GAN to generate realistic handwritten dataset.
 4. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
-reader = easyocr.Reader(['en'], detection='DB', recognition = 'ReXNet_LSTM_Attention')
+reader = easyocr.Reader(['en'], detection='DB', recognition = 'CNN_Transformer')
 ```
 The idea is to be able to plug-in any state-of-the-art model into EasyOCR. There are a lot of geniuses trying to make better detection/recognition model. We are not trying to be a genius here, just make genius's works quickly accessible to the public ... for free. (well I believe most geniuses want their work to create positive impact as fast/big as possible) The pipeline should be something like below diagram. Grey slots are placeholders for changeable light blue modules.
 
