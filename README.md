@@ -95,6 +95,8 @@ English is compatible with every languages. Languages that share common characte
 
 Note 2: Instead of filepath `chinese.jpg`, you can also pass OpenCV image object (numpy array) or image file as bytes. URL to raw image is also acceptable.
 
+Note 3: The line `reader = easyocr.Reader(['ch_sim','en'])` is for loading model into memory. It takes some time but it need to be run only once.
+
 You can also set `detail` = 0 for simpler output.
 
 ``` python
