@@ -73,8 +73,8 @@ Note 2: We also provide Dockerfile [here](https://github.com/JaidedAI/EasyOCR/bl
 
 ``` python
 import easyocr
-reader = easyocr.Reader(['ch_sim','en'])
-reader.readtext('chinese.jpg')
+reader = easyocr.Reader(['ch_sim','en']) # need to run only once to load model into memory 
+result = reader.readtext('chinese.jpg')
 ```
 
 Output will be in list format, each item represents bounding box, text and confident level, respectively.
