@@ -74,8 +74,8 @@ Note 2: We also provide Dockerfile [here](https://github.com/JaidedAI/EasyOCR/bl
 
 ``` python
 import easyocr
-reader = easyocr.Reader(['ch_sim','en'])
-reader.readtext('chinese.jpg')
+reader = easyocr.Reader(['ch_sim','en']) # need to run only once to load model into memory 
+result = reader.readtext('chinese.jpg')
 ```
 
 Output will be in list format, each item represents bounding box, text and confident level, respectively.
@@ -95,6 +95,8 @@ several languages at once but not all languages can be used together.
 English is compatible with every languages. Languages that share common characters are usually compatible with each other.
 
 Note 2: Instead of filepath `chinese.jpg`, you can also pass OpenCV image object (numpy array) or image file as bytes. URL to raw image is also acceptable.
+
+Note 3: The line `reader = easyocr.Reader(['ch_sim','en'])` is for loading model into memory. It takes some time but it need to be run only once.
 
 You can also set `detail` = 0 for simpler output.
 
