@@ -3,7 +3,7 @@
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph
+from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph, download_file_from_google_drive
 from bidi.algorithm import get_display
 import numpy as np
 import cv2
@@ -49,16 +49,17 @@ number = '0123456789'
 symbol  = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
 en_char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+# first element is google drive id, second is file size
 model_url = {
-    'detector': ('https://www.jaided.ai/read_download/craft_mlt_25k.pth', '2f8227d2def4037cdb3b34389dcf9ec1'),
-    'latin.pth': ('https://www.jaided.ai/read_download/latin.pth', 'fb91b9abf65aeeac95a172291b4a6176'),
-    'chinese.pth': ('https://www.jaided.ai/read_download/chinese.pth', 'dfba8e364cd98ed4fed7ad54d71e3965'),
-    'chinese_sim.pth': ('https://www.jaided.ai/read_download/chinese_sim.pth', '0e19a9d5902572e5237b04ee29bdb636'),
-    'japanese.pth': ('https://www.jaided.ai/read_download/japanese.pth', '6d891a4aad9cb7f492809515e4e9fd2e'),
-    'korean.pth': ('https://www.jaided.ai/read_download/korean.pth', '45b3300e0f04ce4d03dda9913b20c336'),
-    'thai.pth': ('https://www.jaided.ai/read_download/thai.pth', '40a06b563a2b3d7897e2d19df20dc709'),
-    'devanagari.pth': ('https://www.jaided.ai/read_download/devanagari.pth', 'db6b1f074fae3070f561675db908ac08'),
-    'cyrillic.pth': ('https://www.jaided.ai/read_download/cyrillic.pth', '5a046f7be2a4f7da6ed50740f487efa8'),
+    'detector': ('1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0', '2f8227d2def4037cdb3b34389dcf9ec1'),
+    'latin.pth': ('1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3', 'fb91b9abf65aeeac95a172291b4a6176'),
+    'chinese.pth': ('1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh', 'dfba8e364cd98ed4fed7ad54d71e3965'),
+    'chinese_sim.pth': ('1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR', '0e19a9d5902572e5237b04ee29bdb636'),
+    'japanese.pth': ('1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu', '6d891a4aad9cb7f492809515e4e9fd2e'),
+    'korean.pth': ('1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y', '45b3300e0f04ce4d03dda9913b20c336'),
+    'thai.pth': ('14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa', '40a06b563a2b3d7897e2d19df20dc709'),
+    'devanagari.pth': ('1uCiMuBl8H8GAwapEjYUVYYdoOivyGzel', 'db6b1f074fae3070f561675db908ac08'),
+    'cyrillic.pth': ('1SBmKXV5dpN5Cekacqk3ms1xq3dGbDuu1', '5a046f7be2a4f7da6ed50740f487efa8'),
     'arabic.pth': ('', ''),
 }
 
@@ -226,7 +227,7 @@ class Reader(object):
                 raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
             LOGGER.warning('Downloading detection model, please wait. '
                            'This may take several minutes depending upon your network connection.')
-            urlretrieve(model_url['detector'][0] , detector_path)
+            download_file_from_google_drive(model_url['detector'][0], detector_path)
             assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
             LOGGER.info('Download complete')
         elif calculate_md5(detector_path) != model_url['detector'][1]:
@@ -236,7 +237,7 @@ class Reader(object):
             os.remove(detector_path)
             LOGGER.warning('Re-downloading the detection model, please wait. '
                            'This may take several minutes depending upon your network connection.')
-            urlretrieve(model_url['detector'][0], detector_path)
+            download_file_from_google_drive(model_url['detector'][0], detector_path)
             assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
         # check model file
         if os.path.isfile(model_path) == False:
@@ -244,7 +245,7 @@ class Reader(object):
                 raise FileNotFoundError("Missing %s and downloads disabled" % model_path)
             LOGGER.warning('Downloading recognition model, please wait. '
                            'This may take several minutes depending upon your network connection.')
-            urlretrieve(model_url[model_file][0], model_path)
+            download_file_from_google_drive(model_url[model_file][0], model_path)
             assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
             LOGGER.info('Download complete.')
         elif calculate_md5(model_path) != model_url[model_file][1]:
@@ -254,7 +255,7 @@ class Reader(object):
             os.remove(model_path)
             LOGGER.warning('Re-downloading the recognition model, please wait. '
                            'This may take several minutes depending upon your network connection.')
-            urlretrieve(model_url[model_file][0], model_path)
+            download_file_from_google_drive(model_url[model_file][0], model_path)
             assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
             LOGGER.info('Download complete')
 
@@ -292,8 +293,12 @@ class Reader(object):
             img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         elif type(image) == np.ndarray:
-            img = image
-            img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            if len(image.shape) == 2: # grayscale
+                img_cv_grey = image
+                img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+            elif len(image.shape) == 3: # BGRscale
+                img = image
+                img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         text_box = get_textbox(self.detector, img, canvas_size, mag_ratio, text_threshold,\
                                link_threshold, low_text, False, self.device)
