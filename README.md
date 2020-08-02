@@ -12,6 +12,7 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 - 24 July 2020 - Version 1.1.5
     - New language support for Hindi, Marathi, Nepali (Devanagari Script)
     - Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
+- [Read all released notes](https://github.com/JaidedAI/EasyOCR/releasenotes.md)
 
 ## What's coming next?
 - [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
@@ -36,7 +37,7 @@ Indonesian (id), Icelandic (is), Italian (it), Japanese (ja), Korean (ko),
 Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Mongolian (mn),
 Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
 Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru),
-Serbian (cyrillic)(rs_cyrillic), Serbian (latin)(rs_latin), 
+Serbian (cyrillic)(rs_cyrillic), Serbian (latin)(rs_latin),
 Slovak (sk) (need revisit), Slovenian (sl), Albanian (sq), Swedish (sv),
 Swahili (sw), Thai (th), Tagalog (tl), Turkish (tr), Ukranian(uk), Uzbek (uz),
 Vietnamese (vi) (need revisit)
@@ -204,6 +205,8 @@ See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issue
 > **Parameters**
 > * **lang_list** (list) - list of language code you want to recognize, for example ['ch_sim','en']. List of supported language code is [here](#Supported-Languages).
 > * **gpu** (bool, string, default = True)
+> * **model_storage_directory** (string, default = None)
+> * **download_enabled** (bool, default = True)
 >
 > **Attribute**
 > * **lang_char** - Show all available characters in current model

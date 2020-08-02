@@ -4,6 +4,7 @@ from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
 from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph
+from bidi.algorithm import get_display
 import numpy as np
 import cv2
 import torch
@@ -34,10 +35,11 @@ latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
                    'hr','hu','id','is','it','ku','la','lt','lv','mi','ms','mt',\
                    'nl','no','oc','pl','pt','ro','rs_latin','sk','sl','sq',\
                    'sv','sw','tl','tr','uz','vi']
+arabic_lang_list = ['ar','fa','ug','ur']
 cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn']
 devanagari_lang_list = ['hi','mr','ne']
 
-all_lang_list = latin_lang_list + cyrillic_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko']
+all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko']
 imgH = 64
 input_channel = 1
 output_channel = 512
@@ -57,6 +59,7 @@ model_url = {
     'thai.pth': ('https://www.jaided.ai/read_download/thai.pth', '40a06b563a2b3d7897e2d19df20dc709'),
     'devanagari.pth': ('https://www.jaided.ai/read_download/devanagari.pth', 'db6b1f074fae3070f561675db908ac08'),
     'cyrillic.pth': ('https://www.jaided.ai/read_download/cyrillic.pth', '5a046f7be2a4f7da6ed50740f487efa8'),
+    'arabic.pth': ('', ''),
 }
 
 class Reader(object):
@@ -119,6 +122,10 @@ class Reader(object):
             self.model_lang = 'korean'
             if set(lang_list) - set(['ko','en']) != set():
                 raise ValueError('Korean is only compatible with English, try lang_list=["ko","en"]')
+        elif set(lang_list) & set(arabic_lang_list):
+            self.model_lang = 'arabic'
+            if set(lang_list) - set(arabic_lang_list+['en']) != set():
+                raise ValueError('Arabic is only compatible with English, try lang_list=["ar","fa","ur","ug","en"]')
         elif set(lang_list) & set(devanagari_lang_list):
             self.model_lang = 'devanagari'
             if set(lang_list) - set(devanagari_lang_list+['en']) != set():
@@ -135,6 +142,12 @@ class Reader(object):
             'ÀÁÂÃÄÅÆÇÈÉÊËÍÎÑÒÓÔÕÖØÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿąęĮįıŁłŒœŠšųŽž'
             self.character = number+ symbol + all_char
             model_file = 'latin.pth'
+        elif self.model_lang == 'arabic':
+            ar_number = '٠١٢٣٤٥٦٧٨٩'
+            ar_symbol = '«»؟،؛'
+            ar_char = 'ءآأؤإئااًبةتثجحخدذرزسشصضطظعغفقكلمنهوىيًٌٍَُِّْٰٓٔٱٹپچڈڑژکڭگںھۀہۂۃۆۇۈۋیېےۓە'
+            self.character = number+ symbol + en_char + ar_number + ar_symbol + ar_char
+            model_file = 'arabic.pth'
         elif self.model_lang == 'cyrillic':
             cyrillic_char = 'ЁЂЄІЇЈЉЊЋЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяёђєіїјљњћўџҐґҮүө'
             self.character = number+ symbol + en_char + cyrillic_char
@@ -301,6 +314,11 @@ class Reader(object):
         result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                       workers, self.device)
+
+        if self.model_lang == 'arabic':
+            result = [list(item) for item in result]
+            for item in result:
+                item[1] = get_display(item[1])
 
         if paragraph:
             result = get_paragraph(result)
