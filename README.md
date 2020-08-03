@@ -12,7 +12,7 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 - 24 July 2020 - Version 1.1.5
     - New language support for Hindi, Marathi, Nepali (Devanagari Script)
     - Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
-- [Read all released notes](https://github.com/JaidedAI/EasyOCR/releasenotes.md)
+- [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next?
 - [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
