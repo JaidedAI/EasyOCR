@@ -9,6 +9,11 @@
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new?
+- 4 August 2020 - Version 1.1.6
+    - New language support for Russian, Serbian, Belarusian, Bulgarian, Mongolian, Ukranian (Cyrillic Script) and Arabic, Persian(Farsi), Urdu, Uyghur (Arabic Script)
+    - Docker file and Ainize demo (thanks @ghandic and @Wook-2)
+    - Better production friendly with Logger and custom model folder location (By setting ` model_storage_directory` when create `Reader` instance) (thanks @jpotter)
+
 - 24 July 2020 - Version 1.1.5
     - New language support for Hindi, Marathi, Nepali (Devanagari Script)
     - Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
@@ -27,11 +32,11 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 ## Supported Languages
 
-We are currently supporting the following 54 languages.
+We are currently supporting the following 58 languages.
 
-Afrikaans (af), Azerbaijani (az), Belarusian (be), Bulgarian (bg), Bosnian (bs),
+Afrikaans (af), Arabic (ar), Azerbaijani (az), Belarusian (be), Bulgarian (bg), Bosnian (bs),
 Simplified Chinese (ch_sim), Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
-Danish (da), German (de), English (en), Spanish (es), Estonian (et),
+Danish (da), German (de), English (en), Spanish (es), Estonian (et), Persian (Farsi) (fa)
 French (fr), Irish (ga), Hindi(hi), Croatian (hr), Hungarian (hu),
 Indonesian (id), Icelandic (is), Italian (it), Japanese (ja), Korean (ko),
 Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Mongolian (mn),
@@ -39,8 +44,8 @@ Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
 Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru),
 Serbian (cyrillic)(rs_cyrillic), Serbian (latin)(rs_latin),
 Slovak (sk) (need revisit), Slovenian (sl), Albanian (sq), Swedish (sv),
-Swahili (sw), Thai (th), Tagalog (tl), Turkish (tr), Ukranian(uk), Uzbek (uz),
-Vietnamese (vi) (need revisit)
+Swahili (sw), Thai (th), Tagalog (tl), Turkish (tr), Uyghur (ug), Ukranian(uk), Urdu (ur),
+Uzbek (uz), Vietnamese (vi) (need revisit)
 
 List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
 If you are native speaker of any language and think we should add or remove any character,

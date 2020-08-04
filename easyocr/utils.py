@@ -7,8 +7,13 @@ import math
 import cv2
 from PIL import Image
 import hashlib
-import sys
-import requests
+import sys, os
+from zipfile import ZipFile
+
+if sys.version_info[0] == 2:
+    from six.moves.urllib.request import urlretrieve
+else:
+    from urllib.request import urlretrieve
 
 def consecutive(data, mode ='first', stepsize=1):
     group = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
@@ -484,29 +489,12 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64):
     image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
 
-# code from https://stackoverflow.com/questions/25010369/wget-curl-large-file-from-google-drive
-def download_file_from_google_drive(id, destination):
-    def get_confirm_token(response):
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                return value
-        return None
-
-    def save_response_content(response, destination):
-        CHUNK_SIZE = 32768
-        with open(destination, "wb") as f:
-            for chunk in response.iter_content(CHUNK_SIZE):
-                if chunk: # filter out keep-alive new chunks
-                    f.write(chunk)
-
-    URL = "https://docs.google.com/uc?export=download"
-    session = requests.Session()
-    response = session.get(URL, params = { 'id' : id }, stream = True)
-    token = get_confirm_token(response)
-    if token:
-        params = { 'id' : id, 'confirm' : token }
-        response = session.get(URL, params = params, stream = True)
-    save_response_content(response, destination)
+def download_and_unzip(url, filename, model_storage_directory):
+    zip_path = os.path.join(model_storage_directory, 'temp.zip')
+    urlretrieve(url, zip_path)
+    with ZipFile(zip_path, 'r') as zipObj:
+        zipObj.extract(filename, model_storage_directory)
+    os.remove(zip_path)
 
 def calculate_md5(fname):
     hash_md5 = hashlib.md5()
