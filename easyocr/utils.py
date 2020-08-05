@@ -560,6 +560,10 @@ def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
                 most_left = min([box[1] for box in candidates])
                 for box in candidates:
                     if box[1] == most_left: best_box = box
+            elif mode == 'rtl':
+                most_right = max([box[2] for box in candidates])
+                for box in candidates:
+                    if box[2] == most_right: best_box = box
             text += ' '+best_box[0]
             current_box_group.remove(best_box)
 

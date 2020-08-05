@@ -321,12 +321,15 @@ class Reader(object):
                       workers, self.device)
 
         if self.model_lang == 'arabic':
+            direction_mode = 'rtl'
             result = [list(item) for item in result]
             for item in result:
                 item[1] = get_display(item[1])
+        else:
+            direction_mode = 'ltr'
 
         if paragraph:
-            result = get_paragraph(result)
+            result = get_paragraph(result, mode = direction_mode)
 
         if detail == 0:
             return [item[1] for item in result]
