@@ -132,7 +132,7 @@ In case you do not have GPU or your GPU has low memory, you can run it in CPU mo
 reader = easyocr.Reader(['th','en'], gpu = False)
 ```
 
-See [Documentation](#API-Documentation)
+For more information, read [tutorial](https://www.jaided.ai/easyocr_tutorial) and [API Documentation](https://www.jaided.ai/easyocr_doc).
 
 #### Run on command line
 
