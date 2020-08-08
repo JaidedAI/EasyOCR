@@ -129,7 +129,7 @@ download it manually from the following links and put it in '~/.EasyOCR/model' f
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
 ``` python
-reader = easyocr.Reader(['th','en'], gpu = False)
+reader = easyocr.Reader(['ch_sim','en'], gpu = False)
 ```
 
 For more information, read [tutorial](https://www.jaided.ai/easyocr/tutorial) and [API Documentation](https://www.jaided.ai/easyocr/documentation).
