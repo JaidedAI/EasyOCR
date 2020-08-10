@@ -20,6 +20,7 @@ else:
     from urllib.request import urlretrieve
     from pathlib import Path
 
+os.environ["LRU_CACHE_CAPACITY"] = "1"
 LOGGER = getLogger(__name__)
 
 BASE_PATH = os.path.dirname(__file__)
@@ -39,7 +40,7 @@ arabic_lang_list = ['ar','fa','ug','ur']
 cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn']
 devanagari_lang_list = ['hi','mr','ne']
 
-all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko']
+all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko','ta']
 imgH = 64
 input_channel = 1
 output_channel = 512
@@ -61,6 +62,7 @@ model_url = {
     'devanagari.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/devanagari.zip', 'db6b1f074fae3070f561675db908ac08'),
     'cyrillic.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/cyrillic.zip', '5a046f7be2a4f7da6ed50740f487efa8'),
     'arabic.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/arabic.zip', '993074555550e4e06a6077d55ff0449a'),
+    'tamil.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip', '4b93972fdacdcdabe6d57097025d4dc2'),
 }
 
 class Reader(object):
@@ -123,6 +125,10 @@ class Reader(object):
             self.model_lang = 'korean'
             if set(lang_list) - set(['ko','en']) != set():
                 raise ValueError('Korean is only compatible with English, try lang_list=["ko","en"]')
+        elif 'ta' in lang_list:
+            self.model_lang = 'tamil'
+            if set(lang_list) - set(['ta','en']) != set():
+                raise ValueError('Tamil is only compatible with English, try lang_list=["ta","en"]')
         elif set(lang_list) & set(arabic_lang_list):
             self.model_lang = 'arabic'
             if set(lang_list) - set(arabic_lang_list+['en']) != set():
@@ -185,6 +191,13 @@ class Reader(object):
                 ko_char = ''.join(ko_list)
             self.character = number + symbol + en_char + ko_char
             model_file = 'korean.pth'
+        elif  self.model_lang == 'tamil':
+            char_file = os.path.join(BASE_PATH, 'character', "ta_char.txt")
+            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
+                ta_list =  input_file.read().splitlines()
+                ta_char = ''.join(ta_list)
+            self.character = number + symbol + en_char + ta_char
+            model_file = 'tamil.pth'
         elif self.model_lang == 'thai':
             separator_list = {
                 'th': ['\xa2', '\xa3'],
