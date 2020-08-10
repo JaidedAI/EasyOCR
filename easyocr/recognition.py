@@ -91,16 +91,15 @@ class AlignCollate(object):
             resized_image = image.resize((resized_w, self.imgH), Image.BICUBIC)
             resized_images.append(transform(resized_image))
 
-        #image_tensors = torch.cat([t.unsqueeze(0) for t in resized_images], 0)
-        return resized_images
+        image_tensors = torch.cat([t.unsqueeze(0) for t in resized_images], 0)
+        return image_tensors
 
 def recognizer_predict(model, converter, test_loader, batch_max_length,\
                        ignore_idx, char_group_idx, decoder = 'greedy', beamWidth= 5, device = 'cpu'):
     model.eval()
     result = []
     with torch.no_grad():
-        for resized_images in test_loader:
-            image_tensors = torch.cat([t.unsqueeze(0) for t in resized_images], 0)
+        for image_tensors in test_loader:
             batch_size = image_tensors.size(0)
             image = image_tensors.to(device)
             # For max length prediction
