@@ -16,9 +16,6 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
     - New language support for Russian, Serbian, Belarusian, Bulgarian, Mongolian, Ukranian (Cyrillic Script) and Arabic, Persian(Farsi), Urdu, Uyghur (Arabic Script)
     - Docker file and Ainize demo (thanks @ghandic and @Wook-2)
     - Better production friendly with Logger and custom model folder location (By setting ` model_storage_directory` when create `Reader` instance) (thanks @jpotter)
-- 24 July 2020 - Version 1.1.5
-    - New language support for Hindi, Marathi, Nepali (Devanagari Script)
-    - Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next?
@@ -34,7 +31,7 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 ## Supported Languages
 
-We are currently supporting the following 58 languages.
+We are currently supporting the following 59 languages.
 
 Afrikaans (af), Arabic (ar), Azerbaijani (az), Belarusian (be), Bulgarian (bg), Bosnian (bs),
 Simplified Chinese (ch_sim), Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
@@ -46,7 +43,7 @@ Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
 Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru),
 Serbian (cyrillic)(rs_cyrillic), Serbian (latin)(rs_latin),
 Slovak (sk) (need revisit), Slovenian (sl), Albanian (sq), Swedish (sv),
-Swahili (sw), Thai (th), Tagalog (tl), Turkish (tr), Uyghur (ug), Ukranian(uk), Urdu (ur),
+Swahili (sw), Tamil (ta), Thai (th), Tagalog (tl), Turkish (tr), Uyghur (ug), Ukranian(uk), Urdu (ur),
 Uzbek (uz), Vietnamese (vi) (need revisit)
 
 List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
