@@ -5,6 +5,7 @@
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)
 [![Tweet](https://img.shields.io/twitter/url/https/github.com/JaidedAI/EasyOCR.svg?style=social)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20library:%20EasyOCR%20https://github.com/JaidedAI/EasyOCR)
 [![Twitter](https://img.shields.io/badge/twitter-@JaidedAI-blue.svg?style=flat)](https://twitter.com/JaidedAI)
+[![Gitter](https://badges.gitter.im/EasyOCR/community.svg)](https://gitter.im/EasyOCR/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
 
