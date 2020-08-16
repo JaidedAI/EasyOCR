@@ -6,7 +6,7 @@ from .modules import BidirectionalLSTM, ResNet_FeatureExtractor
 
 class RecognitionModel(nn.Module):
     def __init__(self, input_channel: int, output_channel: int, hidden_size: int, num_class: int):
-        super(Model, self).__init__()
+        super(RecognitionModel, self).__init__()
         """ FeatureExtraction """
         self.FeatureExtraction = ResNet_FeatureExtractor(input_channel, output_channel)
         self.FeatureExtraction_output = output_channel  # int(imgH/16-1) * 512
@@ -22,8 +22,8 @@ class RecognitionModel(nn.Module):
         """ Prediction """
         self.Prediction = nn.Linear(self.SequenceModeling_output, num_class)
 
-    # def forward(self, input, text): NOTE: text var not used
-    def forward(self, input: torch.Tensor) -> torch.Tensor:
+    #  NOTE: ghandic - text var not used
+    def forward(self, input: torch.Tensor, text: str) -> torch.Tensor:
         """ Feature extraction stage """
         visual_feature = self.FeatureExtraction(input)
         visual_feature = self.AdaptiveAvgPool(visual_feature.permute(0, 3, 1, 2))  # [b, c, h, w] -> [b, w, c, h]

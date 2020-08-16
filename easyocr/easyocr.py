@@ -3,7 +3,7 @@
 import os
 import sys
 from logging import getLogger
-from typing import Any, List
+from typing import Any, List, Tuple
 
 import cv2
 import numpy as np
@@ -13,7 +13,7 @@ from bidi.algorithm import get_display
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .settings import DETECTOR_FILENAME, MODULE_PATH, all_lang_list
+from .settings import *
 from .utils import calculate_md5, download_and_unzip, get_image_list, get_paragraph, group_text_box
 
 if sys.version_info[0] == 2:
@@ -42,23 +42,23 @@ class Reader(object):
             download_enabled (bool, optional): Enabled downloading of model data via HTTP. Defaults to True.
         """
 
-        self.download_enabled = download_enabled
-        self._set_model_dir(model_storage_directory)
         self._set_device(gpu)
         self._set_model_lang(lang_list)
         self._set_character_choices()
         self._set_lang_char(lang_list)  # self.lang_list doesn't seem to be used
-        self._download_models()
 
-        self.detector = get_detector(detector_path, self.device)
+        self._set_model_paths(model_storage_directory)
+        self._download_models(download_enabled)
+
+        self.detector = get_detector(self._detector_path, self.device)
         self.recognizer, self.converter = get_recognizer(
             input_channel,
             output_channel,
             hidden_size,
             self.character,
-            separator_list,
-            dict_list,
-            model_path,
+            self.separator_list,
+            self.dict_list,
+            self._recognition_model_path,
             device=self.device,
         )
 
@@ -199,59 +199,67 @@ class Reader(object):
 
         return img, img_cv_grey
 
-    def _download_models(self):
-        model_path = os.path.join(self.model_storage_directory, model_file)
+    def _download_models(self, download_enabled):
+
         corrupt_msg = "MD5 hash mismatch, possible file corruption"
-        detector_path = os.path.join(self.model_storage_directory, DETECTOR_FILENAME)
-        if os.path.isfile(detector_path) == False:
-            if not self.download_enabled:
-                raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
+
+        if os.path.isfile(self._detector_path) == False:
+            if not download_enabled:
+                raise FileNotFoundError("Missing %s and downloads disabled" % self._detector_path)
             LOGGER.warning(
                 "Downloading detection model, please wait. "
                 "This may take several minutes depending upon your network connection."
             )
             download_and_unzip(model_url["detector"][0], DETECTOR_FILENAME, self.model_storage_directory)
-            assert calculate_md5(detector_path) == model_url["detector"][1], corrupt_msg
+            assert calculate_md5(self._detector_path) == model_url["detector"][1], corrupt_msg
             LOGGER.info("Download complete")
-        elif calculate_md5(detector_path) != model_url["detector"][1]:
-            if not self.download_enabled:
-                raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % detector_path)
+        elif calculate_md5(self._detector_path) != model_url["detector"][1]:
+            if not download_enabled:
+                raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % self._detector_path)
             LOGGER.warning(corrupt_msg)
-            os.remove(detector_path)
+            os.remove(self._detector_path)
             LOGGER.warning(
                 "Re-downloading the detection model, please wait. "
                 "This may take several minutes depending upon your network connection."
             )
             download_and_unzip(model_url["detector"][0], DETECTOR_FILENAME, self.model_storage_directory)
-            assert calculate_md5(detector_path) == model_url["detector"][1], corrupt_msg
+            assert calculate_md5(self._detector_path) == model_url["detector"][1], corrupt_msg
         # check model file
-        if os.path.isfile(model_path) == False:
-            if not self.download_enabled:
-                raise FileNotFoundError("Missing %s and downloads disabled" % model_path)
+        if os.path.isfile(self._recognition_model_path) == False:
+            if not download_enabled:
+                raise FileNotFoundError("Missing %s and downloads disabled" % self._recognition_model_path)
             LOGGER.warning(
                 "Downloading recognition model, please wait. "
                 "This may take several minutes depending upon your network connection."
             )
-            download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
-            assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
+            download_and_unzip(
+                model_url[self._recognition_model_file][0], self._recognition_model_file, self.model_storage_directory
+            )
+            assert (
+                calculate_md5(self._recognition_model_path) == model_url[self._recognition_model_file][1]
+            ), corrupt_msg
             LOGGER.info("Download complete.")
-        elif calculate_md5(model_path) != model_url[model_file][1]:
-            if not self.download_enabled:
-                raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % model_path)
+        elif calculate_md5(self._recognition_model_path) != model_url[self._recognition_model_file][1]:
+            if not download_enabled:
+                raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % self._recognition_model_path)
             LOGGER.warning(corrupt_msg)
-            os.remove(model_path)
+            os.remove(self._recognition_model_path)
             LOGGER.warning(
                 "Re-downloading the recognition model, please wait. "
                 "This may take several minutes depending upon your network connection."
             )
-            download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
-            assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
+            download_and_unzip(
+                model_url[self._recognition_model_file][0], self._recognition_model_file, self.model_storage_directory
+            )
+            assert (
+                calculate_md5(self._recognition_model_path) == model_url[self._recognition_model_file][1]
+            ), corrupt_msg
             LOGGER.info("Download complete")
 
     def _set_lang_char(self, lang_list: List[str]):
-        dict_list = {}
+        self.dict_list = {}
         for lang in lang_list:
-            dict_list[lang] = os.path.join(BASE_PATH, "dict", lang + ".txt")
+            self.dict_list[lang] = os.path.join(BASE_PATH, "dict", lang + ".txt")
 
         self.lang_char = []
         for lang in lang_list:
@@ -263,7 +271,6 @@ class Reader(object):
         self.lang_char = "".join(self.lang_char)
 
     def _set_model_lang(self, lang_list: List[str]):
-
         # check available languages
         unknown_lang = set(lang_list) - set(all_lang_list)
         if unknown_lang != set():
@@ -312,72 +319,71 @@ class Reader(object):
             self.model_lang = "latin"
 
     def _set_character_choices(self):
-
-        separator_list = {}
+        self.separator_list = {}
         if self.model_lang == "latin":
             all_char = (
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
                 + "ÀÁÂÃÄÅÆÇÈÉÊËÍÎÑÒÓÔÕÖØÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿąęĮįıŁłŒœŠšųŽž"
             )
             self.character = number + symbol + all_char
-            model_file = "latin.pth"
+            self._recognition_model_file = "latin.pth"
         elif self.model_lang == "arabic":
             ar_number = "٠١٢٣٤٥٦٧٨٩"
             ar_symbol = "«»؟،؛"
             ar_char = "ءآأؤإئااًبةتثجحخدذرزسشصضطظعغفقكلمنهوىيًٌٍَُِّْٰٓٔٱٹپچڈڑژکڭگںھۀہۂۃۆۇۈۋیېےۓە"
             self.character = number + symbol + en_char + ar_number + ar_symbol + ar_char
-            model_file = "arabic.pth"
+            self._recognition_model_file = "arabic.pth"
         elif self.model_lang == "cyrillic":
             cyrillic_char = (
                 "ЁЂЄІЇЈЉЊЋЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяёђєіїјљњћўџҐґҮүө"
             )
             self.character = number + symbol + en_char + cyrillic_char
-            model_file = "cyrillic.pth"
+            self._recognition_model_file = "cyrillic.pth"
         elif self.model_lang == "devanagari":
             devanagari_char = (
                 ".ँंःअअंअःआइईउऊऋएऐऑओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयरऱलळवशषसह़ािीुूृॅेैॉोौ्ॐ॒क़ख़ग़ज़ड़ढ़फ़ॠ।०१२३४५६७८९॰"
             )
             self.character = number + symbol + en_char + devanagari_char
-            model_file = "devanagari.pth"
+            self._recognition_model_file = "devanagari.pth"
         elif self.model_lang == "chinese_tra":
             char_file = os.path.join(BASE_PATH, "character", "ch_tra_char.txt")
             with open(char_file, "r", encoding="utf-8-sig") as input_file:
                 ch_tra_list = input_file.read().splitlines()
                 ch_tra_char = "".join(ch_tra_list)
             self.character = number + symbol + en_char + ch_tra_char
-            model_file = "chinese.pth"
+            self._recognition_model_file = "chinese.pth"
         elif self.model_lang == "chinese_sim":
             char_file = os.path.join(BASE_PATH, "character", "ch_sim_char.txt")
             with open(char_file, "r", encoding="utf-8-sig") as input_file:
                 ch_sim_list = input_file.read().splitlines()
                 ch_sim_char = "".join(ch_sim_list)
             self.character = number + symbol + en_char + ch_sim_char
-            model_file = "chinese_sim.pth"
+            self._recognition_model_file = "chinese_sim.pth"
         elif self.model_lang == "japanese":
             char_file = os.path.join(BASE_PATH, "character", "ja_char.txt")
             with open(char_file, "r", encoding="utf-8-sig") as input_file:
                 ja_list = input_file.read().splitlines()
                 ja_char = "".join(ja_list)
             self.character = number + symbol + en_char + ja_char
-            model_file = "japanese.pth"
+            self._recognition_model_file = "japanese.pth"
         elif self.model_lang == "korean":
             char_file = os.path.join(BASE_PATH, "character", "ko_char.txt")
             with open(char_file, "r", encoding="utf-8-sig") as input_file:
                 ko_list = input_file.read().splitlines()
                 ko_char = "".join(ko_list)
             self.character = number + symbol + en_char + ko_char
-            model_file = "korean.pth"
+            self._recognition_model_file = "korean.pth"
         elif self.model_lang == "tamil":
             char_file = os.path.join(BASE_PATH, "character", "ta_char.txt")
             with open(char_file, "r", encoding="utf-8-sig") as input_file:
                 ta_list = input_file.read().splitlines()
                 ta_char = "".join(ta_list)
             self.character = number + symbol + en_char + ta_char
-            model_file = "tamil.pth"
+            self._recognition_model_file = "tamil.pth"
         elif self.model_lang == "thai":
-            separator_list = {"th": ["\xa2", "\xa3"], "en": ["\xa4", "\xa5"]}
+            self.separator_list = {"th": ["\xa2", "\xa3"], "en": ["\xa4", "\xa5"]}
             separator_char = []
-            for lang, sep in separator_list.items():
+            for lang, sep in self.separator_list.items():
                 separator_char += sep
 
             special_c0 = "ุู"
@@ -388,15 +394,18 @@ class Reader(object):
             th_char = "กขคฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮฤ" + "เแโใไะา" + special_c + "ํฺ" + "ฯๆ"
             th_number = "0123456789๑๒๓๔๕๖๗๘๙"
             self.character = "".join(separator_char) + symbol + en_char + th_char + th_number
-            model_file = "thai.pth"
+            self._recognition_model_file = "thai.pth"
         else:
             LOGGER.error("invalid language")
+            raise NotImplementedError("invalid language")
 
-    def _set_model_dir(self, dir: str):
+    def _set_model_paths(self, dir: str):
         self.model_storage_directory = MODULE_PATH + "/model"
         if dir:
             self.model_storage_directory = dir
         Path(self.model_storage_directory).mkdir(parents=True, exist_ok=True)
+        self._recognition_model_path = os.path.join(self.model_storage_directory, self._recognition_model_file)
+        self._detector_path = os.path.join(self.model_storage_directory, DETECTOR_FILENAME)
 
     def _set_device(self, gpu: bool):
         if gpu is False:

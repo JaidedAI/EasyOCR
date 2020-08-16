@@ -154,7 +154,7 @@ def recognizer_predict(
     test_loader: torch.utils.data.DataLoader,
     batch_max_length: int,
     ignore_idx: List[int],
-    # char_group_idx,
+    char_group_idx,  # NOTE: - ghandic Not used
     decoder: str = "greedy",
     beamWidth: int = 5,
     device: str = "cpu",

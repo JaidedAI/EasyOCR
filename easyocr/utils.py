@@ -7,7 +7,7 @@ import os
 import pickle
 import re
 import sys
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 from zipfile import ZipFile
 
 import cv2
@@ -44,7 +44,7 @@ def consecutive(data: np.ndarray, mode: str = "first", stepsize: int = 1) -> Lis
 
 def word_segmentation(
     mat: np.ndarray,
-    separator_idx: Dict[str : List[int]] = {"th": [1, 2], "en": [3, 4]},
+    separator_idx: Dict[str, List[int]] = {"th": [1, 2], "en": [3, 4]},
     separator_idx_list: List[int] = [1, 2, 3, 4],
 ) -> List:
     """[summary]  # TODO
@@ -762,7 +762,7 @@ def calculate_md5(fname: str) -> str:
 
 def get_paragraph(
     raw_result: List, x_ths: float = 1, y_ths: float = 0.5, mode: str = "ltr"
-) -> List[List[List[Tuple[float, float], Tuple[float, float], Tuple[float, float], Tuple[float, float]], str]]:
+) -> List[List[Union[List[Tuple[float, float]], str]]]:
     """[summary] # TODO: ghandic - Unsure on raw_result shape/data types
 
     Args:
@@ -772,7 +772,7 @@ def get_paragraph(
         mode (str, optional): [description]. Defaults to "ltr".
 
     Returns:
-        List[List[List[Tuple[float, float], Tuple[float, float], Tuple[float, float], Tuple[float, float]], str]]: [description]
+        List[List[Union[List[Tuple[float, float]], str]]]: [description]
     """
     # create basic attributes
     box_group = []

@@ -1,5 +1,6 @@
+import os
+
 os.environ["LRU_CACHE_CAPACITY"] = "1"
-LOGGER = getLogger(__name__)
 
 BASE_PATH = os.path.dirname(__file__)
 MODULE_PATH = (

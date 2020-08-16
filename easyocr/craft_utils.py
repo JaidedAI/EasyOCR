@@ -109,8 +109,8 @@ def getDetBoxes_core(
     return det, labels, mapper
 
 
-# def getPoly_core(boxes:List, labels:np.ndarray, mapper:List[int], linkmap:np.ndarray): - ghandic linkmap not used
-def getPoly_core(boxes: List, labels: np.ndarray, mapper: List[int]) -> List[np.ndarray]:
+# NOTE: - ghandic linkmap not used
+def getPoly_core(boxes: List, labels: np.ndarray, mapper: List[int], linkmap: np.ndarray) -> List[np.ndarray]:
     """[summary] # TODO
 
     Args:
