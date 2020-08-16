@@ -2,7 +2,7 @@ FROM pytorch/pytorch
 
 # if you forked EasyOCR, you can pass in your own GitHub username to use your fork
 # i.e. gh_username=myname
-ARG gh_username=JaidedAI
+ARG gh_username=ghandic
 ARG language_models="['ch_sim','en']"
 ARG service_home="/home/EasyOCR"
 
@@ -13,6 +13,7 @@ RUN apt-get update -y && \
     libsm6 \
     libxext6 \
     libxrender-dev \
+    libgl1-mesa-dev \
     git \
     # cleanup
     && apt-get autoremove -y \
@@ -23,7 +24,7 @@ RUN apt-get update -y && \
 RUN mkdir "$service_home" \
     && git clone "https://github.com/$gh_username/EasyOCR.git" "$service_home" \
     && cd "$service_home" \
-    && git remote add upstream "https://github.com/JaidedAI/EasyOCR.git" \
+    && git remote add upstream "https://github.com/$gh_username/EasyOCR.git" \
     && git pull upstream master
 
 # Build C extensions and pandas

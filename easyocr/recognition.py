@@ -1,39 +1,74 @@
-from PIL import Image
+import math
+from collections import OrderedDict
+from typing import Dict, List, Tuple
+
+import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
-import torch.utils.data
 import torch.nn.functional as F
+import torch.utils.data
 import torchvision.transforms as transforms
-import numpy as np
-from collections import OrderedDict
+from PIL import Image
 
-from .model import Model
+from .model import RecognitionModel
 from .utils import CTCLabelConverter
-import math
 
-def contrast_grey(img):
+
+def contrast_grey(img: np.ndarray) -> Tuple[float, float, float]:
+    """[summary] # TODO
+
+    Args:
+        img (np.ndarray): [description]
+
+    Returns:
+        Tuple[float, float, float]: [description]
+    """
     high = np.percentile(img, 90)
-    low  = np.percentile(img, 10)
-    return (high-low)/np.maximum(10, high+low), high, low
+    low = np.percentile(img, 10)
+    return (high - low) / np.maximum(10, high + low), high, low
 
-def adjust_contrast_grey(img, target = 0.4):
+
+def adjust_contrast_grey(img: np.ndarray, target: float = 0.4) -> np.ndarray:
+    """[summary] # TODO
+
+    Args:
+        img (np.ndarray): [description]
+        target (float, optional): [description]. Defaults to 0.4.
+
+    Returns:
+        np.ndarray: [description]
+    """
     contrast, high, low = contrast_grey(img)
     if contrast < target:
         img = img.astype(int)
-        ratio = 200./np.maximum(10, high-low)
-        img = (img - low + 25)*ratio
-        img = np.maximum(np.full(img.shape, 0) ,np.minimum(np.full(img.shape, 255), img)).astype(np.uint8)
+        ratio = 200.0 / np.maximum(10, high - low)
+        img = (img - low + 25) * ratio
+        img = np.maximum(np.full(img.shape, 0), np.minimum(np.full(img.shape, 255), img)).astype(np.uint8)
     return img
 
-class NormalizePAD(object):
 
-    def __init__(self, max_size, PAD_type='right'):
+class NormalizePAD(object):
+    def __init__(self, max_size: int, PAD_type: str = "right"):
+        """[summary] # TODO
+
+        Args:
+            max_size (int): [description]
+            PAD_type (str, optional): [description]. Defaults to "right".
+        """
         self.toTensor = transforms.ToTensor()
         self.max_size = max_size
         self.max_width_half = math.floor(max_size[2] / 2)
         self.PAD_type = PAD_type
 
-    def __call__(self, img):
+    def __call__(self, img: np.ndarray) -> np.ndarray:
+        """[summary] # TODO
+
+        Args:
+            img (np.ndarray): [description]
+
+        Returns:
+            np.ndarray: [description]
+        """
         img = self.toTensor(img)
         img.sub_(0.5).div_(0.5)
         c, h, w = img.size()
@@ -44,28 +79,46 @@ class NormalizePAD(object):
 
         return Pad_img
 
-class ListDataset(torch.utils.data.Dataset):
 
-    def __init__(self, image_list):
+class ListDataset(torch.utils.data.Dataset):
+    def __init__(self, image_list: List[np.ndarray]):
         self.image_list = image_list
         self.nSamples = len(image_list)
 
     def __len__(self):
         return self.nSamples
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Image.Image:
         img = self.image_list[index]
-        return Image.fromarray(img, 'L')
+        return Image.fromarray(img, "L")
+
 
 class AlignCollate(object):
+    def __init__(
+        self, imgH: int = 32, imgW: int = 100, keep_ratio_with_pad: bool = False, adjust_contrast: float = 0.0
+    ):
+        """[summary] # TODO
 
-    def __init__(self, imgH=32, imgW=100, keep_ratio_with_pad=False, adjust_contrast = 0.):
+        Args:
+            imgH (int, optional): [description]. Defaults to 32.
+            imgW (int, optional): [description]. Defaults to 100.
+            keep_ratio_with_pad (bool, optional): [description]. Defaults to False.
+            adjust_contrast (float, optional): [description]. Defaults to 0.0.
+        """
         self.imgH = imgH
         self.imgW = imgW
         self.keep_ratio_with_pad = keep_ratio_with_pad
         self.adjust_contrast = adjust_contrast
 
-    def __call__(self, batch):
+    def __call__(self, batch: List[np.ndarray]) -> torch.Tensor:
+        """[summary] # TODO
+
+        Args:
+            batch (List[np.ndarray]): [description]
+
+        Returns:
+            torch.Tensor: [description]
+        """
         batch = filter(lambda x: x is not None, batch)
         images = batch
 
@@ -79,8 +132,8 @@ class AlignCollate(object):
             #### augmentation here - change contrast
             if self.adjust_contrast > 0:
                 image = np.array(image.convert("L"))
-                image = adjust_contrast_grey(image, target = self.adjust_contrast)
-                image = Image.fromarray(image, 'L')
+                image = adjust_contrast_grey(image, target=self.adjust_contrast)
+                image = Image.fromarray(image, "L")
 
             ratio = w / float(h)
             if math.ceil(self.imgH * ratio) > self.imgW:
@@ -94,8 +147,33 @@ class AlignCollate(object):
         image_tensors = torch.cat([t.unsqueeze(0) for t in resized_images], 0)
         return image_tensors
 
-def recognizer_predict(model, converter, test_loader, batch_max_length,\
-                       ignore_idx, char_group_idx, decoder = 'greedy', beamWidth= 5, device = 'cpu'):
+
+def recognizer_predict(
+    model: RecognitionModel,
+    converter: CTCLabelConverter,
+    test_loader: torch.utils.data.DataLoader,
+    batch_max_length: int,
+    ignore_idx: List[int],
+    # char_group_idx,
+    decoder: str = "greedy",
+    beamWidth: int = 5,
+    device: str = "cpu",
+) -> List[Tuple[str, float]]:
+    """[summary] # TODO
+
+    Args:
+        model (RecognitionModel): [description]
+        converter (CTCLabelConverter): [description]
+        test_loader (torch.utils.data.DataLoader): [description]
+        batch_max_length (int): [description]
+        ignore_idx (List[int]): [description]
+        decoder (str, optional): [description]. Defaults to "greedy".
+        beamWidth (int, optional): [description]. Defaults to 5.
+        device (str, optional): [description]. Defaults to "cpu".
+
+    Returns:
+        List[Tuple[str, float]]: [description]
+    """
     model.eval()
     result = []
     with torch.no_grad():
@@ -114,21 +192,21 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             ######## filter ignore_char, rebalance
             preds_prob = F.softmax(preds, dim=2)
             preds_prob = preds_prob.cpu().detach().numpy()
-            preds_prob[:,:,ignore_idx] = 0.
+            preds_prob[:, :, ignore_idx] = 0.0
             pred_norm = preds_prob.sum(axis=2)
-            preds_prob = preds_prob/np.expand_dims(pred_norm, axis=-1)
+            preds_prob = preds_prob / np.expand_dims(pred_norm, axis=-1)
             preds_prob = torch.from_numpy(preds_prob).float().to(device)
 
-            if decoder == 'greedy':
+            if decoder == "greedy":
                 # Select max probabilty (greedy decoding) then decode index to character
                 _, preds_index = preds_prob.max(2)
                 preds_index = preds_index.view(-1)
                 preds_index = preds_index.view(-1)
                 preds_str = converter.decode_greedy(preds_index.data, preds_size.data)
-            elif decoder == 'beamsearch':
+            elif decoder == "beamsearch":
                 k = preds_prob.cpu().detach().numpy()
                 preds_str = converter.decode_beamsearch(k, beamWidth=beamWidth)
-            elif decoder == 'wordbeamsearch':
+            elif decoder == "wordbeamsearch":
                 k = preds_prob.cpu().detach().numpy()
                 preds_str = converter.decode_wordbeamsearch(k, beamWidth=beamWidth)
 
@@ -140,14 +218,38 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
 
     return result
 
-def get_recognizer(input_channel, output_channel, hidden_size, character,\
-                   separator_list, dict_list, model_path, device = 'cpu'):
+
+def get_recognizer(
+    input_channel: int,
+    output_channel: int,
+    hidden_size: int,
+    character: str,
+    separator_list: Dict[str, str],
+    dict_list: Dict[str, str],
+    model_path: str,
+    device: str = "cpu",
+) -> Tuple[RecognitionModel, CTCLabelConverter]:
+    """[summary] # TODO
+
+    Args:
+        input_channel (int): [description]
+        output_channel (int): [description]
+        hidden_size (int): [description]
+        character (str): [description]
+        separator_list (Dict[str, str]): [description]
+        dict_list (Dict[str, str]): [description]
+        model_path (str): [description]
+        device (str, optional): [description]. Defaults to "cpu".
+
+    Returns:
+        Tuple[RecognitionModel, CTCLabelConverter]: [description]
+    """
 
     converter = CTCLabelConverter(character, separator_list, dict_list)
     num_class = len(converter.character)
-    model = Model(input_channel, output_channel, hidden_size, num_class)
+    model = RecognitionModel(input_channel, output_channel, hidden_size, num_class)
 
-    if device == 'cpu':
+    if device == "cpu":
         state_dict = torch.load(model_path, map_location=device)
         new_state_dict = OrderedDict()
         for key, value in state_dict.items():
@@ -160,57 +262,125 @@ def get_recognizer(input_channel, output_channel, hidden_size, character,\
 
     return model, converter
 
-def get_text(character, imgH, imgW, recognizer, converter, image_list,\
-             ignore_char = '',decoder = 'greedy', beamWidth =5, batch_size=1, contrast_ths=0.1,\
-             adjust_contrast=0.5, filter_ths = 0.003, workers = 1, device = 'cpu'):
-    batch_max_length = int(imgW/10)
+
+def get_text(
+    character: str,
+    imgH: int,
+    imgW: int,
+    recognizer: RecognitionModel,
+    converter: CTCLabelConverter,
+    image_list: List,  # TODO: ghandic - unsure on input shape
+    ignore_char: str = "",
+    decoder: str = "greedy",
+    beamWidth: int = 5,
+    batch_size: int = 1,
+    contrast_ths: float = 0.1,
+    adjust_contrast: float = 0.5,
+    filter_ths: float = 0.003,
+    workers: int = 1,
+    device: str = "cpu",
+) -> List:  # TODO: ghandic - unsure on output shape
+    """[summary] # TODO
+
+    Args:
+        character (str): [description]
+        imgH (int): [description]
+        imgW (int): [description]
+        recognizer (RecognitionModel): [description]
+        converter (CTCLabelConverter): [description]
+        image_list (List): [description]
+        decoder (str, optional): [description]. Defaults to "greedy".
+        beamWidth (int, optional): [description]. Defaults to 5.
+        batch_size (int, optional): [description]. Defaults to 1.
+        contrast_ths (float, optional): [description]. Defaults to 0.1.
+        adjust_contrast (float, optional): [description]. Defaults to 0.5.
+        filter_ths (float, optional): [description]. Defaults to 0.003.
+        workers (int, optional): [description]. Defaults to 1.
+        device (str, optional): [description]. Defaults to "cpu".
+
+    Returns:
+        List: [description]
+    """
+    batch_max_length = int(imgW / 10)
 
     char_group_idx = {}
     ignore_idx = []
     for char in ignore_char:
-        try: ignore_idx.append(character.index(char)+1)
-        except: pass
+        try:
+            ignore_idx.append(character.index(char) + 1)
+        except:
+            pass
 
     coord = [item[0] for item in image_list]
     img_list = [item[1] for item in image_list]
     AlignCollate_normal = AlignCollate(imgH=imgH, imgW=imgW, keep_ratio_with_pad=True)
     test_data = ListDataset(img_list)
     test_loader = torch.utils.data.DataLoader(
-        test_data, batch_size=batch_size, shuffle=False,
-        num_workers=int(workers), collate_fn=AlignCollate_normal, pin_memory=True)
+        test_data,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=int(workers),
+        collate_fn=AlignCollate_normal,
+        pin_memory=True,
+    )
 
     # predict first round
-    result1 = recognizer_predict(recognizer, converter, test_loader,batch_max_length,\
-                                 ignore_idx, char_group_idx, decoder, beamWidth, device = device)
+    result1 = recognizer_predict(
+        recognizer,
+        converter,
+        test_loader,
+        batch_max_length,
+        ignore_idx,
+        char_group_idx,
+        decoder,
+        beamWidth,
+        device=device,
+    )
 
     # predict second round
-    low_confident_idx = [i for i,item in enumerate(result1) if (item[1] < contrast_ths)]
+    low_confident_idx = [i for i, item in enumerate(result1) if (item[1] < contrast_ths)]
     if len(low_confident_idx) > 0:
         img_list2 = [img_list[i] for i in low_confident_idx]
-        AlignCollate_contrast = AlignCollate(imgH=imgH, imgW=imgW, keep_ratio_with_pad=True, adjust_contrast=adjust_contrast)
+        AlignCollate_contrast = AlignCollate(
+            imgH=imgH, imgW=imgW, keep_ratio_with_pad=True, adjust_contrast=adjust_contrast
+        )
         test_data = ListDataset(img_list2)
         test_loader = torch.utils.data.DataLoader(
-                        test_data, batch_size=batch_size, shuffle=False,
-                        num_workers=int(workers), collate_fn=AlignCollate_contrast, pin_memory=True)
-        result2 = recognizer_predict(recognizer, converter, test_loader, batch_max_length,\
-                                     ignore_idx, char_group_idx, decoder, beamWidth, device = device)
+            test_data,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=int(workers),
+            collate_fn=AlignCollate_contrast,
+            pin_memory=True,
+        )
+        result2 = recognizer_predict(
+            recognizer,
+            converter,
+            test_loader,
+            batch_max_length,
+            ignore_idx,
+            char_group_idx,
+            decoder,
+            beamWidth,
+            device=device,
+        )
 
     result = []
     for i, zipped in enumerate(zip(coord, result1)):
         box, pred1 = zipped
         if i in low_confident_idx:
             pred2 = result2[low_confident_idx.index(i)]
-            if pred1[1]>pred2[1]:
-                result.append( (box, pred1[0], pred1[1]) )
+            if pred1[1] > pred2[1]:
+                result.append((box, pred1[0], pred1[1]))
             else:
-                result.append( (box, pred2[0], pred2[1]) )
+                result.append((box, pred2[0], pred2[1]))
         else:
-            result.append( (box, pred1[0], pred1[1]) )
+            result.append((box, pred1[0], pred1[1]))
 
-    #confidence_score = pred_max_prob.cumprod(dim=0)[-1]
-    #if confidence_score.item() > filter_ths:
+    # confidence_score = pred_max_prob.cumprod(dim=0)[-1]
+    # if confidence_score.item() > filter_ths:
     #    print(pred, confidence_score.item())
-    #else:
+    # else:
     #    print('not sure', pred, confidence_score.item())
 
     return result
