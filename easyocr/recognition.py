@@ -55,7 +55,6 @@ class ListDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         img = self.image_list[index]
-
         return Image.fromarray(img, 'L')
 
 class AlignCollate(object):

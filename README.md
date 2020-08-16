@@ -3,33 +3,48 @@
 [![PyPI Status](https://badge.fury.io/py/easyocr.svg)](https://badge.fury.io/py/easyocr)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/JaidedAI/EasyOCR/blob/master/LICENSE)
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.fan/easyocr)
-[![GitHub stars](https://img.shields.io/github/stars/JaidedAI/EasyOCR.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/JaidedAI/EasyOCR/stargazers/)
+[![Tweet](https://img.shields.io/twitter/url/https/github.com/JaidedAI/EasyOCR.svg?style=social)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20library:%20EasyOCR%20https://github.com/JaidedAI/EasyOCR)
+[![Twitter](https://img.shields.io/badge/twitter-@JaidedAI-blue.svg?style=flat)](https://twitter.com/JaidedAI)
 
 Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
 
+## What's new?
+- 10 August 2020 - Version 1.1.7
+    - New language support for Tamil
+    - Temporary fix for memory leakage on CPU mode
+- 4 August 2020 - Version 1.1.6
+    - New language support for Russian, Serbian, Belarusian, Bulgarian, Mongolian, Ukranian (Cyrillic Script) and Arabic, Persian(Farsi), Urdu, Uyghur (Arabic Script)
+    - Docker file and Ainize demo (thanks @ghandic and @Wook-2)
+    - Better production friendly with Logger and custom model folder location (By setting ` model_storage_directory` when create `Reader` instance) (thanks @jpotter)
+- [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
+
+## What's coming next?
+- [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
+
 ## Examples
-
-See this [Colab Demo](https://colab.fan/easyocr). You can run it in the browser.
-
 
 ![example](examples/example.png)
 
 ![example2](examples/example2.png)
 
+![example3](examples/example3.png)
+
 ## Supported Languages
 
-We are currently supporting the following 45 languages.
+We are currently supporting the following 59 languages.
 
-Afrikaans (af), Azerbaijani (az), Bosnian (bs), Simplified Chinese (ch_sim),
-Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
-Danish (da), German (de), English (en), Spanish (es), Estonian (et),
-French (fr), Irish (ga), Croatian (hr), Hungarian (hu), Indonesian (id),
-Icelandic (is), Italian (it), Japanese (ja), Korean (ko), Kurdish (ku),
-Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Malay (ms), Maltese (mt),
-Dutch (nl), Norwegian (no), Occitan (oc), Polish (pl), Portuguese (pt),
-Romanian (ro), Serbian (latin)(rs_latin), Slovak (sk) (need revisit),
-Slovenian (sl), Albanian (sq), Swedish (sv),Swahili (sw), Thai (th),
-Tagalog (tl), Turkish (tr), Uzbek (uz), Vietnamese (vi) (need revisit)
+Afrikaans (af), Arabic (ar), Azerbaijani (az), Belarusian (be), Bulgarian (bg), Bosnian (bs),
+Simplified Chinese (ch_sim), Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
+Danish (da), German (de), English (en), Spanish (es), Estonian (et), Persian (Farsi) (fa)
+French (fr), Irish (ga), Hindi(hi), Croatian (hr), Hungarian (hu),
+Indonesian (id), Icelandic (is), Italian (it), Japanese (ja), Korean (ko),
+Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Mongolian (mn),
+Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
+Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru),
+Serbian (cyrillic)(rs_cyrillic), Serbian (latin)(rs_latin),
+Slovak (sk) (need revisit), Slovenian (sl), Albanian (sq), Swedish (sv),
+Swahili (sw), Tamil (ta), Thai (th), Tagalog (tl), Turkish (tr), Uyghur (ug), Ukranian(uk), Urdu (ur),
+Uzbek (uz), Vietnamese (vi) (need revisit)
 
 List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
 If you are native speaker of any language and think we should add or remove any character,
@@ -49,14 +64,22 @@ For latest development release,
 pip install git+git://github.com/jaidedai/easyocr.git
 ```
 
-Note: for Windows, please install torch and torchvision first by following official instruction here https://pytorch.org
+Note 1: for Windows, please install torch and torchvision first by following the official instruction here https://pytorch.org. On pytorch website, be sure to select the right CUDA version you have. If you intend to run on CPU mode only, select CUDA = None.
+
+Note 2: We also provide Dockerfile [here](https://github.com/JaidedAI/EasyOCR/blob/master/Dockerfile).
+
+#### Try Third-Party Demos
+
+1. [Google Colab](https://colab.fan/easyocr)
+2. [Dockerhub](https://hub.docker.com/r/challisa/easyocr)
+3. [Ainize](https://easyocrgpu-wook-2.endpoint.ainize.ai/)
 
 ## Usage
 
 ``` python
 import easyocr
-reader = easyocr.Reader(['ch_sim','en'])
-reader.readtext('chinese.jpg')
+reader = easyocr.Reader(['ch_sim','en']) # need to run only once to load model into memory
+result = reader.readtext('chinese.jpg')
 ```
 
 Output will be in list format, each item represents bounding box, text and confident level, respectively.
@@ -77,6 +100,8 @@ English is compatible with every languages. Languages that share common characte
 
 Note 2: Instead of filepath `chinese.jpg`, you can also pass OpenCV image object (numpy array) or image file as bytes. URL to raw image is also acceptable.
 
+Note 3: The line `reader = easyocr.Reader(['ch_sim','en'])` is for loading model into memory. It takes some time but it need to be run only once.
+
 You can also set `detail` = 0 for simpler output.
 
 ``` python
@@ -92,21 +117,23 @@ Result:
 Model weight for chosen language will be automatically downloaded or you can
 download it manually from the following links and put it in '~/.EasyOCR/model' folder
 
-- [text detection model](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
+- [text detection model (CRAFT)](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
 - [latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
 - [chinese (traditional) model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
 - [chinese (simplified) model](https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing)
 - [japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
 - [korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
 - [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
+- [devanagari model](https://drive.google.com/file/d/1uCiMuBl8H8GAwapEjYUVYYdoOivyGzel/view?usp=sharing)
+- [cyrillic model](https://drive.google.com/file/d/1SBmKXV5dpN5Cekacqk3ms1xq3dGbDuu1/view?usp=sharing)
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
 ``` python
-reader = easyocr.Reader(['th','en'], gpu = False)
+reader = easyocr.Reader(['ch_sim','en'], gpu = False)
 ```
 
-See [Documentation](#API-Documentation)
+For more information, read [tutorial](https://www.jaided.ai/easyocr/tutorial) and [API Documentation](https://www.jaided.ai/easyocr/documentation).
 
 #### Run on command line
 
@@ -126,12 +153,12 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 1. Handwritten support: Network architecture should not matter.
 The key is using GAN to generate realistic handwritten dataset.
-2. Faster processing time: model pruning (lite version) / quantization / export to other platforms
-3. Data generation script and model training pipeline
+2. Faster processing time: model pruning (lite version) / quantization / export to other platforms (ONNX?)
+3. Open Dataset and model training pipeline
 4. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
-reader = easyocr.Reader(['en'], detection='pixellink', recognition = 'ReXNet_LSTM_Attention')
+reader = easyocr.Reader(['en'], detection='DB', recognition = 'CNN_Transformer')
 ```
 The idea is to be able to plug-in any state-of-the-art model into EasyOCR. There are a lot of geniuses trying to make better detection/recognition model. We are not trying to be a genius here, just make genius's works quickly accessible to the public ... for free. (well I believe most geniuses want their work to create positive impact as fast/big as possible) The pipeline should be something like below diagram. Grey slots are placeholders for changeable light blue modules.
 
@@ -141,11 +168,15 @@ The idea is to be able to plug-in any state-of-the-art model into EasyOCR. There
 
 This project is based on researches/codes from several papers/open-source repositories.
 
-Detection part is using CRAFT algorithm from this [official repository](https://github.com/clovaai/CRAFT-pytorch) and their [paper](https://arxiv.org/abs/1904.01941).
+All deep learning part is based on [Pytorch](https://pytorch.org). :heart:
 
-Recognition model is CRNN ([paper](https://arxiv.org/abs/1507.05717)). It is composed of 3 main components, feature extraction (we are currently using [Resnet](https://arxiv.org/abs/1512.03385)), sequence labeling ([LSTM](https://www.bioinf.jku.at/publications/older/2604.pdf)) and decoding ([CTC](https://www.cs.toronto.edu/~graves/icml_2006.pdf)). Training pipeline for recognition part is a modified version from this [repository](https://github.com/clovaai/deep-text-recognition-benchmark).
+Detection part is using CRAFT algorithm from this [official repository](https://github.com/clovaai/CRAFT-pytorch) and their [paper](https://arxiv.org/abs/1904.01941) (Thanks @YoungminBaek from @clovaai). We also use their pretrained model.
 
-Beam search code is based on this [repository](https://github.com/githubharald/CTCDecoder) and his [blog](https://towardsdatascience.com/beam-search-decoding-in-ctc-trained-neural-networks-5a889a3d85a7).
+Recognition model is CRNN ([paper](https://arxiv.org/abs/1507.05717)). It is composed of 3 main components, feature extraction (we are currently using [Resnet](https://arxiv.org/abs/1512.03385)), sequence labeling ([LSTM](https://www.bioinf.jku.at/publications/older/2604.pdf)) and decoding ([CTC](https://www.cs.toronto.edu/~graves/icml_2006.pdf)). Training pipeline for recognition part is a modified version from  [deep-text-recognition-benchmark](https://github.com/clovaai/deep-text-recognition-benchmark). (Thanks @ku21fan from @clovaai) This repository is a gem that deserved more recognition.
+
+Beam search code is based on this [repository](https://github.com/githubharald/CTCDecoder) and his [blog](https://towardsdatascience.com/beam-search-decoding-in-ctc-trained-neural-networks-5a889a3d85a7). (Thanks @githubharald)
+
+Data synthesis is based on [TextRecognitionDataGenerator](https://github.com/Belval/TextRecognitionDataGenerator). (Thanks @Belval)
 
 And good read about CTC from distill.pub [here](https://distill.pub/2017/ctc/).
 
@@ -157,7 +188,7 @@ Let's advance humanity together by making AI available to everyone!
 
 **Coder:** Please send PR for small bug/improvement. For bigger one, discuss with us by open an issue first. There is a list of possible bug/improvement issue tagged with ['PR WELCOME'](https://github.com/JaidedAI/EasyOCR/issues?q=is%3Aissue+is%3Aopen+label%3A%22PR+WELCOME%22).
 
-**User:** Post success stories in [Book of Gratitude](https://github.com/JaidedAI/EasyOCR/issues/160) to encourage further development. Also post failure cases in [Book of Pain](https://github.com/JaidedAI/EasyOCR/issues/161) to help improving future model.
+**User:** Tell us how EasyOCR benefit you/your organization to encourage further development. Also post failure cases in [Issue  Section](https://github.com/JaidedAI/EasyOCR/issues) to help improving future model.
 
 **Tech leader/Guru:** If you found this library useful, please spread the word! (See [Yann Lecun's post](https://www.facebook.com/yann.lecun/posts/10157018122787143) about EasyOCR)
 
@@ -186,6 +217,8 @@ See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issue
 > **Parameters**
 > * **lang_list** (list) - list of language code you want to recognize, for example ['ch_sim','en']. List of supported language code is [here](#Supported-Languages).
 > * **gpu** (bool, string, default = True)
+> * **model_storage_directory** (string, default = None)
+> * **download_enabled** (bool, default = True)
 >
 > **Attribute**
 > * **lang_char** - Show all available characters in current model
@@ -203,6 +236,7 @@ Contrast, Text Detection and Bounding Box Merging.
 > * **allowlist** (string) - Force EasyOCR to recognize only subset of characters. Useful for specific problem (E.g. license plate, etc.)
 > * **blocklist** (string) - Block subset of character. This argument will be ignored if allowlist is given.
 > * **detail** (int, default = 1) - Set this to 0 for simple output
+> * **paragraph** (bool, default = False) - Combine result into paragraph
 >
 > **Parameters 2: Contrast**
 > * **contrast_ths** (float, default = 0.1) - Text box with contrast lower than this value will be passed into model 2 times. First is with original image and second with contrast adjusted to 'adjust_contrast' value. The one with more confident level will be returned as a result.
