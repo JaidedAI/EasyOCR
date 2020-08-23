@@ -1,4 +1,10 @@
 
+- 23 August 2020 - Version 1.1.8
+    - 20 new language supports for Bengali, Assamese, Abaza, Adyghe, Kabardian, Avar,
+    Dargwa, Ingush, Chechen, Lak, Lezgian, Tabassaran, Bihari, Maithili, Angika,
+    Bhojpuri, Magahi, Nagpuri, Newari, Goan Konkani
+    - Support RGBA input format
+    - Add `min_size` argument for `readtext`: for filtering out small text box
 - 10 August 2020 - Version 1.1.7
     - New language support for Tamil
     - Temporary fix for memory leakage on CPU mode

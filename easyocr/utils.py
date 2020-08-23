@@ -503,6 +503,9 @@ def calculate_md5(fname):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
+def diff(input_list):
+    return max(input_list)-min(input_list)
+
 def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
     # create basic attributes
     box_group = []
@@ -589,5 +592,5 @@ def printProgressBar (prefix = '', suffix = '', decimals = 1, length = 100, fill
         filledLength = int(length * progress)
         bar = fill * filledLength + '-' * (length - filledLength)
         print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
-    
+
     return progress_hook

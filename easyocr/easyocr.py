@@ -3,7 +3,7 @@
 from .detection import get_detector, get_textbox
 from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph, download_and_unzip, printProgressBar
+from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph, download_and_unzip, printProgressBar, diff
 from bidi.algorithm import get_display
 import numpy as np
 import cv2
@@ -37,10 +37,12 @@ latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
                    'nl','no','oc','pl','pt','ro','rs_latin','sk','sl','sq',\
                    'sv','sw','tl','tr','uz','vi']
 arabic_lang_list = ['ar','fa','ug','ur']
-cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn']
-devanagari_lang_list = ['hi','mr','ne']
+bengali_lang_list = ['bn','as']
+cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn','abq','ady','kbd',\
+                      'ava','dar','inh','che','lbe','lez','tab']
+devanagari_lang_list = ['hi','mr','ne','bh','mai','ang','bho','mah','sck','new','gom']
 
-all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list + devanagari_lang_list + ['th','ch_sim','ch_tra','ja','ko','ta']
+all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list + devanagari_lang_list + bengali_lang_list + ['th','ch_sim','ch_tra','ja','ko','ta']
 imgH = 64
 input_channel = 1
 output_channel = 512
@@ -63,6 +65,7 @@ model_url = {
     'cyrillic.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/cyrillic.zip', '5a046f7be2a4f7da6ed50740f487efa8'),
     'arabic.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/arabic.zip', '993074555550e4e06a6077d55ff0449a'),
     'tamil.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip', '4b93972fdacdcdabe6d57097025d4dc2'),
+    'bengali.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.8/bengali.zip', 'cea9e897e2c0576b62cbb1554997ce1c'),
 }
 
 class Reader(object):
@@ -129,6 +132,10 @@ class Reader(object):
             self.model_lang = 'tamil'
             if set(lang_list) - set(['ta','en']) != set():
                 raise ValueError('Tamil is only compatible with English, try lang_list=["ta","en"]')
+        elif set(lang_list) & set(bengali_lang_list):
+            self.model_lang = 'bengali'
+            if set(lang_list) - set(bengali_lang_list+['en']) != set():
+                raise ValueError('Bengali is only compatible with English, try lang_list=["bn","as","en"]')
         elif set(lang_list) & set(arabic_lang_list):
             self.model_lang = 'arabic'
             if set(lang_list) - set(arabic_lang_list+['en']) != set():
@@ -163,6 +170,10 @@ class Reader(object):
             devanagari_char = '.ँंःअअंअःआइईउऊऋएऐऑओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयरऱलळवशषसह़ािीुूृॅेैॉोौ्ॐ॒क़ख़ग़ज़ड़ढ़फ़ॠ।०१२३४५६७८९॰'
             self.character = number+ symbol + en_char + devanagari_char
             model_file = 'devanagari.pth'
+        elif self.model_lang == 'bengali':
+            bn_char = '।ঁংঃঅআইঈউঊঋঌএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ়ািীুূৃেৈোৌ্ৎড়ঢ়য়০১২৩৪৫৬৭৮৯'
+            self.character = number+ symbol + en_char + bn_char
+            model_file = 'bengali.pth'
         elif  self.model_lang == 'chinese_tra':
             char_file = os.path.join(BASE_PATH, 'character', "ch_tra_char.txt")
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
@@ -279,7 +290,7 @@ class Reader(object):
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                 paragraph = False,\
+                 paragraph = False, min_size = 20,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
@@ -309,15 +320,23 @@ class Reader(object):
             if len(image.shape) == 2: # grayscale
                 img_cv_grey = image
                 img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-            elif len(image.shape) == 3: # BGRscale
+            elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
                 img = image
                 img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            elif len(image.shape) == 3 and image.shape[2] == 4: # RGBAscale
+                img = image[:,:,:3]
+                img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        else:
+            LOGGER.warning('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
 
         text_box = get_textbox(self.detector, img, canvas_size, mag_ratio, text_threshold,\
                                link_threshold, low_text, False, self.device)
         horizontal_list, free_list = group_text_box(text_box, slope_ths, ycenter_ths, height_ths, width_ths, add_margin)
 
-        # should add filter to screen small box out
+        if min_size:
+            horizontal_list = [i for i in horizontal_list if max(i[1]-i[0],i[3]-i[2]) > min_size]
+            free_list = [i for i in free_list if max(diff([c[0] for c in i]), diff([c[1] for c in i]))>min_size]
 
         image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
 
