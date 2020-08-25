@@ -298,7 +298,7 @@ class Reader(object):
                  width_ths = 0.5, add_margin = 0.1):
         '''
         Parameters:
-        file: file path or numpy-array or a byte stream object
+        image: file path or numpy-array or a byte stream object
         '''
 
         if type(image) == str:
