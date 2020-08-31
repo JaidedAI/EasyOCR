@@ -9,6 +9,7 @@ from PIL import Image
 import hashlib
 import sys, os
 from zipfile import ZipFile
+from .imgproc import loadImage
 
 if sys.version_info[0] == 2:
     from six.moves.urllib.request import urlretrieve
@@ -594,3 +595,35 @@ def printProgressBar (prefix = '', suffix = '', decimals = 1, length = 100, fill
         print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
 
     return progress_hook
+
+def reformat_input(image):
+    if type(image) == str:
+        if image.startswith('http://') or image.startswith('https://'):
+            tmp, _ = urlretrieve(image , reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
+            img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
+            os.remove(tmp)
+        else:
+            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+            image = os.path.expanduser(image)
+        img = loadImage(image)  # can accept URL
+    elif type(image) == bytes:
+        nparr = np.frombuffer(image, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    elif type(image) == np.ndarray:
+        if len(image.shape) == 2: # grayscale
+            img_cv_grey = image
+            img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
+            img = image
+            img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        elif len(image.shape) == 3 and image.shape[2] == 4: # RGBAscale
+            img = image[:,:,:3]
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    else:
+        LOGGER.warning('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
+
+    return img, img_cv_grey

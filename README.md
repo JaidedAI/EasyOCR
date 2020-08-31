@@ -9,15 +9,14 @@
 Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new?
+- 31 August 2020 - Version 1.1.9
+    - Add `detect` and `recognize` method for performing text detection and recognition separately
 - 23 August 2020 - Version 1.1.8
     - 20 new language supports for Bengali, Assamese, Abaza, Adyghe, Kabardian, Avar,
     Dargwa, Ingush, Chechen, Lak, Lezgian, Tabassaran, Bihari, Maithili, Angika,
     Bhojpuri, Magahi, Nagpuri, Newari, Goan Konkani
     - Support RGBA input format
     - Add `min_size` argument for `readtext`: for filtering out small text box
-- 10 August 2020 - Version 1.1.7
-    - New language support for Tamil
-    - Temporary fix for memory leakage on CPU mode
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next?

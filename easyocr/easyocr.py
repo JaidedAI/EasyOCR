@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from .detection import get_detector, get_textbox
-from .imgproc import loadImage
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph, download_and_unzip, printProgressBar, diff
+from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
+                   download_and_unzip, printProgressBar, diff, reformat_input
 from bidi.algorithm import get_display
 import numpy as np
 import cv2
 import torch
 import os
 import sys
+from PIL import Image
 from logging import getLogger
 
 if sys.version_info[0] == 2:
@@ -70,7 +71,8 @@ model_url = {
 
 class Reader(object):
 
-    def __init__(self, lang_list, gpu=True, model_storage_directory=None, download_enabled=True):
+    def __init__(self, lang_list, gpu=True, model_storage_directory=None,
+                 download_enabled=True, detector=True, recognizer=True):
         """Create an EasyOCR Reader.
 
         Parameters:
@@ -282,63 +284,52 @@ class Reader(object):
             download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
             assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
             LOGGER.info('Download complete')
-
-        self.detector = get_detector(detector_path, self.device)
-        self.recognizer, self.converter = get_recognizer(input_channel, output_channel,\
+        if detector:
+            self.detector = get_detector(detector_path, self.device)
+        if recognizer:
+            self.recognizer, self.converter = get_recognizer(input_channel, output_channel,\
                                                          hidden_size, self.character, separator_list,\
                                                          dict_list, model_path, device = self.device)
 
-    def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                 paragraph = False, min_size = 20,\
-                 contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
-                 canvas_size = 2560, mag_ratio = 1.,\
-                 slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, add_margin = 0.1):
-        '''
-        Parameters:
-        image: file path or numpy-array or a byte stream object
-        '''
+    def detect(self, img, min_size = 20, text_threshold = 0.7, low_text = 0.4,\
+               link_threshold = 0.4,canvas_size = 2560, mag_ratio = 1.,\
+               slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
+               width_ths = 0.5, add_margin = 0.1, reformat=True):
 
-        if type(image) == str:
-            if image.startswith('http://') or image.startswith('https://'):
-                tmp, _ = urlretrieve(image , reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
-                img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
-                os.remove(tmp)
-            else:
-                img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
-                image = os.path.expanduser(image)
-            img = loadImage(image)  # can accept URL
-        elif type(image) == bytes:
-            nparr = np.frombuffer(image, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        if reformat:
+            img, img_cv_grey = reformat_input(img)
 
-        elif type(image) == np.ndarray:
-            if len(image.shape) == 2: # grayscale
-                img_cv_grey = image
-                img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-            elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
-                img = image
-                img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            elif len(image.shape) == 3 and image.shape[2] == 4: # RGBAscale
-                img = image[:,:,:3]
-                img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-                img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        else:
-            LOGGER.warning('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
-
-        text_box = get_textbox(self.detector, img, canvas_size, mag_ratio, text_threshold,\
-                               link_threshold, low_text, False, self.device)
-        horizontal_list, free_list = group_text_box(text_box, slope_ths, ycenter_ths, height_ths, width_ths, add_margin)
+        text_box = get_textbox(self.detector, img, canvas_size, mag_ratio,\
+                               text_threshold, link_threshold, low_text,\
+                               False, self.device)
+        horizontal_list, free_list = group_text_box(text_box, slope_ths,\
+                                                    ycenter_ths, height_ths,\
+                                                    width_ths, add_margin)
 
         if min_size:
             horizontal_list = [i for i in horizontal_list if max(i[1]-i[0],i[3]-i[2]) > min_size]
             free_list = [i for i in free_list if max(diff([c[0] for c in i]), diff([c[1] for c in i]))>min_size]
 
-        image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
+        return horizontal_list, free_list
+
+    def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
+                  decoder = 'greedy', beamWidth= 5, batch_size = 1,\
+                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                  paragraph = False,\
+                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
+                  reformat=True):
+
+        if reformat:
+            img, img_cv_grey = reformat_input(img_cv_grey)
+
+        if (horizontal_list==None) and (free_list==None):
+            y_max, x_max = img_cv_grey.shape
+            ratio = x_max/y_max
+            max_width = int(imgH*ratio)
+            crop_img = cv2.resize(img_cv_grey, (max_width, imgH), interpolation =  Image.ANTIALIAS)
+            image_list = [([[0,0],[x_max,0],[x_max,y_max],[0,y_max]] ,crop_img)]
+        else:
+            image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
 
         if allowlist:
             ignore_char = ''.join(set(self.character)-set(allowlist))
@@ -367,3 +358,32 @@ class Reader(object):
             return [item[1] for item in result]
         else:
             return result
+
+    def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
+                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                 paragraph = False, min_size = 20,\
+                 contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
+                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
+                 canvas_size = 2560, mag_ratio = 1.,\
+                 slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
+                 width_ths = 0.5, add_margin = 0.1):
+        '''
+        Parameters:
+        image: file path or numpy-array or a byte stream object
+        '''
+        img, img_cv_grey = reformat_input(image)
+
+        horizontal_list, free_list = self.detect(img, min_size, text_threshold,\
+                                                 low_text, link_threshold,\
+                                                 canvas_size, mag_ratio,\
+                                                 slope_ths, ycenter_ths,\
+                                                 height_ths,width_ths,\
+                                                 add_margin, False)
+
+        result = self.recognize(img_cv_grey, horizontal_list, free_list,\
+                                decoder, beamWidth, batch_size,\
+                                workers, allowlist, blocklist, detail,\
+                                paragraph, contrast_ths, adjust_contrast,\
+                                filter_ths, False)
+
+        return result
