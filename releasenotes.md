@@ -1,4 +1,6 @@
 
+- 31 August 2020 - Version 1.1.9
+    - Add `detect` and `recognize` method for performing text detection and recognition separately
 - 23 August 2020 - Version 1.1.8
     - 20 new language supports for Bengali, Assamese, Abaza, Adyghe, Kabardian, Avar,
     Dargwa, Ingush, Chechen, Lak, Lezgian, Tabassaran, Bihari, Maithili, Angika,
