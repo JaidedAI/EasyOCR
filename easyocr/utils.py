@@ -194,7 +194,7 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
         # get beam-labelings of best beams
         bestLabelings = last.sort()[0:beamWidth]
         # go over best beams
-        for labeling in bestLabelings:
+        for labeling, simplified in bestLabelings:
             # probability of paths ending with a non-blank
             prNonBlank = 0
             # in case of non-empty beam
