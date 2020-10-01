@@ -111,45 +111,26 @@ class Reader(object):
 
         # choose model
         if 'th' in lang_list:
-            self.model_lang = 'thai'
-            if set(lang_list) - set(['th','en']) != set():
-                raise ValueError('Thai is only compatible with English, try lang_list=["th","en"]')
+            self.setModelLanguage('thai', lang_list, ['th','en'], '["th","en"]')
         elif 'ch_tra' in lang_list:
-            self.model_lang = 'chinese_tra'
-            if set(lang_list) - set(['ch_tra','en']) != set():
-                raise ValueError('Chinese is only compatible with English, try lang_list=["ch_tra","en"]')
+            self.setModelLanguage('chinese_tra', lang_list, ['ch_tra','en'], '["ch_tra","en"]')
         elif 'ch_sim' in lang_list:
-            self.model_lang = 'chinese_sim'
-            if set(lang_list) - set(['ch_sim','en']) != set():
-                raise ValueError('Chinese is only compatible with English, try lang_list=["ch_sim","en"]')
+            self.setModelLanguage('chinese_sim', lang_list, ['ch_sim','en'], '["ch_sim","en"]')
         elif 'ja' in lang_list:
-            self.model_lang = 'japanese'
-            if set(lang_list) - set(['ja','en']) != set():
-                raise ValueError('Japanese is only compatible with English, try lang_list=["ja","en"]')
+            self.setModelLanguage('japanese', lang_list, ['ja','en'], '["ja","en"]')
         elif 'ko' in lang_list:
-            self.model_lang = 'korean'
-            if set(lang_list) - set(['ko','en']) != set():
-                raise ValueError('Korean is only compatible with English, try lang_list=["ko","en"]')
+            self.setModelLanguage('korean', lang_list, ['ko','en'], '["ko","en"]')
         elif 'ta' in lang_list:
-            self.model_lang = 'tamil'
-            if set(lang_list) - set(['ta','en']) != set():
-                raise ValueError('Tamil is only compatible with English, try lang_list=["ta","en"]')
+            self.setModelLanguage('tamil', lang_list, ['ta','en'], '["ta","en"]')
         elif set(lang_list) & set(bengali_lang_list):
-            self.model_lang = 'bengali'
-            if set(lang_list) - set(bengali_lang_list+['en']) != set():
-                raise ValueError('Bengali is only compatible with English, try lang_list=["bn","as","en"]')
+            self.setModelLanguage('bengali', lang_list, bengali_lang_list+['en'], '["bn","as","en"]')
         elif set(lang_list) & set(arabic_lang_list):
-            self.model_lang = 'arabic'
-            if set(lang_list) - set(arabic_lang_list+['en']) != set():
-                raise ValueError('Arabic is only compatible with English, try lang_list=["ar","fa","ur","ug","en"]')
+            self.setModelLanguage('arabic', lang_list, arabic_lang_list+['en'], '["ar","fa","ur","ug","en"]')
         elif set(lang_list) & set(devanagari_lang_list):
-            self.model_lang = 'devanagari'
-            if set(lang_list) - set(devanagari_lang_list+['en']) != set():
-                raise ValueError('Devanagari is only compatible with English, try lang_list=["hi","mr","ne","en"]')
+            self.setModelLanguage('devanagari', lang_list, devanagari_lang_list+['en'], '["hi","mr","ne","en"]')
         elif set(lang_list) & set(cyrillic_lang_list):
-            self.model_lang = 'cyrillic'
-            if set(lang_list) - set(cyrillic_lang_list+['en']) != set():
-                raise ValueError('Cyrillic is only compatible with English, try lang_list=["ru","rs_cyrillic","be","bg","uk","mn","en"]')
+            self.setModelLanguage('cyrillic', lang_list, cyrillic_lang_list+['en'],
+                                  '["ru","rs_cyrillic","be","bg","uk","mn","en"]')
         else: self.model_lang = 'latin'
 
         separator_list = {}
@@ -177,38 +158,23 @@ class Reader(object):
             self.character = number+ symbol + en_char + bn_char
             model_file = 'bengali.pth'
         elif  self.model_lang == 'chinese_tra':
-            char_file = os.path.join(BASE_PATH, 'character', "ch_tra_char.txt")
-            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                ch_tra_list =  input_file.read().splitlines()
-                ch_tra_char = ''.join(ch_tra_list)
+            ch_tra_char = self.getChar("ch_tra_char.txt")
             self.character = number + symbol + en_char + ch_tra_char
             model_file = 'chinese.pth'
         elif  self.model_lang == 'chinese_sim':
-            char_file = os.path.join(BASE_PATH, 'character', "ch_sim_char.txt")
-            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                ch_sim_list =  input_file.read().splitlines()
-                ch_sim_char = ''.join(ch_sim_list)
+            ch_sim_char = self.getChar("ch_sim_char.txt")
             self.character = number + symbol + en_char + ch_sim_char
             model_file = 'chinese_sim.pth'
         elif  self.model_lang == 'japanese':
-            char_file = os.path.join(BASE_PATH, 'character', "ja_char.txt")
-            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                ja_list =  input_file.read().splitlines()
-                ja_char = ''.join(ja_list)
+            ja_char = self.getChar("ja_char.txt")
             self.character = number + symbol + en_char + ja_char
             model_file = 'japanese.pth'
         elif  self.model_lang == 'korean':
-            char_file = os.path.join(BASE_PATH, 'character', "ko_char.txt")
-            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                ko_list =  input_file.read().splitlines()
-                ko_char = ''.join(ko_list)
+            ko_char = self.getChar("ko_char.txt")
             self.character = number + symbol + en_char + ko_char
             model_file = 'korean.pth'
         elif  self.model_lang == 'tamil':
-            char_file = os.path.join(BASE_PATH, 'character', "ta_char.txt")
-            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                ta_list =  input_file.read().splitlines()
-                ta_char = ''.join(ta_list)
+            ta_char = self.getChar("ta_char.txt")
             self.character = number + symbol + en_char + ta_char
             model_file = 'tamil.pth'
         elif self.model_lang == 'thai':
@@ -290,6 +256,21 @@ class Reader(object):
             self.recognizer, self.converter = get_recognizer(input_channel, output_channel,\
                                                          hidden_size, self.character, separator_list,\
                                                          dict_list, model_path, device = self.device)
+
+    def setModelLanguage(self, language, lang_list, list_lang, list_lang_string):
+        self.model_lang = language
+        if set(lang_list) - set(list_lang) != set():
+            if language == 'ch_tra' or language == 'ch_sim':
+                language = 'chinese'
+            raise ValueError(language.capitalize() + ' is only compatible with English, try lang_list=' + list_lang_string)
+
+    def getChar(self, fileName):
+        char_file = os.path.join(BASE_PATH, 'character', fileName)
+        with open(char_file, "r", encoding="utf-8-sig") as input_file:
+            list = input_file.read().splitlines()
+            char = ''.join(list)
+        return char
+
 
     def detect(self, img, min_size = 20, text_threshold = 0.7, low_text = 0.4,\
                link_threshold = 0.4,canvas_size = 2560, mag_ratio = 1.,\
