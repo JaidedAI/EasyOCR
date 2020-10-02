@@ -207,7 +207,7 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
 
             # add beam at current time-step if needed
             prev_labeling = labeling
-            if not last.entries[labeling].simplified::
+            if not last.entries[labeling].simplified:
                 labeling = simplify_label(labeling, blankIdx)
 
             # labeling = simplify_label(labeling, blankIdx)
