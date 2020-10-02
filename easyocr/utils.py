@@ -82,7 +82,7 @@ class BeamState:
         "return beam-labelings, sorted by probability"
         beams = [v for (_, v) in self.entries.items()]
         sortedBeams = sorted(beams, reverse=True, key=lambda x: x.prTotal*x.prText)
-        return [(x.labeling, x.simplified) for x in sortedBeams]
+        return [x.labeling for x in sortedBeams]
 
     def wordsearch(self, classes, ignore_idx, maxCandidate, dict_list):
         beams = [v for (_, v) in self.entries.items()]
@@ -194,7 +194,7 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
         # get beam-labelings of best beams
         bestLabelings = last.sort()[0:beamWidth]
         # go over best beams
-        for labeling, simplified in bestLabelings:
+        for labeling in bestLabelings:
             # probability of paths ending with a non-blank
             prNonBlank = 0
             # in case of non-empty beam
@@ -207,7 +207,7 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
 
             # add beam at current time-step if needed
             prev_labeling = labeling
-            if not simplified:
+            if not last.entries[labeling].simplified::
                 labeling = simplify_label(labeling, blankIdx)
 
             # labeling = simplify_label(labeling, blankIdx)
