@@ -51,7 +51,26 @@ hidden_size = 512
 
 number = '0123456789'
 symbol  = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
-en_char = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+special_c0 = 'ุู'
+special_c1 = 'ิีืึ'+ 'ั'
+special_c2 = '่้๊๋'
+special_c3 = '็์'
+special_c = special_c0+special_c1+special_c2+special_c3 + 'ำ'
+
+# All language characters
+characters = {
+    'all_char': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'+\
+            'ÀÁÂÃÄÅÆÇÈÉÊËÍÎÑÒÓÔÕÖØÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿąęĮįıŁłŒœŠšųŽž',
+    'en_char' : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    'ar_number' : '٠١٢٣٤٥٦٧٨٩',
+    'ar_symbol' : '«»؟،؛',
+    'ar_char' : 'ءآأؤإئااًبةتثجحخدذرزسشصضطظعغفقكلمنهوىيًٌٍَُِّْٰٓٔٱٹپچڈڑژکڭگںھۀہۂۃۆۇۈۋیېےۓە',
+    'cyrillic_char' : 'ЁЂЄІЇЈЉЊЋЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяёђєіїјљњћўџҐґҮүө',
+    'devanagari_char' : '.ँंःअअंअःआइईउऊऋएऐऑओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयरऱलळवशषसह़ािीुूृॅेैॉोौ्ॐ॒क़ख़ग़ज़ड़ढ़फ़ॠ।०१२३४५६७८९॰',
+    'bn_char' : '।ঁংঃঅআইঈউঊঋঌএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ়ািীুূৃেৈোৌ্ৎড়ঢ়য়০১২৩৪৫৬৭৮৯',
+    'th_char' : 'กขคฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮฤ' +'เแโใไะา'+ special_c +  'ํฺ'+'ฯๆ',
+    'th_number' : '0123456789๑๒๓๔๕๖๗๘๙',
+}
 
 # first element is url path, second is file size
 model_url = {
@@ -135,47 +154,39 @@ class Reader(object):
 
         separator_list = {}
         if self.model_lang == 'latin':
-            all_char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'+\
-            'ÀÁÂÃÄÅÆÇÈÉÊËÍÎÑÒÓÔÕÖØÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿąęĮįıŁłŒœŠšųŽž'
-            self.character = number+ symbol + all_char
+            self.character = number+ symbol + characters['all_char']
             model_file = 'latin.pth'
         elif self.model_lang == 'arabic':
-            ar_number = '٠١٢٣٤٥٦٧٨٩'
-            ar_symbol = '«»؟،؛'
-            ar_char = 'ءآأؤإئااًبةتثجحخدذرزسشصضطظعغفقكلمنهوىيًٌٍَُِّْٰٓٔٱٹپچڈڑژکڭگںھۀہۂۃۆۇۈۋیېےۓە'
-            self.character = number+ symbol + en_char + ar_number + ar_symbol + ar_char
+            self.character = number + symbol + characters['en_char'] + characters['ar_number'] + characters['ar_symbol'] + characters['ar_char']
             model_file = 'arabic.pth'
         elif self.model_lang == 'cyrillic':
-            cyrillic_char = 'ЁЂЄІЇЈЉЊЋЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяёђєіїјљњћўџҐґҮүө'
-            self.character = number+ symbol + en_char + cyrillic_char
+            self.character = number+ symbol + characters['en_char'] + characters['cyrillic_char']
             model_file = 'cyrillic.pth'
         elif self.model_lang == 'devanagari':
-            devanagari_char = '.ँंःअअंअःआइईउऊऋएऐऑओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयरऱलळवशषसह़ािीुूृॅेैॉोौ्ॐ॒क़ख़ग़ज़ड़ढ़फ़ॠ।०१२३४५६७८९॰'
-            self.character = number+ symbol + en_char + devanagari_char
+            self.character = number+ symbol + characters['en_char'] + characters['devanagari_char']
             model_file = 'devanagari.pth'
         elif self.model_lang == 'bengali':
-            bn_char = '।ঁংঃঅআইঈউঊঋঌএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ়ািীুূৃেৈোৌ্ৎড়ঢ়য়০১২৩৪৫৬৭৮৯'
-            self.character = number+ symbol + en_char + bn_char
+            self.character = number+ symbol + characters['en_char'] + characters['bn_char']
             model_file = 'bengali.pth'
         elif  self.model_lang == 'chinese_tra':
             ch_tra_char = self.getChar("ch_tra_char.txt")
-            self.character = number + symbol + en_char + ch_tra_char
+            self.character = number + symbol + characters['en_char'] + ch_tra_char
             model_file = 'chinese.pth'
         elif  self.model_lang == 'chinese_sim':
             ch_sim_char = self.getChar("ch_sim_char.txt")
-            self.character = number + symbol + en_char + ch_sim_char
+            self.character = number + symbol + characters['en_char'] + ch_sim_char
             model_file = 'chinese_sim.pth'
         elif  self.model_lang == 'japanese':
             ja_char = self.getChar("ja_char.txt")
-            self.character = number + symbol + en_char + ja_char
+            self.character = number + symbol + characters['en_char'] + ja_char
             model_file = 'japanese.pth'
         elif  self.model_lang == 'korean':
             ko_char = self.getChar("ko_char.txt")
-            self.character = number + symbol + en_char + ko_char
+            self.character = number + symbol + characters['en_char'] + ko_char
             model_file = 'korean.pth'
         elif  self.model_lang == 'tamil':
             ta_char = self.getChar("ta_char.txt")
-            self.character = number + symbol + en_char + ta_char
+            self.character = number + symbol + characters['en_char'] + ta_char
             model_file = 'tamil.pth'
         elif self.model_lang == 'thai':
             separator_list = {
@@ -185,15 +196,7 @@ class Reader(object):
             separator_char = []
             for lang, sep in separator_list.items():
                 separator_char += sep
-
-            special_c0 = 'ุู'
-            special_c1 = 'ิีืึ'+ 'ั'
-            special_c2 = '่้๊๋'
-            special_c3 = '็์'
-            special_c = special_c0+special_c1+special_c2+special_c3 + 'ำ'
-            th_char = 'กขคฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮฤ' +'เแโใไะา'+ special_c +  'ํฺ'+'ฯๆ'
-            th_number = '0123456789๑๒๓๔๕๖๗๘๙'
-            self.character = ''.join(separator_char) + symbol + en_char + th_char + th_number
+            self.character = ''.join(separator_char) + symbol + characters['en_char'] + characters['th_char'] + characters['th_number']
             model_file = 'thai.pth'
         else:
             LOGGER.error('invalid language')
