@@ -1,13 +1,12 @@
 from easyocr import easyocr
-from kivymd.app import MDApp
+from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
-from kivymd.uix.button import MDIconButton
-from kivymd.uix.button import MDFlatButton
-from kivy.uix.label import Label
 import cv2
 from kivy.uix.screenmanager import ScreenManager, Screen
 import re
+from kivy.clock import Clock, mainthread
+from kivy.uix.button import Button
 
 Builder.load_string('''
 <CameraClick>:
@@ -37,8 +36,8 @@ Builder.load_string('''
         on_press: 
         	root.capture()
         on_release:
+            root.manager.current = "Image"
         	root.manager.transition.direction = 'up'
-        	root.manager.current = 'Image'
     Image:
     	source: 'Degouldlogo.png'
     	size: self.texture_size
@@ -125,12 +124,10 @@ Builder.load_string('''
 		text: "Code Sent"
 		color: 0, 0, 0, 1
 
+    
+
+
 ''')
-
-class TestCamera(MDApp):
-    def build(self):
-
-        return sm
 
 class CameraClick(BoxLayout, Screen):
     def capture(self):
@@ -154,7 +151,6 @@ class ImageScreen(BoxLayout, Screen):
                         self.ids.my_code.text = str(checkcode)
 
 
-
 class CodeEnterScreen(BoxLayout, Screen):
     pass
 
@@ -162,12 +158,17 @@ class CodeSentScreen(Screen):
     pass
 
 
+class TestCamera(App):
+    def build(self):
+        return sm
+
 # Create the screen manager
 sm = ScreenManager()
 sm.add_widget(CameraClick(name='Camera'))
 sm.add_widget(ImageScreen(name='Image'))
 sm.add_widget(CodeEnterScreen(name='CodeEntry'))
 sm.add_widget(CodeSentScreen(name='CodeSent'))
+
 
 if __name__ == '__main__':
     TestCamera().run()

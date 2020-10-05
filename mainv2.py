@@ -23,6 +23,7 @@ class CameraClick(BoxLayout, Screen):
 class ImageScreen(BoxLayout, Screen):
 
     def testrun(self):
+        my_code = '0000000'
         reader = easyocr.Reader(['en'])
         img = cv2.imread('saved_img.jpg')
         result = reader.readtext(img, detail=0)
@@ -34,6 +35,8 @@ class ImageScreen(BoxLayout, Screen):
                 for line in datafile:  # <--- Loop through each line
                     if checkcode in line:
                         self.ids.my_code.text = str(checkcode)
+                if checkcode not in line:
+                    self.ids.my_code.text = str('No code found')
 
 
 
