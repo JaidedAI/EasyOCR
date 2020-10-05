@@ -65,6 +65,7 @@ class BeamEntry:
         self.prText = 1 # LM score
         self.lmApplied = False # flag if LM was already applied to this beam
         self.labeling = () # beam-labeling
+        self.simplified = True  # To run simplyfiy label
 
 class BeamState:
     "information about the beams at specific time-step"
@@ -132,6 +133,45 @@ def simplify_label(labeling, blankIdx = 0):
 
     return tuple(labeling)
 
+def fast_simplify_label(labeling, c, blankIdx=0):
+
+    # Adding BlankIDX after Non-Blank IDX
+    if labeling and c == blankIdx and labeling[-1] != blankIdx:
+        newLabeling = labeling + (c,)
+
+    # Case when a nonBlankChar is added after BlankChar |len(char) - 1
+    elif labeling and c != blankIdx and labeling[-1] == blankIdx:
+
+        # If Blank between same character do nothing | As done by Simplify label
+        if labeling[-2] == c:
+            newLabeling = labeling + (c,)
+
+        # if blank between different character, remove it | As done by Simplify Label
+        else:
+            newLabeling = labeling[:-1] + (c,)
+
+    # if consecutive blanks : Keep the original label
+    elif labeling and c == blankIdx and labeling[-1] == blankIdx:
+        newLabeling = labeling
+
+    # if empty beam & first index is blank
+    elif not labeling and c == blankIdx:
+        newLabeling = labeling
+
+    # if empty beam & first index is non-blank
+    elif not labeling and c != blankIdx:
+        newLabeling = labeling + (c,)
+
+    elif labeling and c != blankIdx:
+        newLabeling = labeling + (c,)
+
+    # Cases that might still require simplyfying
+    else:
+        newLabeling = labeling + (c,)
+        newLabeling = simplify_label(newLabeling, blankIdx)
+
+    return newLabeling
+
 def addBeam(beamState, labeling):
     "add beam if it does not yet exist"
     if labeling not in beamState.entries:
@@ -166,7 +206,11 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             prBlank = (last.entries[labeling].prTotal) * mat[t, blankIdx]
 
             # add beam at current time-step if needed
-            labeling = simplify_label(labeling, blankIdx)
+            prev_labeling = labeling
+            if not last.entries[labeling].simplified:
+                labeling = simplify_label(labeling, blankIdx)
+
+            # labeling = simplify_label(labeling, blankIdx)
             addBeam(curr, labeling)
 
             # fill in data
@@ -174,7 +218,7 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             curr.entries[labeling].prNonBlank += prNonBlank
             curr.entries[labeling].prBlank += prBlank
             curr.entries[labeling].prTotal += prBlank + prNonBlank
-            curr.entries[labeling].prText = last.entries[labeling].prText
+            curr.entries[labeling].prText = last.entries[prev_labeling].prText
             # beam-labeling not changed, therefore also LM score unchanged from
 
             #curr.entries[labeling].lmApplied = True # LM already applied at previous time-step for this beam-labeling
@@ -185,14 +229,15 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             for c in char_highscore:
             #for c in range(maxC - 1):
                 # add new char to current beam-labeling
-                newLabeling = labeling + (c,)
-                newLabeling = simplify_label(newLabeling, blankIdx)
+                # newLabeling = labeling + (c,)
+                # newLabeling = simplify_label(newLabeling, blankIdx)
+                newLabeling = fast_simplify_label(labeling, c, blankIdx)
 
                 # if new labeling contains duplicate char at the end, only consider paths ending with a blank
                 if labeling and labeling[-1] == c:
-                    prNonBlank = mat[t, c] * last.entries[labeling].prBlank
+                    prNonBlank = mat[t, c] * last.entries[prev_labeling].prBlank
                 else:
-                    prNonBlank = mat[t, c] * last.entries[labeling].prTotal
+                    prNonBlank = mat[t, c] * last.entries[prev_labeling].prTotal
 
                 # add beam at current time-step if needed
                 addBeam(curr, newLabeling)
