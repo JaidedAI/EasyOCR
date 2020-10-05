@@ -1,7 +1,9 @@
 from easyocr import easyocr
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
+from kivymd.uix.button import MDIconButton
+from kivymd.uix.button import MDFlatButton
 from kivy.uix.label import Label
 import cv2
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -16,22 +18,30 @@ Builder.load_string('''
         Rectangle:
             pos: self.pos
             size: self.size
+    spacing: 20
     Image:
-    	source: 'logos.png'
+    	source: 'Bentleylogo.png'
     	size: self.texture_size
     Camera:
         id: camera
         resolution: (640, 640)
+        size_hint: (1,4)
         play: True
+    
     Button:
-        text: 'Capture'
+        text: "Capture"
+        text_color: 0, 0, 1, 1
         size_hint_y: None
         height: '48dp'
+        width: '48dp'
         on_press: 
         	root.capture()
         on_release:
         	root.manager.transition.direction = 'up'
         	root.manager.current = 'Image'
+    Image:
+    	source: 'Degouldlogo.png'
+    	size: self.texture_size
 
 
 <ImageScreen>
@@ -44,7 +54,7 @@ Builder.load_string('''
             size: self.size
     on_enter: root.testrun()        
     Image:
-    	source: 'logos.png'
+    	source: 'Bentleylogo.png'
     	size: self.texture_size
     Label:
 		text: "Is this code correct?"
@@ -67,6 +77,10 @@ Builder.load_string('''
         on_release:
         	root.manager.transition.direction = 'up'
         	root.manager.current = 'CodeEntry'
+    
+    Image:
+    	source: 'Degouldlogo.png'
+    	size: self.texture_size
 
 <CodeEnterScreen>
 	orientation: 'vertical'
@@ -86,6 +100,7 @@ Builder.load_string('''
     TextInput:
     	height: '48dp'
     	id: code_input
+    	multiline: False
 
 	Button:
 		height: '48dp'
@@ -93,6 +108,9 @@ Builder.load_string('''
     	on_release:
         	root.manager.transition.direction = 'up'
         	root.manager.current = 'CodeSent'
+    Image:
+    	source: 'Degouldlogo.png'
+    	size: self.texture_size
 
 <CodeSentScreen>
 	orientation: 'vertical'
@@ -109,9 +127,9 @@ Builder.load_string('''
 
 ''')
 
-
-class TestCamera(App):
+class TestCamera(MDApp):
     def build(self):
+
         return sm
 
 class CameraClick(BoxLayout, Screen):

@@ -1,0 +1,104 @@
+#:import MDIconButton kivymd.button.MDIconButton
+#:import MDFlatButton kivymd.button MDFlatButton
+<CameraClick>:
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Image:
+    	source: 'logos.png'
+    	size: self.texture_size
+    Camera:
+        id: camera
+        resolution: (640, 640)
+        play: True
+    MDIconButton:
+        icon: "language-python"
+        pos_hint: {"center_x": .5, "center_y": .5}
+    Button:
+        text: "MDFLATBUTTON"
+        text_color: 0, 0, 1, 1
+        size_hint_y: None
+        height: '48dp'
+        on_press:
+        	root.capture()
+        on_release:
+        	root.manager.transition.direction = 'up'
+        	root.manager.current = 'Image'
+
+
+<ImageScreen>
+	orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    on_enter: root.testrun()
+    Image:
+    	source: 'logos.png'
+    	size: self.texture_size
+    Label:
+		text: "Is this code correct?"
+		color: 0, 0, 0, 1
+	Label:
+	    id: my_code
+	    text: "0000000"
+		color: 0, 0, 0, 1
+	Button:
+    	text: 'Yes'
+        size_hint_y: None
+        height: '48dp'
+        on_release:
+        	root.manager.transition.direction = 'up'
+        	root.manager.current = 'CodeSent'
+	Button:
+    	text: 'No'
+        size_hint_y: None
+        height: '48dp'
+        on_release:
+        	root.manager.transition.direction = 'up'
+        	root.manager.current = 'CodeEntry'
+
+<CodeEnterScreen>
+	orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Image:
+    	source: 'logos.png'
+    	size: self.texture_size
+    Label:
+		text: "Enter Code"
+		height: '48dp'
+		color: 0, 0, 0, 1
+    TextInput:
+    	height: '48dp'
+    	id: code_input
+
+	Button:
+		height: '48dp'
+		text: "submit"
+    	on_release:
+        	root.manager.transition.direction = 'up'
+        	root.manager.current = 'CodeSent'
+
+<CodeSentScreen>
+	orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    on_enter: root.manager.current = 'Camera'
+    Label:
+		text: "Code Sent"
+		color: 0, 0, 0, 1
