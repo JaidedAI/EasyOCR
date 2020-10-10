@@ -160,7 +160,7 @@ def getPoly_core(boxes, labels, mapper, linkmap):
         if num_sec != 0:
             cp_section[-1] = [cp_section[-1][0] / num_sec, cp_section[-1][1] / num_sec]
 
-        # pass if num of pivots is not sufficient or segment widh is smaller than character height 
+        # pass if num of pivots is not sufficient or segment width is smaller than character height 
         if None in pp or seg_w < np.max(seg_height) * 0.25:
             polys.append(None); continue
 

@@ -9,6 +9,7 @@ from PIL import Image
 import hashlib
 import sys, os
 from zipfile import ZipFile
+from .imgproc import loadImage
 
 if sys.version_info[0] == 2:
     from six.moves.urllib.request import urlretrieve
@@ -64,6 +65,7 @@ class BeamEntry:
         self.prText = 1 # LM score
         self.lmApplied = False # flag if LM was already applied to this beam
         self.labeling = () # beam-labeling
+        self.simplified = True  # To run simplyfiy label
 
 class BeamState:
     "information about the beams at specific time-step"
@@ -131,6 +133,45 @@ def simplify_label(labeling, blankIdx = 0):
 
     return tuple(labeling)
 
+def fast_simplify_label(labeling, c, blankIdx=0):
+
+    # Adding BlankIDX after Non-Blank IDX
+    if labeling and c == blankIdx and labeling[-1] != blankIdx:
+        newLabeling = labeling + (c,)
+
+    # Case when a nonBlankChar is added after BlankChar |len(char) - 1
+    elif labeling and c != blankIdx and labeling[-1] == blankIdx:
+
+        # If Blank between same character do nothing | As done by Simplify label
+        if labeling[-2] == c:
+            newLabeling = labeling + (c,)
+
+        # if blank between different character, remove it | As done by Simplify Label
+        else:
+            newLabeling = labeling[:-1] + (c,)
+
+    # if consecutive blanks : Keep the original label
+    elif labeling and c == blankIdx and labeling[-1] == blankIdx:
+        newLabeling = labeling
+
+    # if empty beam & first index is blank
+    elif not labeling and c == blankIdx:
+        newLabeling = labeling
+
+    # if empty beam & first index is non-blank
+    elif not labeling and c != blankIdx:
+        newLabeling = labeling + (c,)
+
+    elif labeling and c != blankIdx:
+        newLabeling = labeling + (c,)
+
+    # Cases that might still require simplyfying
+    else:
+        newLabeling = labeling + (c,)
+        newLabeling = simplify_label(newLabeling, blankIdx)
+
+    return newLabeling
+
 def addBeam(beamState, labeling):
     "add beam if it does not yet exist"
     if labeling not in beamState.entries:
@@ -165,7 +206,11 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             prBlank = (last.entries[labeling].prTotal) * mat[t, blankIdx]
 
             # add beam at current time-step if needed
-            labeling = simplify_label(labeling, blankIdx)
+            prev_labeling = labeling
+            if not last.entries[labeling].simplified:
+                labeling = simplify_label(labeling, blankIdx)
+
+            # labeling = simplify_label(labeling, blankIdx)
             addBeam(curr, labeling)
 
             # fill in data
@@ -173,7 +218,7 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             curr.entries[labeling].prNonBlank += prNonBlank
             curr.entries[labeling].prBlank += prBlank
             curr.entries[labeling].prTotal += prBlank + prNonBlank
-            curr.entries[labeling].prText = last.entries[labeling].prText
+            curr.entries[labeling].prText = last.entries[prev_labeling].prText
             # beam-labeling not changed, therefore also LM score unchanged from
 
             #curr.entries[labeling].lmApplied = True # LM already applied at previous time-step for this beam-labeling
@@ -184,14 +229,15 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             for c in char_highscore:
             #for c in range(maxC - 1):
                 # add new char to current beam-labeling
-                newLabeling = labeling + (c,)
-                newLabeling = simplify_label(newLabeling, blankIdx)
+                # newLabeling = labeling + (c,)
+                # newLabeling = simplify_label(newLabeling, blankIdx)
+                newLabeling = fast_simplify_label(labeling, c, blankIdx)
 
                 # if new labeling contains duplicate char at the end, only consider paths ending with a blank
                 if labeling and labeling[-1] == c:
-                    prNonBlank = mat[t, c] * last.entries[labeling].prBlank
+                    prNonBlank = mat[t, c] * last.entries[prev_labeling].prBlank
                 else:
-                    prNonBlank = mat[t, c] * last.entries[labeling].prTotal
+                    prNonBlank = mat[t, c] * last.entries[prev_labeling].prTotal
 
                 # add beam at current time-step if needed
                 addBeam(curr, newLabeling)
@@ -491,7 +537,7 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64):
 
 def download_and_unzip(url, filename, model_storage_directory):
     zip_path = os.path.join(model_storage_directory, 'temp.zip')
-    urlretrieve(url, zip_path)
+    urlretrieve(url, zip_path,reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
     with ZipFile(zip_path, 'r') as zipObj:
         zipObj.extract(filename, model_storage_directory)
     os.remove(zip_path)
@@ -502,6 +548,9 @@ def calculate_md5(fname):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+def diff(input_list):
+    return max(input_list)-min(input_list)
 
 def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
     # create basic attributes
@@ -560,9 +609,66 @@ def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
                 most_left = min([box[1] for box in candidates])
                 for box in candidates:
                     if box[1] == most_left: best_box = box
+            elif mode == 'rtl':
+                most_right = max([box[2] for box in candidates])
+                for box in candidates:
+                    if box[2] == most_right: best_box = box
             text += ' '+best_box[0]
             current_box_group.remove(best_box)
 
         result.append([ [[min_gx,min_gy],[max_gx,min_gy],[max_gx,max_gy],[min_gx,max_gy]], text[1:]])
 
     return result
+
+
+def printProgressBar (prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    def progress_hook(count, blockSize, totalSize):
+        progress = count * blockSize / totalSize
+        percent = ("{0:." + str(decimals) + "f}").format(progress * 100)
+        filledLength = int(length * progress)
+        bar = fill * filledLength + '-' * (length - filledLength)
+        print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+
+    return progress_hook
+
+def reformat_input(image):
+    if type(image) == str:
+        if image.startswith('http://') or image.startswith('https://'):
+            tmp, _ = urlretrieve(image , reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
+            img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
+            os.remove(tmp)
+        else:
+            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+            image = os.path.expanduser(image)
+        img = loadImage(image)  # can accept URL
+    elif type(image) == bytes:
+        nparr = np.frombuffer(image, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    elif type(image) == np.ndarray:
+        if len(image.shape) == 2: # grayscale
+            img_cv_grey = image
+            img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
+            img = image
+            img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        elif len(image.shape) == 3 and image.shape[2] == 4: # RGBAscale
+            img = image[:,:,:3]
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    else:
+        LOGGER.warning('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
+
+    return img, img_cv_grey

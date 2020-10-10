@@ -6,17 +6,17 @@
 [![Tweet](https://img.shields.io/twitter/url/https/github.com/JaidedAI/EasyOCR.svg?style=social)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20library:%20EasyOCR%20https://github.com/JaidedAI/EasyOCR)
 [![Twitter](https://img.shields.io/badge/twitter-@JaidedAI-blue.svg?style=flat)](https://twitter.com/JaidedAI)
 
-Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korean and Thai.
+Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new?
-- 4 August 2020 - Version 1.1.6
-    - New language support for Russian, Serbian, Belarusian, Bulgarian, Mongolian, Ukranian (Cyrillic Script) and Arabic, Persian(Farsi), Urdu, Uyghur (Arabic Script)
-    - Docker file and Ainize demo (thanks @ghandic and @Wook-2)
-    - Better production friendly with Logger and custom model folder location (By setting ` model_storage_directory` when create `Reader` instance) (thanks @jpotter)
-
-- 24 July 2020 - Version 1.1.5
-    - New language support for Hindi, Marathi, Nepali (Devanagari Script)
-    - Automatic word merging into paragraph (Use this feature by setting `readtext`'s parameter `'paragraph' = True`)
+- 31 August 2020 - Version 1.1.9
+    - Add `detect` and `recognize` method for performing text detection and recognition separately
+- 23 August 2020 - Version 1.1.8
+    - 20 new language supports for Bengali, Assamese, Abaza, Adyghe, Kabardian, Avar,
+    Dargwa, Ingush, Chechen, Lak, Lezgian, Tabassaran, Bihari, Maithili, Angika,
+    Bhojpuri, Magahi, Nagpuri, Newari, Goan Konkani
+    - Support RGBA input format
+    - Add `min_size` argument for `readtext`: for filtering out small text box
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next?
@@ -32,24 +32,7 @@ Ready-to-use OCR with 40+ languages supported including Chinese, Japanese, Korea
 
 ## Supported Languages
 
-We are currently supporting the following 58 languages.
-
-Afrikaans (af), Arabic (ar), Azerbaijani (az), Belarusian (be), Bulgarian (bg), Bosnian (bs),
-Simplified Chinese (ch_sim), Traditional Chinese (ch_tra), Czech (cs), Welsh (cy),
-Danish (da), German (de), English (en), Spanish (es), Estonian (et), Persian (Farsi) (fa)
-French (fr), Irish (ga), Hindi(hi), Croatian (hr), Hungarian (hu),
-Indonesian (id), Icelandic (is), Italian (it), Japanese (ja), Korean (ko),
-Kurdish (ku), Latin (la), Lithuanian (lt), Latvian (lv), Maori (mi), Mongolian (mn),
-Marathi (mr), Malay (ms), Maltese (mt), Nepali (ne), Dutch (nl), Norwegian (no),
-Occitan (oc), Polish (pl), Portuguese (pt), Romanian (ro), Russian (ru),
-Serbian (cyrillic)(rs_cyrillic), Serbian (latin)(rs_latin),
-Slovak (sk) (need revisit), Slovenian (sl), Albanian (sq), Swedish (sv),
-Swahili (sw), Thai (th), Tagalog (tl), Turkish (tr), Uyghur (ug), Ukranian(uk), Urdu (ur),
-Uzbek (uz), Vietnamese (vi) (need revisit)
-
-List of characters is in folder [easyocr/character](https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/character).
-If you are native speaker of any language and think we should add or remove any character,
-please create an issue and/or pull request (like [this one](https://github.com/JaidedAI/EasyOCR/pull/15)).
+We are currently supporting 70+ languages. See [list of supported languages](https://www.jaided.ai/easyocr).
 
 ## Installation
 
@@ -129,10 +112,10 @@ download it manually from the following links and put it in '~/.EasyOCR/model' f
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
 ``` python
-reader = easyocr.Reader(['th','en'], gpu = False)
+reader = easyocr.Reader(['ch_sim','en'], gpu = False)
 ```
 
-See [Documentation](#API-Documentation)
+For more information, read [tutorial](https://www.jaided.ai/easyocr/tutorial) and [API Documentation](https://www.jaided.ai/easyocr/documentation).
 
 #### Run on command line
 
@@ -214,7 +197,7 @@ See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issue
 > Base class for EasyOCR
 >
 > **Parameters**
-> * **lang_list** (list) - list of language code you want to recognize, for example ['ch_sim','en']. List of supported language code is [here](#Supported-Languages).
+> * **lang_list** (list) - list of language code you want to recognize, for example ['ch_sim','en']. List of supported language code is [here](https://www.jaided.ai/easyocr).
 > * **gpu** (bool, string, default = True)
 > * **model_storage_directory** (string, default = None)
 > * **download_enabled** (bool, default = True)

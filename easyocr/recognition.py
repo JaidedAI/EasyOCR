@@ -55,7 +55,6 @@ class ListDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         img = self.image_list[index]
-
         return Image.fromarray(img, 'L')
 
 class AlignCollate(object):
@@ -123,7 +122,6 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             if decoder == 'greedy':
                 # Select max probabilty (greedy decoding) then decode index to character
                 _, preds_index = preds_prob.max(2)
-                preds_index = preds_index.view(-1)
                 preds_index = preds_index.view(-1)
                 preds_str = converter.decode_greedy(preds_index.data, preds_size.data)
             elif decoder == 'beamsearch':
