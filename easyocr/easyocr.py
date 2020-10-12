@@ -38,10 +38,11 @@ latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
                    'nl','no','oc','pl','pt','ro','rs_latin','sk','sl','sq',\
                    'sv','sw','tl','tr','uz','vi']
 arabic_lang_list = ['ar','fa','ug','ur']
-bengali_lang_list = ['bn','as']
+bengali_lang_list = ['bn','as','mni']
 cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn','abq','ady','kbd',\
                       'ava','dar','inh','che','lbe','lez','tab']
-devanagari_lang_list = ['hi','mr','ne','bh','mai','ang','bho','mah','sck','new','gom']
+devanagari_lang_list = ['hi','mr','ne','bh','mai','ang','bho','mah','sck','new',\
+                        'gom','sa','bgc']
 
 all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list + devanagari_lang_list + bengali_lang_list + ['th','ch_sim','ch_tra','ja','ko','ta']
 imgH = 64

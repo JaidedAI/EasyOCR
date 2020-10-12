@@ -9,14 +9,13 @@
 Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new?
+- 12 October 2020 - Version 1.1.10
+    - Faster `beamsearch` decoder (thanks @amitbcp)
+    - Better code structure (thanks @susmith98)
+    - New language supports for Haryanvi(bgc), Sanskrit(sa) (Devanagari Script) and Manipuri(mni) (Bengari Script)
 - 31 August 2020 - Version 1.1.9
     - Add `detect` and `recognize` method for performing text detection and recognition separately
-- 23 August 2020 - Version 1.1.8
-    - 20 new language supports for Bengali, Assamese, Abaza, Adyghe, Kabardian, Avar,
-    Dargwa, Ingush, Chechen, Lak, Lezgian, Tabassaran, Bihari, Maithili, Angika,
-    Bhojpuri, Magahi, Nagpuri, Newari, Goan Konkani
-    - Support RGBA input format
-    - Add `min_size` argument for `readtext`: for filtering out small text box
+
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next?
@@ -191,55 +190,6 @@ Lastly, please understand that my priority will have to go to popular language o
 
 See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issues/91)
 
-## API Documentation
+## Business Inquiries
 
-#### `Reader` class
-> Base class for EasyOCR
->
-> **Parameters**
-> * **lang_list** (list) - list of language code you want to recognize, for example ['ch_sim','en']. List of supported language code is [here](https://www.jaided.ai/easyocr).
-> * **gpu** (bool, string, default = True)
-> * **model_storage_directory** (string, default = None)
-> * **download_enabled** (bool, default = True)
->
-> **Attribute**
-> * **lang_char** - Show all available characters in current model
-
-#### `readtext` method
-> Main method for Reader object. There are 4 groups of parameter: General,
-Contrast, Text Detection and Bounding Box Merging.
->
-> **Parameters 1: General**
-> * **image** (string, numpy array, byte) - Input image
-> * **decoder** (string, default = 'greedy') - options are 'greedy', 'beamsearch' and 'wordbeamsearch'.
-> * **beamWidth** (int, default = 5) - How many beam to keep when decoder = 'beamsearch' or 'wordbeamsearch'
-> * **batch_size** (int, default = 1) - batch_size>1 will make EasyOCR faster but use more memory
-> * **workers** (int, default = 0) - Number thread used in of dataloader
-> * **allowlist** (string) - Force EasyOCR to recognize only subset of characters. Useful for specific problem (E.g. license plate, etc.)
-> * **blocklist** (string) - Block subset of character. This argument will be ignored if allowlist is given.
-> * **detail** (int, default = 1) - Set this to 0 for simple output
-> * **paragraph** (bool, default = False) - Combine result into paragraph
->
-> **Parameters 2: Contrast**
-> * **contrast_ths** (float, default = 0.1) - Text box with contrast lower than this value will be passed into model 2 times. First is with original image and second with contrast adjusted to 'adjust_contrast' value. The one with more confident level will be returned as a result.
-> * **adjust_contrast** (float, default = 0.5) - target contrast level for low contrast text box
->
-> **Parameters 3: Text Detection (from CRAFT)**
-> * **text_threshold** (float, default = 0.7) - Text confidence threshold
-> * **low_text** (float, default = 0.4) -  Text low-bound score
-> * **link_threshold** (float, default = 0.4) - Link confidence threshold
-> * **canvas_size** (int, default = 2560) - Maximum image size. Image bigger than this value will be resized down.  
-> * **mag_ratio** (float, default = 1) - Image magnification ratio
->
-> **Parameters 4: Bounding Box Merging**
->
-> This set of parameter controls when adjacent bounding boxes merge with each other. Every parameters except 'slope_ths' is in the unit of box height.
->
-> ![width_ths](examples/width_ths.png)
-> * **slope_ths** (float, default = 0.1) - Maximum slope (delta y/delta x) to considered merging. Low value means tiled boxes will not be merged.
-> * **ycenter_ths** (float, default = 0.5) - Maximum shift in y direction. Boxes with different level should not be merged.
-> * **height_ths** (float, default = 0.5) - Maximum different in box height. Boxes with very different text size should not be merged.
-> * **width_ths** (float, default = 0.5) - Maximum horizontal distance to merge boxes.
-> * **add_margin** (float, default = 0.1) - Extend bounding boxes in all direction by certain value. This is important for language with complex script (E.g. Thai).
->
-> **Return** (list)
+For Enterprise Support, [Jaided AI](https://www.jaided.ai/) offers full service for custom OCR/AI systems from building, maintenance and deployment. Click [here](https://www.jaided.ai/contact) to contact us.

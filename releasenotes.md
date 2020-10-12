@@ -1,4 +1,7 @@
-
+- 12 October 2020 - Version 1.1.10
+    - Faster beamsearch decoder (thanks @amitbcp)
+    - Better code structure (thanks @susmith98)
+    - New language supports for Haryanvi, Sanskrit (Devanagari Script) and Manipuri (Bengari script)
 - 31 August 2020 - Version 1.1.9
     - Add `detect` and `recognize` method for performing text detection and recognition separately
 - 23 August 2020 - Version 1.1.8
