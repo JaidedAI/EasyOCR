@@ -190,6 +190,6 @@ Lastly, please understand that my priority will have to go to popular language o
 
 See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issues/91)
 
-## About Us
+## Business Inquiries
 
-Jaided AI
+For Enterprise Support, [Jaided AI](https://www.jaided.ai/) offers full service for custom OCR/AI systems from building, maintenance and deployment. Click [here](https://www.jaided.ai/contact) to contact us.
