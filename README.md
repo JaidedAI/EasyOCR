@@ -9,8 +9,6 @@
 Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new
-- xx November 2020 - Version 1.1.11
-    -
 - 12 October 2020 - Version 1.1.10
     - Faster `beamsearch` decoder (thanks @amitbcp)
     - Better code structure (thanks @susmith98)
@@ -21,6 +19,7 @@ Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korea
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next
+- Faster processing time
 - [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
 
 ## Examples
