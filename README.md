@@ -8,7 +8,9 @@
 
 Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korean and Thai.
 
-## What's new?
+## What's new
+- xx November 2020 - Version 1.1.11
+    -
 - 12 October 2020 - Version 1.1.10
     - Faster `beamsearch` decoder (thanks @amitbcp)
     - Better code structure (thanks @susmith98)
@@ -18,7 +20,7 @@ Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korea
 
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
-## What's coming next?
+## What's coming next
 - [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
 
 ## Examples
@@ -124,19 +126,13 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 ## Implementation Roadmap
 
-#### Phase 1 (Now - October, 2020)
-
-1. Language packs: Hindi, Arabic, Cyrillic alphabet, etc. Aiming to cover > 80-90% of world's population. See [current development list](https://github.com/JaidedAI/EasyOCR/issues/91). Also improve existing languages.
+1. Language packs: Expand support to more languages. We are aiming to cover > 80-90% of world's population. Also improve existing languages.
 2. Better documentation and api
 3. Language model for better decoding
-
-#### Phase 2 (After October, 2020)
-
-1. Handwritten support: Network architecture should not matter.
-The key is using GAN to generate realistic handwritten dataset.
-2. Faster processing time: model pruning (lite version) / quantization / export to other platforms (ONNX?)
-3. Open Dataset and model training pipeline
-4. Restructure code to support swappable detection and recognition algorithm.
+4. Handwritten support: The key is using GAN to generate realistic handwritten dataset.
+5. Faster processing time: model pruning (lite version) / quantization / export to other platforms (ONNX?)
+6. Open Dataset and model training pipeline
+7. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
 reader = easyocr.Reader(['en'], detection='DB', recognition = 'CNN_Transformer')
