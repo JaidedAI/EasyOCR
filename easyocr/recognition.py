@@ -6,8 +6,7 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 import numpy as np
 from collections import OrderedDict
-
-from .model import Model
+import importlib
 from .utils import CTCLabelConverter
 import math
 
@@ -139,12 +138,18 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
 
     return result
 
-def get_recognizer(input_channel, output_channel, hidden_size, character,\
-                   separator_list, dict_list, model_path, device = 'cpu'):
+def get_recognizer(recog_network, network_params, character,\
+                   separator_list, dict_list, model_path,\
+                   device = 'cpu'):
 
     converter = CTCLabelConverter(character, separator_list, dict_list)
     num_class = len(converter.character)
-    model = Model(input_channel, output_channel, hidden_size, num_class)
+
+    if recog_network == 'standard':
+        model_pkg = importlib.import_module("easyocr.model.model")
+    else:
+        model_pkg = importlib.import_module(recog_network)
+    model = model_pkg.Model(num_class=num_class, **network_params)
 
     if device == 'cpu':
         state_dict = torch.load(model_path, map_location=device)

@@ -4,6 +4,7 @@ from .detection import get_detector, get_textbox
 from .recognition import get_recognizer, get_text
 from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
                    download_and_unzip, printProgressBar, diff, reformat_input
+from .config import *
 from bidi.algorithm import get_display
 import numpy as np
 import cv2
@@ -12,6 +13,7 @@ import os
 import sys
 from PIL import Image
 from logging import getLogger
+import yaml
 
 if sys.version_info[0] == 2:
     from io import open
@@ -21,77 +23,12 @@ else:
     from urllib.request import urlretrieve
     from pathlib import Path
 
-os.environ["LRU_CACHE_CAPACITY"] = "1"
 LOGGER = getLogger(__name__)
-
-BASE_PATH = os.path.dirname(__file__)
-MODULE_PATH = os.environ.get("EASYOCR_MODULE_PATH") or \
-              os.environ.get("MODULE_PATH") or \
-              os.path.expanduser("~/.EasyOCR/")
-
-# detector parameters
-DETECTOR_FILENAME = 'craft_mlt_25k.pth'
-
-# recognizer parameters
-latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
-                   'hr','hu','id','is','it','ku','la','lt','lv','mi','ms','mt',\
-                   'nl','no','oc','pl','pt','ro','rs_latin','sk','sl','sq',\
-                   'sv','sw','tl','tr','uz','vi']
-arabic_lang_list = ['ar','fa','ug','ur']
-bengali_lang_list = ['bn','as','mni']
-cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn','abq','ady','kbd',\
-                      'ava','dar','inh','che','lbe','lez','tab']
-devanagari_lang_list = ['hi','mr','ne','bh','mai','ang','bho','mah','sck','new',\
-                        'gom','sa','bgc']
-
-all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list + devanagari_lang_list + bengali_lang_list + ['th','ch_sim','ch_tra','ja','ko','ta']
-imgH = 64
-input_channel = 1
-output_channel = 512
-hidden_size = 512
-
-number = '0123456789'
-symbol  = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
-special_c0 = 'ุู'
-special_c1 = 'ิีืึ'+ 'ั'
-special_c2 = '่้๊๋'
-special_c3 = '็์'
-special_c = special_c0+special_c1+special_c2+special_c3 + 'ำ'
-
-# All language characters
-characters = {
-    'all_char': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'+\
-            'ÀÁÂÃÄÅÆÇÈÉÊËÍÎÑÒÓÔÕÖØÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿąęĮįıŁłŒœŠšųŽž',
-    'en_char' : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    'ar_number' : '٠١٢٣٤٥٦٧٨٩',
-    'ar_symbol' : '«»؟،؛',
-    'ar_char' : 'ءآأؤإئااًبةتثجحخدذرزسشصضطظعغفقكلمنهوىيًٌٍَُِّْٰٓٔٱٹپچڈڑژکڭگںھۀہۂۃۆۇۈۋیېےۓە',
-    'cyrillic_char' : 'ЁЂЄІЇЈЉЊЋЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяёђєіїјљњћўџҐґҮүө',
-    'devanagari_char' : '.ँंःअअंअःआइईउऊऋएऐऑओऔकखगघङचछजझञटठडढणतथदधनऩपफबभमयरऱलळवशषसह़ािीुूृॅेैॉोौ्ॐ॒क़ख़ग़ज़ड़ढ़फ़ॠ।०१२३४५६७८९॰',
-    'bn_char' : '।ঁংঃঅআইঈউঊঋঌএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ়ািীুূৃেৈোৌ্ৎড়ঢ়য়০১২৩৪৫৬৭৮৯',
-    'th_char' : 'กขคฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮฤ' +'เแโใไะา'+ special_c +  'ํฺ'+'ฯๆ',
-    'th_number' : '0123456789๑๒๓๔๕๖๗๘๙',
-}
-
-# first element is url path, second is file size
-model_url = {
-    'detector': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/craft_mlt_25k.zip', '2f8227d2def4037cdb3b34389dcf9ec1'),
-    'latin.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/latin.zip', 'fb91b9abf65aeeac95a172291b4a6176'),
-    'chinese.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/chinese.zip', 'dfba8e364cd98ed4fed7ad54d71e3965'),
-    'chinese_sim.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/chinese_sim.zip', '0e19a9d5902572e5237b04ee29bdb636'),
-    'japanese.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/japanese.zip', '6d891a4aad9cb7f492809515e4e9fd2e'),
-    'korean.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/korean.zip', '45b3300e0f04ce4d03dda9913b20c336'),
-    'thai.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/thai.zip', '40a06b563a2b3d7897e2d19df20dc709'),
-    'devanagari.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/devanagari.zip', 'db6b1f074fae3070f561675db908ac08'),
-    'cyrillic.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/cyrillic.zip', '5a046f7be2a4f7da6ed50740f487efa8'),
-    'arabic.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/arabic.zip', '993074555550e4e06a6077d55ff0449a'),
-    'tamil.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip', '4b93972fdacdcdabe6d57097025d4dc2'),
-    'bengali.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.8/bengali.zip', 'cea9e897e2c0576b62cbb1554997ce1c'),
-}
 
 class Reader(object):
 
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
+                 user_network_directory=None, recog_network = 'standard',
                  download_enabled=True, detector=True, recognizer=True):
         """Create an EasyOCR Reader.
 
@@ -104,6 +41,10 @@ class Reader(object):
             models will be read from a directory as defined by the environment variable
             EASYOCR_MODULE_PATH (preferred), MODULE_PATH (if defined), or ~/.EasyOCR/.
 
+            user_network_directory (string): Path to directory for custom network architecture.
+            If not specified, it is as defined by the environment variable
+            EASYOCR_MODULE_PATH (preferred), MODULE_PATH (if defined), or ~/.EasyOCR/.
+
             download_enabled (bool): Enabled downloading of model data via HTTP (default).
         """
         self.download_enabled = download_enabled
@@ -112,6 +53,12 @@ class Reader(object):
         if model_storage_directory:
             self.model_storage_directory = model_storage_directory
         Path(self.model_storage_directory).mkdir(parents=True, exist_ok=True)
+
+        self.user_network_directory = MODULE_PATH + '/user_network'
+        if user_network_directory:
+            self.user_network_directory = user_network_directory
+        Path(self.user_network_directory).mkdir(parents=True, exist_ok=True)
+        sys.path.append(self.user_network_directory)
 
         if gpu is False:
             self.device = 'cpu'
@@ -124,98 +71,7 @@ class Reader(object):
         else:
             self.device = gpu
 
-        # check available languages
-        unknown_lang = set(lang_list) - set(all_lang_list)
-        if unknown_lang != set():
-            raise ValueError(unknown_lang, 'is not supported')
-
-        # choose model
-        if 'th' in lang_list:
-            self.setModelLanguage('thai', lang_list, ['th','en'], '["th","en"]')
-        elif 'ch_tra' in lang_list:
-            self.setModelLanguage('chinese_tra', lang_list, ['ch_tra','en'], '["ch_tra","en"]')
-        elif 'ch_sim' in lang_list:
-            self.setModelLanguage('chinese_sim', lang_list, ['ch_sim','en'], '["ch_sim","en"]')
-        elif 'ja' in lang_list:
-            self.setModelLanguage('japanese', lang_list, ['ja','en'], '["ja","en"]')
-        elif 'ko' in lang_list:
-            self.setModelLanguage('korean', lang_list, ['ko','en'], '["ko","en"]')
-        elif 'ta' in lang_list:
-            self.setModelLanguage('tamil', lang_list, ['ta','en'], '["ta","en"]')
-        elif set(lang_list) & set(bengali_lang_list):
-            self.setModelLanguage('bengali', lang_list, bengali_lang_list+['en'], '["bn","as","en"]')
-        elif set(lang_list) & set(arabic_lang_list):
-            self.setModelLanguage('arabic', lang_list, arabic_lang_list+['en'], '["ar","fa","ur","ug","en"]')
-        elif set(lang_list) & set(devanagari_lang_list):
-            self.setModelLanguage('devanagari', lang_list, devanagari_lang_list+['en'], '["hi","mr","ne","en"]')
-        elif set(lang_list) & set(cyrillic_lang_list):
-            self.setModelLanguage('cyrillic', lang_list, cyrillic_lang_list+['en'],
-                                  '["ru","rs_cyrillic","be","bg","uk","mn","en"]')
-        else: self.model_lang = 'latin'
-
-        separator_list = {}
-        if self.model_lang == 'latin':
-            self.character = number+ symbol + characters['all_char']
-            model_file = 'latin.pth'
-        elif self.model_lang == 'arabic':
-            self.character = number + symbol + characters['en_char'] + characters['ar_number'] + characters['ar_symbol'] + characters['ar_char']
-            model_file = 'arabic.pth'
-        elif self.model_lang == 'cyrillic':
-            self.character = number+ symbol + characters['en_char'] + characters['cyrillic_char']
-            model_file = 'cyrillic.pth'
-        elif self.model_lang == 'devanagari':
-            self.character = number+ symbol + characters['en_char'] + characters['devanagari_char']
-            model_file = 'devanagari.pth'
-        elif self.model_lang == 'bengali':
-            self.character = number+ symbol + characters['en_char'] + characters['bn_char']
-            model_file = 'bengali.pth'
-        elif  self.model_lang == 'chinese_tra':
-            ch_tra_char = self.getChar("ch_tra_char.txt")
-            self.character = number + symbol + characters['en_char'] + ch_tra_char
-            model_file = 'chinese.pth'
-        elif  self.model_lang == 'chinese_sim':
-            ch_sim_char = self.getChar("ch_sim_char.txt")
-            self.character = number + symbol + characters['en_char'] + ch_sim_char
-            model_file = 'chinese_sim.pth'
-        elif  self.model_lang == 'japanese':
-            ja_char = self.getChar("ja_char.txt")
-            self.character = number + symbol + characters['en_char'] + ja_char
-            model_file = 'japanese.pth'
-        elif  self.model_lang == 'korean':
-            ko_char = self.getChar("ko_char.txt")
-            self.character = number + symbol + characters['en_char'] + ko_char
-            model_file = 'korean.pth'
-        elif  self.model_lang == 'tamil':
-            ta_char = self.getChar("ta_char.txt")
-            self.character = number + symbol + characters['en_char'] + ta_char
-            model_file = 'tamil.pth'
-        elif self.model_lang == 'thai':
-            separator_list = {
-                'th': ['\xa2', '\xa3'],
-                'en': ['\xa4', '\xa5']
-            }
-            separator_char = []
-            for lang, sep in separator_list.items():
-                separator_char += sep
-            self.character = ''.join(separator_char) + symbol + characters['en_char'] + characters['th_char'] + characters['th_number']
-            model_file = 'thai.pth'
-        else:
-            LOGGER.error('invalid language')
-
-        dict_list = {}
-        for lang in lang_list:
-            dict_list[lang] = os.path.join(BASE_PATH, 'dict', lang + ".txt")
-
-        self.lang_char = []
-        for lang in lang_list:
-            char_file = os.path.join(BASE_PATH, 'character', lang + "_char.txt")
-            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                char_list =  input_file.read().splitlines()
-            self.lang_char += char_list
-        self.lang_char = set(self.lang_char).union(set(number+symbol))
-        self.lang_char = ''.join(self.lang_char)
-
-        model_path = os.path.join(self.model_storage_directory, model_file)
+        # check and download detection model
         corrupt_msg = 'MD5 hash mismatch, possible file corruption'
         detector_path = os.path.join(self.model_storage_directory, DETECTOR_FILENAME)
         if os.path.isfile(detector_path) == False:
@@ -235,30 +91,146 @@ class Reader(object):
                            'This may take several minutes depending upon your network connection.')
             download_and_unzip(model_url['detector'][0], DETECTOR_FILENAME, self.model_storage_directory)
             assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
-        # check model file
-        if os.path.isfile(model_path) == False:
-            if not self.download_enabled:
-                raise FileNotFoundError("Missing %s and downloads disabled" % model_path)
-            LOGGER.warning('Downloading recognition model, please wait. '
-                           'This may take several minutes depending upon your network connection.')
-            download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
-            assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
-            LOGGER.info('Download complete.')
-        elif calculate_md5(model_path) != model_url[model_file][1]:
-            if not self.download_enabled:
-                raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % model_path)
-            LOGGER.warning(corrupt_msg)
-            os.remove(model_path)
-            LOGGER.warning('Re-downloading the recognition model, please wait. '
-                           'This may take several minutes depending upon your network connection.')
-            download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
-            assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
-            LOGGER.info('Download complete')
+
+        # recognition model
+        separator_list = {}
+        if recog_network != 'standard':
+            with open(os.path.join(self.user_network_directory, recog_network+ '.yaml')) as file:
+                recog_config = yaml.load(file, Loader=yaml.FullLoader)
+            imgH = recog_config['imgH']
+            available_lang = recog_config['lang_list']
+            self.setModelLanguage(recog_network, lang_list, available_lang, available_lang)
+            char_file = os.path.join(self.user_network_directory, recog_network+ '.txt')
+            with open(char_file, "r", encoding="utf-8-sig") as input_file:
+                list = input_file.read().splitlines()
+                self.character = number+ symbol + ''.join(list)
+            model_file = recog_network+ '.pth'
+            model_path = os.path.join(self.model_storage_directory, model_file)
+        else:
+            # check available languages
+            unknown_lang = set(lang_list) - set(all_lang_list)
+            if unknown_lang != set():
+                raise ValueError(unknown_lang, 'is not supported')
+
+            # choose recognition model
+            if 'th' in lang_list:
+                self.setModelLanguage('thai', lang_list, ['th','en'], '["th","en"]')
+            elif 'ch_tra' in lang_list:
+                self.setModelLanguage('chinese_tra', lang_list, ['ch_tra','en'], '["ch_tra","en"]')
+            elif 'ch_sim' in lang_list:
+                self.setModelLanguage('chinese_sim', lang_list, ['ch_sim','en'], '["ch_sim","en"]')
+            elif 'ja' in lang_list:
+                self.setModelLanguage('japanese', lang_list, ['ja','en'], '["ja","en"]')
+            elif 'ko' in lang_list:
+                self.setModelLanguage('korean', lang_list, ['ko','en'], '["ko","en"]')
+            elif 'ta' in lang_list:
+                self.setModelLanguage('tamil', lang_list, ['ta','en'], '["ta","en"]')
+            elif set(lang_list) & set(bengali_lang_list):
+                self.setModelLanguage('bengali', lang_list, bengali_lang_list+['en'], '["bn","as","en"]')
+            elif set(lang_list) & set(arabic_lang_list):
+                self.setModelLanguage('arabic', lang_list, arabic_lang_list+['en'], '["ar","fa","ur","ug","en"]')
+            elif set(lang_list) & set(devanagari_lang_list):
+                self.setModelLanguage('devanagari', lang_list, devanagari_lang_list+['en'], '["hi","mr","ne","en"]')
+            elif set(lang_list) & set(cyrillic_lang_list):
+                self.setModelLanguage('cyrillic', lang_list, cyrillic_lang_list+['en'],
+                                      '["ru","rs_cyrillic","be","bg","uk","mn","en"]')
+            else: self.model_lang = 'latin'
+
+            if self.model_lang == 'latin':
+                self.character = number+ symbol + characters['all_char']
+                model_file = 'latin.pth'
+            elif self.model_lang == 'arabic':
+                self.character = number + symbol + characters['en_char'] + characters['ar_number'] + characters['ar_symbol'] + characters['ar_char']
+                model_file = 'arabic.pth'
+            elif self.model_lang == 'cyrillic':
+                self.character = number+ symbol + characters['en_char'] + characters['cyrillic_char']
+                model_file = 'cyrillic.pth'
+            elif self.model_lang == 'devanagari':
+                self.character = number+ symbol + characters['en_char'] + characters['devanagari_char']
+                model_file = 'devanagari.pth'
+            elif self.model_lang == 'bengali':
+                self.character = number+ symbol + characters['en_char'] + characters['bn_char']
+                model_file = 'bengali.pth'
+            elif  self.model_lang == 'chinese_tra':
+                ch_tra_char = self.getChar("ch_tra_char.txt")
+                self.character = number + symbol + characters['en_char'] + ch_tra_char
+                model_file = 'chinese.pth'
+            elif  self.model_lang == 'chinese_sim':
+                ch_sim_char = self.getChar("ch_sim_char.txt")
+                self.character = number + symbol + characters['en_char'] + ch_sim_char
+                model_file = 'chinese_sim.pth'
+            elif  self.model_lang == 'japanese':
+                ja_char = self.getChar("ja_char.txt")
+                self.character = number + symbol + characters['en_char'] + ja_char
+                model_file = 'japanese.pth'
+            elif  self.model_lang == 'korean':
+                ko_char = self.getChar("ko_char.txt")
+                self.character = number + symbol + characters['en_char'] + ko_char
+                model_file = 'korean.pth'
+            elif  self.model_lang == 'tamil':
+                ta_char = self.getChar("ta_char.txt")
+                self.character = number + symbol + characters['en_char'] + ta_char
+                model_file = 'tamil.pth'
+            elif self.model_lang == 'thai':
+                separator_list = {
+                    'th': ['\xa2', '\xa3'],
+                    'en': ['\xa4', '\xa5']
+                }
+                separator_char = []
+                for lang, sep in separator_list.items():
+                    separator_char += sep
+                self.character = ''.join(separator_char) + symbol + characters['en_char'] + characters['th_char'] + characters['th_number']
+                model_file = 'thai.pth'
+            else:
+                LOGGER.error('invalid language')
+
+            model_path = os.path.join(self.model_storage_directory, model_file)
+            # check recognition model file
+            if os.path.isfile(model_path) == False:
+                if not self.download_enabled:
+                    raise FileNotFoundError("Missing %s and downloads disabled" % model_path)
+                LOGGER.warning('Downloading recognition model, please wait. '
+                               'This may take several minutes depending upon your network connection.')
+                download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
+                assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
+                LOGGER.info('Download complete.')
+            elif calculate_md5(model_path) != model_url[model_file][1]:
+                if not self.download_enabled:
+                    raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % model_path)
+                LOGGER.warning(corrupt_msg)
+                os.remove(model_path)
+                LOGGER.warning('Re-downloading the recognition model, please wait. '
+                               'This may take several minutes depending upon your network connection.')
+                download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
+                assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
+                LOGGER.info('Download complete')
+
+        self.lang_char = []
+        for lang in lang_list:
+            char_file = os.path.join(BASE_PATH, 'character', lang + "_char.txt")
+            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
+                char_list =  input_file.read().splitlines()
+            self.lang_char += char_list
+        self.lang_char = set(self.lang_char).union(set(number+symbol))
+        self.lang_char = ''.join(self.lang_char)
+
+        dict_list = {}
+        for lang in lang_list:
+            dict_list[lang] = os.path.join(BASE_PATH, 'dict', lang + ".txt")
+
         if detector:
             self.detector = get_detector(detector_path, self.device)
         if recognizer:
-            self.recognizer, self.converter = get_recognizer(input_channel, output_channel,\
-                                                         hidden_size, self.character, separator_list,\
+            if recog_network == 'standard':
+                network_params = {
+                    'input_channel': 1,
+                    'output_channel': 512,
+                    'hidden_size': 512
+                    }
+            else:
+                network_params = recog_config['network_params']
+            self.recognizer, self.converter = get_recognizer(recog_network, network_params,\
+                                                         self.character, separator_list,\
                                                          dict_list, model_path, device = self.device)
 
     def setModelLanguage(self, language, lang_list, list_lang, list_lang_string):
