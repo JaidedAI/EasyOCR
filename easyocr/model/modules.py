@@ -89,6 +89,30 @@ class BidirectionalLSTM(nn.Module):
         output = self.linear(recurrent)  # batch_size x T x output_size
         return output
 
+class VGG_FeatureExtractor(nn.Module):
+
+    def __init__(self, input_channel, output_channel=256):
+        super(VGG_FeatureExtractor, self).__init__()
+        self.output_channel = [int(output_channel / 8), int(output_channel / 4),
+                               int(output_channel / 2), output_channel]
+        self.ConvNet = nn.Sequential(
+            nn.Conv2d(input_channel, self.output_channel[0], 3, 1, 1), nn.ReLU(True),
+            nn.MaxPool2d(2, 2),
+            nn.Conv2d(self.output_channel[0], self.output_channel[1], 3, 1, 1), nn.ReLU(True),
+            nn.MaxPool2d(2, 2),
+            nn.Conv2d(self.output_channel[1], self.output_channel[2], 3, 1, 1), nn.ReLU(True),
+            nn.Conv2d(self.output_channel[2], self.output_channel[2], 3, 1, 1), nn.ReLU(True),
+            nn.MaxPool2d((2, 1), (2, 1)),
+            nn.Conv2d(self.output_channel[2], self.output_channel[3], 3, 1, 1, bias=False),
+            nn.BatchNorm2d(self.output_channel[3]), nn.ReLU(True),
+            nn.Conv2d(self.output_channel[3], self.output_channel[3], 3, 1, 1, bias=False),
+            nn.BatchNorm2d(self.output_channel[3]), nn.ReLU(True),
+            nn.MaxPool2d((2, 1), (2, 1)),
+            nn.Conv2d(self.output_channel[3], self.output_channel[3], 2, 1, 0), nn.ReLU(True))
+
+    def forward(self, input):
+        return self.ConvNet(input)
+
 class ResNet_FeatureExtractor(nn.Module):
     """ FeatureExtractor of FAN (http://openaccess.thecvf.com/content_ICCV_2017/papers/Cheng_Focusing_Attention_Towards_ICCV_2017_paper.pdf) """
 

@@ -125,6 +125,8 @@ class Reader(object):
                 self.setModelLanguage('korean', lang_list, ['ko','en'], '["ko","en"]')
             elif 'ta' in lang_list:
                 self.setModelLanguage('tamil', lang_list, ['ta','en'], '["ta","en"]')
+            elif 'te' in lang_list:
+                self.setModelLanguage('telugu', lang_list, ['te','en'], '["te","en"]')
             elif set(lang_list) & set(bengali_lang_list):
                 self.setModelLanguage('bengali', lang_list, bengali_lang_list+['en'], '["bn","as","en"]')
             elif set(lang_list) & set(arabic_lang_list):
@@ -171,6 +173,10 @@ class Reader(object):
                 ta_char = self.getChar("ta_char.txt")
                 self.character = number + symbol + characters['en_char'] + ta_char
                 model_file = 'tamil.pth'
+            elif  self.model_lang == 'telugu':
+                self.character = number + symbol + characters['en_char'] + characters['te_char']
+                model_file = 'telugu.pth'
+                recog_network = 'lite'
             elif self.model_lang == 'thai':
                 separator_list = {
                     'th': ['\xa2', '\xa3'],
@@ -226,6 +232,12 @@ class Reader(object):
                     'input_channel': 1,
                     'output_channel': 512,
                     'hidden_size': 512
+                    }
+            elif recog_network == 'lite':
+                network_params = {
+                    'input_channel': 1,
+                    'output_channel': 256,
+                    'hidden_size': 256
                     }
             else:
                 network_params = recog_config['network_params']

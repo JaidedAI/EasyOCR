@@ -21,7 +21,7 @@ cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn','abq','ady','kbd',\
                       'ava','dar','inh','che','lbe','lez','tab']
 devanagari_lang_list = ['hi','mr','ne','bh','mai','ang','bho','mah','sck','new',\
                         'gom','sa','bgc']
-other_lang_list = ['th','ch_sim','ch_tra','ja','ko','ta']
+other_lang_list = ['th','ch_sim','ch_tra','ja','ko','ta','te','kn']
 
 all_lang_list = latin_lang_list + arabic_lang_list+ cyrillic_lang_list +\
                 devanagari_lang_list + bengali_lang_list + other_lang_list
@@ -48,6 +48,7 @@ characters = {
     'bn_char' : '।ঁংঃঅআইঈউঊঋঌএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ়ািীুূৃেৈোৌ্ৎড়ঢ়য়০১২৩৪৫৬৭৮৯',
     'th_char' : 'กขคฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮฤ' +'เแโใไะา'+ special_c +  'ํฺ'+'ฯๆ',
     'th_number' : '0123456789๑๒๓๔๕๖๗๘๙',
+    'te_char': 'ఁంఃఅఆఇఈఉఊఋఌఎఏఐఒఓఔకఖగఘఙచఛజఝఞటఠడఢణతథదధనపఫబభమయరఱలళవశషసహాిీుూృౄెేైొోౌ్ౠౡౢౣ',
 }
 
 # first element is url path, second is file size
@@ -64,4 +65,6 @@ model_url = {
     'arabic.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/arabic.zip', '993074555550e4e06a6077d55ff0449a'),
     'tamil.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip', '4b93972fdacdcdabe6d57097025d4dc2'),
     'bengali.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.8/bengali.zip', 'cea9e897e2c0576b62cbb1554997ce1c'),
+    'telugu.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.11/telugu.zip', 'f7576012a3abe593950c47bfa1bd8ddc'),
+    'kannada.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.11/kannada.zip', ''),
 }
