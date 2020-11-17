@@ -113,8 +113,8 @@ download it manually from the following links and put it in '~/.EasyOCR/model' f
 - [arabic model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/arabic.zip)
 - [tamil model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip)
 - [bengali model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.8/bengali.zip)
-- [telugu model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.11/telugu.zip)
-- [kannada model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.11/kannada.zip)
+- [telugu model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.2/telugu.zip)
+- [kannada model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.2/kannada.zip)
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 
