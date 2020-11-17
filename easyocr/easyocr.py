@@ -127,6 +127,8 @@ class Reader(object):
                 self.setModelLanguage('tamil', lang_list, ['ta','en'], '["ta","en"]')
             elif 'te' in lang_list:
                 self.setModelLanguage('telugu', lang_list, ['te','en'], '["te","en"]')
+            elif 'kn' in lang_list:
+                self.setModelLanguage('kannada', lang_list, ['kn','en'], '["kn","en"]')
             elif set(lang_list) & set(bengali_lang_list):
                 self.setModelLanguage('bengali', lang_list, bengali_lang_list+['en'], '["bn","as","en"]')
             elif set(lang_list) & set(arabic_lang_list):
@@ -176,6 +178,10 @@ class Reader(object):
             elif  self.model_lang == 'telugu':
                 self.character = number + symbol + characters['en_char'] + characters['te_char']
                 model_file = 'telugu.pth'
+                recog_network = 'lite'
+            elif  self.model_lang == 'kannada':
+                self.character = number + symbol + characters['en_char'] + characters['kn_char']
+                model_file = 'kannada.pth'
                 recog_network = 'lite'
             elif self.model_lang == 'thai':
                 separator_list = {

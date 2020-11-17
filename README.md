@@ -9,6 +9,8 @@
 Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new
+- 17 November 2020 - Version 1.2
+    - New language supports for Telugu and Kannada. These are experimental lite recognition models. Their file sizes are only around 7% of other models and they are ~6x faster at inference with CPU.
 - 12 October 2020 - Version 1.1.10
     - Faster `beamsearch` decoder (thanks @amitbcp)
     - Better code structure (thanks @susmith98)
@@ -99,15 +101,20 @@ Result:
 Model weight for chosen language will be automatically downloaded or you can
 download it manually from the following links and put it in '~/.EasyOCR/model' folder
 
-- [text detection model (CRAFT)](https://drive.google.com/file/d/1tdItXPoFFeKBtkxb9HBYdBGo-SyMg1m0/view?usp=sharing)
-- [latin model](https://drive.google.com/file/d/1M7Lj3OtUsaoppD4ZKudjepzCMsXKlxp3/view?usp=sharing)
-- [chinese (traditional) model](https://drive.google.com/file/d/1xWyQC9NIZHNtgz57yofgj2N91rpwBrjh/view?usp=sharing)
-- [chinese (simplified) model](https://drive.google.com/file/d/1-jN_R1M4tdlWunRnD5T_Yqb7Io5nNJoR/view?usp=sharing)
-- [japanese model](https://drive.google.com/file/d/1ftAeVI6W8HvpLL1EwrQdvuLss23vYqPu/view?usp=sharing)
-- [korean model](https://drive.google.com/file/d/1UBKX7dHybcwKK_i2fYx_CXaL1hrTzQ6y/view?usp=sharing)
-- [thai model](https://drive.google.com/file/d/14BEuxcfmS0qWi3m9RsxwcUsjavM3rFMa/view?usp=sharing)
-- [devanagari model](https://drive.google.com/file/d/1uCiMuBl8H8GAwapEjYUVYYdoOivyGzel/view?usp=sharing)
-- [cyrillic model](https://drive.google.com/file/d/1SBmKXV5dpN5Cekacqk3ms1xq3dGbDuu1/view?usp=sharing)
+- [text detection model (CRAFT)](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/craft_mlt_25k.zip)
+- [latin model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/latin.zip)
+- [chinese (traditional) model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/chinese.zip)
+- [chinese (simplified) model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/chinese_sim.zip)
+- [japanese model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/japanese.zip)
+- [korean model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/korean.zip)
+- [thai model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/thai.zip)
+- [devanagari model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/devanagari.zip)
+- [cyrillic model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/cyrillic.zip)
+- [arabic model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/arabic.zip)
+- [tamil model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip)
+- [bengali model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.8/bengali.zip)
+- [telugu model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.11/telugu.zip)
+- [kannada model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.11/kannada.zip)
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 

@@ -1,3 +1,5 @@
+- 17 November 2020 - Version 1.2
+    - New language supports for Telugu and Kannada. These are experimental lite recognition models. Their file sizes are only around 7% of other models and they are ~6x faster at inference with CPU.
 - 12 October 2020 - Version 1.1.10
     - Faster beamsearch decoder (thanks @amitbcp)
     - Better code structure (thanks @susmith98)
