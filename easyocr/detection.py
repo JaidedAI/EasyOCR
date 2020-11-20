@@ -21,7 +21,7 @@ def copyStateDict(state_dict):
         new_state_dict[name] = v
     return new_state_dict
 
-def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold, low_text, poly, device):
+def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold, low_text, poly, device, estimate_num_chars=False):
     # resize
     img_resized, target_ratio, size_heatmap = resize_aspect_ratio(image, canvas_size,\
                                                                           interpolation=cv2.INTER_LINEAR, mag_ratio=mag_ratio)
@@ -42,12 +42,14 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     score_link = y[0,:,:,1].cpu().data.numpy()
 
     # Post-processing
-    boxes, polys = getDetBoxes(score_text, score_link, text_threshold, link_threshold, low_text, poly)
+    boxes, polys, mapper = getDetBoxes(score_text, score_link, text_threshold, link_threshold, low_text, poly, estimate_num_chars)
 
     # coordinate adjustment
     boxes = adjustResultCoordinates(boxes, ratio_w, ratio_h)
     polys = adjustResultCoordinates(polys, ratio_w, ratio_h)
     for k in range(len(polys)):
+        if estimate_num_chars:
+            boxes[k] = (boxes[k], mapper[k])
         if polys[k] is None: polys[k] = boxes[k]
 
     return boxes, polys
@@ -65,9 +67,13 @@ def get_detector(trained_model, device='cpu'):
     net.eval()
     return net
 
-def get_textbox(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device):
+def get_textbox(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device, optimal_num_chars=None):
     result = []
-    bboxes, polys = test_net(canvas_size, mag_ratio, detector, image, text_threshold, link_threshold, low_text, poly, device)
+    estimate_num_chars = optimal_num_chars is not None
+    bboxes, polys = test_net(canvas_size, mag_ratio, detector, image, text_threshold, link_threshold, low_text, poly, device, estimate_num_chars)
+
+    if estimate_num_chars:
+        polys = [p for p, _ in sorted(polys, key=lambda x: abs(optimal_num_chars - x[1]))]
 
     for i, box in enumerate(polys):
         poly = np.array(box).astype(np.int32).reshape((-1))

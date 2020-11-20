@@ -7,6 +7,7 @@ MIT License
 import numpy as np
 import cv2
 import math
+from scipy.ndimage import label
 
 """ auxilary functions """
 # unwarp corodinates
@@ -16,7 +17,7 @@ def warpCoord(Minv, pt):
 """ end of auxilary functions """
 
 
-def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text):
+def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text, estimate_num_chars=False):
     # prepare data
     linkmap = linkmap.copy()
     textmap = textmap.copy()
@@ -42,6 +43,12 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
         # make segmentation map
         segmap = np.zeros(textmap.shape, dtype=np.uint8)
         segmap[labels==k] = 255
+        if estimate_num_chars:
+            _, character_locs = cv2.threshold((textmap - linkmap) * segmap /255., text_threshold, 1, 0)
+            _, n_chars = label(character_locs)
+            mapper.append(n_chars)
+        else:
+            mapper.append(k)
         segmap[np.logical_and(link_score==1, text_score==0)] = 0   # remove link area
         x, y = stats[k, cv2.CC_STAT_LEFT], stats[k, cv2.CC_STAT_TOP]
         w, h = stats[k, cv2.CC_STAT_WIDTH], stats[k, cv2.CC_STAT_HEIGHT]
@@ -74,7 +81,6 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
         box = np.array(box)
 
         det.append(box)
-        mapper.append(k)
 
     return det, labels, mapper
 
@@ -224,15 +230,17 @@ def getPoly_core(boxes, labels, mapper, linkmap):
 
     return polys
 
-def getDetBoxes(textmap, linkmap, text_threshold, link_threshold, low_text, poly=False):
-    boxes, labels, mapper = getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
+def getDetBoxes(textmap, linkmap, text_threshold, link_threshold, low_text, poly=False, estimate_num_chars=False):
+    if poly and estimate_num_chars:
+        raise Exception("Estimating the number of characters not currently supported with poly.")
+    boxes, labels, mapper = getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text, estimate_num_chars)
 
     if poly:
         polys = getPoly_core(boxes, labels, mapper, linkmap)
     else:
         polys = [None] * len(boxes)
 
-    return boxes, polys
+    return boxes, polys, mapper
 
 def adjustResultCoordinates(polys, ratio_w, ratio_h, ratio_net = 2):
     if len(polys) > 0:

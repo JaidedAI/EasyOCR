@@ -404,7 +404,7 @@ def four_point_transform(image, rect):
 
     return warped
 
-def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, width_ths = 1.0, add_margin = 0.05):
+def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, width_ths = 1.0, add_margin = 0.05, sort_output = True):
     # poly top-left, top-right, low-right, low-left
     horizontal_list, free_list,combined_list, merged_list = [],[],[],[]
 
@@ -434,7 +434,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             y4 = poly[7] + np.sin(theta24)*margin
 
             free_list.append([[x1,y1],[x2,y2],[x3,y3],[x4,y4]])
-    horizontal_list = sorted(horizontal_list, key=lambda item: item[4])
+    if sort_output:
+        horizontal_list = sorted(horizontal_list, key=lambda item: item[4])
 
     # combine box
     new_box = []
@@ -500,7 +501,7 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
     # may need to check if box is really in image
     return merged_list, free_list
 
-def get_image_list(horizontal_list, free_list, img, model_height = 64):
+def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_output = True):
     image_list = []
     maximum_y,maximum_x = img.shape
 
@@ -532,7 +533,8 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64):
     max_ratio = max(max_ratio_hori, max_ratio_free)
     max_width = math.ceil(max_ratio)*model_height
 
-    image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
+    if sort_output:
+        image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
 
 def download_and_unzip(url, filename, model_storage_directory):
