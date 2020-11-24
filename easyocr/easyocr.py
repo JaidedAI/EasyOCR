@@ -101,9 +101,7 @@ class Reader(object):
             available_lang = recog_config['lang_list']
             self.setModelLanguage(recog_network, lang_list, available_lang, available_lang)
             char_file = os.path.join(self.user_network_directory, recog_network+ '.txt')
-            with open(char_file, "r", encoding="utf-8-sig") as input_file:
-                list = input_file.read().splitlines()
-                self.character = number+ symbol + ''.join(list)
+            self.character = recog_config['character_list']
             model_file = recog_network+ '.pth'
             model_path = os.path.join(self.model_storage_directory, model_file)
         else:
