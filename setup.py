@@ -3,15 +3,27 @@ End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution
 """
 
 from setuptools import setup
+from io import open
+
+with open('requirements.txt', encoding="utf-8-sig") as f:
+    requirements = f.readlines()
+
+def readme():
+    with open('README.md', encoding="utf-8-sig") as f:
+        README = f.read()
+    return README
 
 setup(
     name='easyocr',
     packages=['easyocr'],
     include_package_data=True,
-    version='1.1.3',
-    install_requires=['torch', 'torchvision','opencv-python', 'scipy', 'numpy','Pillow<7.0','scikit-image'],
+    version='1.2.1',
+    install_requires=requirements,
+    entry_points={"console_scripts": ["easyocr= easyocr.cli:main"]},
     license='Apache License 2.0',
     description='End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution',
+    long_description=readme(),
+    long_description_content_type="text/markdown",
     author='Rakpong Kittinaradorn',
     author_email='r.kittinaradorn@gmail.com',
     url='https://github.com/jaidedai/easyocr',

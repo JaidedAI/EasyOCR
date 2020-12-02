@@ -1,12 +1,15 @@
 A
 B
 C
+Ç
 D
 E
+Ə
 F
 G
 H
 I
+İ
 J
 K
 L
@@ -17,6 +20,7 @@ P
 Q
 R
 S
+Ş
 T
 U
 V
@@ -29,8 +33,10 @@ b
 c
 d
 e
+ə
 f
 g
+ğ
 h
 i
 j
@@ -43,6 +49,7 @@ p
 q
 r
 s
+ş
 t
 u
 v

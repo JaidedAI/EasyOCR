@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import torch
 import pickle
 import numpy as np
@@ -5,6 +7,14 @@ import math
 import cv2
 from PIL import Image
 import hashlib
+import sys, os
+from zipfile import ZipFile
+from .imgproc import loadImage
+
+if sys.version_info[0] == 2:
+    from six.moves.urllib.request import urlretrieve
+else:
+    from urllib.request import urlretrieve
 
 def consecutive(data, mode ='first', stepsize=1):
     group = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
@@ -55,6 +65,7 @@ class BeamEntry:
         self.prText = 1 # LM score
         self.lmApplied = False # flag if LM was already applied to this beam
         self.labeling = () # beam-labeling
+        self.simplified = True  # To run simplyfiy label
 
 class BeamState:
     "information about the beams at specific time-step"
@@ -122,6 +133,45 @@ def simplify_label(labeling, blankIdx = 0):
 
     return tuple(labeling)
 
+def fast_simplify_label(labeling, c, blankIdx=0):
+
+    # Adding BlankIDX after Non-Blank IDX
+    if labeling and c == blankIdx and labeling[-1] != blankIdx:
+        newLabeling = labeling + (c,)
+
+    # Case when a nonBlankChar is added after BlankChar |len(char) - 1
+    elif labeling and c != blankIdx and labeling[-1] == blankIdx:
+
+        # If Blank between same character do nothing | As done by Simplify label
+        if labeling[-2] == c:
+            newLabeling = labeling + (c,)
+
+        # if blank between different character, remove it | As done by Simplify Label
+        else:
+            newLabeling = labeling[:-1] + (c,)
+
+    # if consecutive blanks : Keep the original label
+    elif labeling and c == blankIdx and labeling[-1] == blankIdx:
+        newLabeling = labeling
+
+    # if empty beam & first index is blank
+    elif not labeling and c == blankIdx:
+        newLabeling = labeling
+
+    # if empty beam & first index is non-blank
+    elif not labeling and c != blankIdx:
+        newLabeling = labeling + (c,)
+
+    elif labeling and c != blankIdx:
+        newLabeling = labeling + (c,)
+
+    # Cases that might still require simplyfying
+    else:
+        newLabeling = labeling + (c,)
+        newLabeling = simplify_label(newLabeling, blankIdx)
+
+    return newLabeling
+
 def addBeam(beamState, labeling):
     "add beam if it does not yet exist"
     if labeling not in beamState.entries:
@@ -156,7 +206,11 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             prBlank = (last.entries[labeling].prTotal) * mat[t, blankIdx]
 
             # add beam at current time-step if needed
-            labeling = simplify_label(labeling, blankIdx)
+            prev_labeling = labeling
+            if not last.entries[labeling].simplified:
+                labeling = simplify_label(labeling, blankIdx)
+
+            # labeling = simplify_label(labeling, blankIdx)
             addBeam(curr, labeling)
 
             # fill in data
@@ -164,7 +218,7 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             curr.entries[labeling].prNonBlank += prNonBlank
             curr.entries[labeling].prBlank += prBlank
             curr.entries[labeling].prTotal += prBlank + prNonBlank
-            curr.entries[labeling].prText = last.entries[labeling].prText
+            curr.entries[labeling].prText = last.entries[prev_labeling].prText
             # beam-labeling not changed, therefore also LM score unchanged from
 
             #curr.entries[labeling].lmApplied = True # LM already applied at previous time-step for this beam-labeling
@@ -175,14 +229,15 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             for c in char_highscore:
             #for c in range(maxC - 1):
                 # add new char to current beam-labeling
-                newLabeling = labeling + (c,)
-                newLabeling = simplify_label(newLabeling, blankIdx)
+                # newLabeling = labeling + (c,)
+                # newLabeling = simplify_label(newLabeling, blankIdx)
+                newLabeling = fast_simplify_label(labeling, c, blankIdx)
 
                 # if new labeling contains duplicate char at the end, only consider paths ending with a blank
                 if labeling and labeling[-1] == c:
-                    prNonBlank = mat[t, c] * last.entries[labeling].prBlank
+                    prNonBlank = mat[t, c] * last.entries[prev_labeling].prBlank
                 else:
-                    prNonBlank = mat[t, c] * last.entries[labeling].prTotal
+                    prNonBlank = mat[t, c] * last.entries[prev_labeling].prTotal
 
                 # add beam at current time-step if needed
                 addBeam(curr, newLabeling)
@@ -349,28 +404,13 @@ def four_point_transform(image, rect):
 
     return warped
 
-def contrast_grey(img):
-    high = np.percentile(img, 90)
-    low  = np.percentile(img, 10)
-    return (high-low)/(high+low), high, low
-
-def adjust_contrast_grey(img, target = 0.7):
-    contrast, high, low = contrast_grey(img)
-    if contrast < target:
-        img = img.astype(int)
-        ratio = 200./(high-low)
-        img = (img - low + 25)*ratio
-        img = np.maximum(np.full(img.shape, 0) ,np.minimum(np.full(img.shape, 255), img)).astype(np.uint8)
-    return img
-
 def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, width_ths = 1.0, add_margin = 0.05):
     # poly top-left, top-right, low-right, low-left
-
     horizontal_list, free_list,combined_list, merged_list = [],[],[],[]
 
     for poly in polys:
-        slope_up = (poly[3]-poly[1])/(poly[2]-poly[0])
-        slope_down = (poly[5]-poly[7])/(poly[4]-poly[6])
+        slope_up = (poly[3]-poly[1])/np.maximum(10, (poly[2]-poly[0]))
+        slope_down = (poly[5]-poly[7])/np.maximum(10, (poly[4]-poly[6]))
         if max(abs(slope_up), abs(slope_down)) < slope_ths:
             x_max = max([poly[0],poly[2],poly[4],poly[6]])
             x_min = min([poly[0],poly[2],poly[4],poly[6]])
@@ -381,8 +421,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             height = np.linalg.norm( [poly[6]-poly[0],poly[7]-poly[1]])
             margin = int(1.44*add_margin*height)
 
-            theta13 = abs(np.arctan( (poly[1]-poly[5])/(poly[0]-poly[4]) ))
-            theta24 = abs(np.arctan( (poly[3]-poly[7])/(poly[2]-poly[6]) ))
+            theta13 = abs(np.arctan( (poly[1]-poly[5])/np.maximum(10, (poly[0]-poly[4]))))
+            theta24 = abs(np.arctan( (poly[3]-poly[7])/np.maximum(10, (poly[2]-poly[6]))))
             # do I need to clip minimum, maximum value here?
             x1 = poly[0] - np.cos(theta13)*margin
             y1 = poly[1] - np.sin(theta13)*margin
@@ -495,9 +535,140 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64):
     image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
 
+def download_and_unzip(url, filename, model_storage_directory):
+    zip_path = os.path.join(model_storage_directory, 'temp.zip')
+    urlretrieve(url, zip_path,reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
+    with ZipFile(zip_path, 'r') as zipObj:
+        zipObj.extract(filename, model_storage_directory)
+    os.remove(zip_path)
+
 def calculate_md5(fname):
     hash_md5 = hashlib.md5()
     with open(fname, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+def diff(input_list):
+    return max(input_list)-min(input_list)
+
+def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
+    # create basic attributes
+    box_group = []
+    for box in raw_result:
+        all_x = [int(coord[0]) for coord in box[0]]
+        all_y = [int(coord[1]) for coord in box[0]]
+        min_x = min(all_x)
+        max_x = max(all_x)
+        min_y = min(all_y)
+        max_y = max(all_y)
+        height = max_y - min_y
+        box_group.append([box[1], min_x, max_x, min_y, max_y, height, 0.5*(min_y+max_y), 0]) # last element indicates group
+    # cluster boxes into paragraph
+    current_group = 1
+    while len([box for box in box_group if box[7]==0]) > 0:
+        box_group0 = [box for box in box_group if box[7]==0] # group0 = non-group
+        # new group
+        if len([box for box in box_group if box[7]==current_group]) == 0:
+            box_group0[0][7] = current_group # assign first box to form new group
+        # try to add group
+        else:
+            current_box_group = [box for box in box_group if box[7]==current_group]
+            mean_height = np.mean([box[5] for box in current_box_group])
+            min_gx = min([box[1] for box in current_box_group]) - x_ths*mean_height
+            max_gx = max([box[2] for box in current_box_group]) + x_ths*mean_height
+            min_gy = min([box[3] for box in current_box_group]) - y_ths*mean_height
+            max_gy = max([box[4] for box in current_box_group]) + y_ths*mean_height
+            add_box = False
+            for box in box_group0:
+                same_horizontal_level = (min_gx<=box[1]<=max_gx) or (min_gx<=box[2]<=max_gx)
+                same_vertical_level = (min_gy<=box[3]<=max_gy) or (min_gy<=box[4]<=max_gy)
+                if same_horizontal_level and same_vertical_level:
+                    box[7] = current_group
+                    add_box = True
+                    break
+            # cannot add more box, go to next group
+            if add_box==False:
+                current_group += 1
+    # arrage order in paragraph
+    result = []
+    for i in set(box[7] for box in box_group):
+        current_box_group = [box for box in box_group if box[7]==i]
+        mean_height = np.mean([box[5] for box in current_box_group])
+        min_gx = min([box[1] for box in current_box_group])
+        max_gx = max([box[2] for box in current_box_group])
+        min_gy = min([box[3] for box in current_box_group])
+        max_gy = max([box[4] for box in current_box_group])
+
+        text = ''
+        while len(current_box_group) > 0:
+            highest = min([box[6] for box in current_box_group])
+            candidates = [box for box in current_box_group if box[6]<highest+0.4*mean_height]
+            # get the far left
+            if mode == 'ltr':
+                most_left = min([box[1] for box in candidates])
+                for box in candidates:
+                    if box[1] == most_left: best_box = box
+            elif mode == 'rtl':
+                most_right = max([box[2] for box in candidates])
+                for box in candidates:
+                    if box[2] == most_right: best_box = box
+            text += ' '+best_box[0]
+            current_box_group.remove(best_box)
+
+        result.append([ [[min_gx,min_gy],[max_gx,min_gy],[max_gx,max_gy],[min_gx,max_gy]], text[1:]])
+
+    return result
+
+
+def printProgressBar (prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    def progress_hook(count, blockSize, totalSize):
+        progress = count * blockSize / totalSize
+        percent = ("{0:." + str(decimals) + "f}").format(progress * 100)
+        filledLength = int(length * progress)
+        bar = fill * filledLength + '-' * (length - filledLength)
+        print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+
+    return progress_hook
+
+def reformat_input(image):
+    if type(image) == str:
+        if image.startswith('http://') or image.startswith('https://'):
+            tmp, _ = urlretrieve(image , reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
+            img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
+            os.remove(tmp)
+        else:
+            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+            image = os.path.expanduser(image)
+        img = loadImage(image)  # can accept URL
+    elif type(image) == bytes:
+        nparr = np.frombuffer(image, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    elif type(image) == np.ndarray:
+        if len(image.shape) == 2: # grayscale
+            img_cv_grey = image
+            img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
+            img = image
+            img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        elif len(image.shape) == 3 and image.shape[2] == 4: # RGBAscale
+            img = image[:,:,:3]
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    else:
+        LOGGER.warning('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
+
+    return img, img_cv_grey

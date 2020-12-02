@@ -1,7 +1,8 @@
 torch
-torchvision
+torchvision>=0.5
 opencv-python
 scipy
 numpy
-Pillow<7.0
+Pillow
 scikit-image
+python-bidi
