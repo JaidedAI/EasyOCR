@@ -47,6 +47,9 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     # coordinate adjustment
     boxes = adjustResultCoordinates(boxes, ratio_w, ratio_h)
     polys = adjustResultCoordinates(polys, ratio_w, ratio_h)
+    if estimate_num_chars:
+        boxes = list(boxes)
+        polys = list(polys)
     for k in range(len(polys)):
         if estimate_num_chars:
             boxes[k] = (boxes[k], mapper[k])
