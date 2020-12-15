@@ -3,7 +3,8 @@
 from .detection import get_detector, get_textbox
 from .recognition import get_recognizer, get_text
 from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
-                   download_and_unzip, printProgressBar, diff, reformat_input
+                   download_and_unzip, printProgressBar, diff, reformat_input,\
+                   make_rotated_img_list, set_result_with_confidence
 from .config import *
 from bidi.algorithm import get_display
 import numpy as np
@@ -288,6 +289,7 @@ class Reader(object):
     def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
                   decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                   workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                  rotation_info = None,\
                   paragraph = False,\
                   contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                   reformat=True):
@@ -311,6 +313,10 @@ class Reader(object):
         else:
             ignore_char = ''.join(set(self.character)-set(self.lang_char))
 
+        image_len = len(image_list)
+        if rotation_info:
+            image_list = make_rotated_img_list(rotation_info, image_list)
+
         if self.model_lang in ['chinese_tra','chinese_sim', 'japanese', 'korean']: decoder = 'greedy'
         result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                       ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
@@ -327,6 +333,9 @@ class Reader(object):
         if paragraph:
             result = get_paragraph(result, mode = direction_mode)
 
+        if rotation_info:
+            result = set_result_with_confidence(result, image_len)
+
         if detail == 0:
             return [item[1] for item in result]
         else:
@@ -334,7 +343,7 @@ class Reader(object):
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                 paragraph = False, min_size = 20,\
+                 rotation_info = None, paragraph = False, min_size = 20,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
@@ -355,7 +364,7 @@ class Reader(object):
 
         result = self.recognize(img_cv_grey, horizontal_list, free_list,\
                                 decoder, beamWidth, batch_size,\
-                                workers, allowlist, blocklist, detail,\
+                                workers, allowlist, blocklist, detail, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
                                 filter_ths, False)
 
