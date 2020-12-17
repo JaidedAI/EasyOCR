@@ -267,17 +267,18 @@ class Reader(object):
     def detect(self, img, min_size = 20, text_threshold = 0.7, low_text = 0.4,\
                link_threshold = 0.4,canvas_size = 2560, mag_ratio = 1.,\
                slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-               width_ths = 0.5, add_margin = 0.1, reformat=True):
+               width_ths = 0.5, add_margin = 0.1, reformat=True, optimal_num_chars=None):
 
         if reformat:
             img, img_cv_grey = reformat_input(img)
 
         text_box = get_textbox(self.detector, img, canvas_size, mag_ratio,\
                                text_threshold, link_threshold, low_text,\
-                               False, self.device)
+                               False, self.device, optimal_num_chars)
         horizontal_list, free_list = group_text_box(text_box, slope_ths,\
                                                     ycenter_ths, height_ths,\
-                                                    width_ths, add_margin)
+                                                    width_ths, add_margin, \
+                                                    (optimal_num_chars is None))
 
         if min_size:
             horizontal_list = [i for i in horizontal_list if max(i[1]-i[0],i[3]-i[2]) > min_size]
