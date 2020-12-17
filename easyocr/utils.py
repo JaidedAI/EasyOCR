@@ -674,3 +674,68 @@ def reformat_input(image):
         LOGGER.warning('Invalid input type. Suppoting format = string(file path or url), bytes, numpy array')
 
     return img, img_cv_grey
+
+
+def make_rotated_img_list(rotationInfo, img_list):
+    result_img_list = img_list[:]
+
+    # add rotated images to original image_list
+    if 90 in rotationInfo:
+        for img_info in img_list:
+            result_img_list.append((img_info[0], cv2.rotate(img_info[1], cv2.ROTATE_90_COUNTERCLOCKWISE)))
+
+    if 180 in rotationInfo:
+        for img_info in img_list:
+            result_img_list.append((img_info[0], cv2.rotate(img_info[1], cv2.ROTATE_180)))
+
+    if 270 in rotationInfo:
+        for img_info in img_list:
+            result_img_list.append((img_info[0], cv2.rotate(img_info[1], cv2.ROTATE_90_CLOCKWISE)))
+
+    return result_img_list
+
+
+def set_result_with_confidence(result_list, origin_len):
+    set_len = len(result_list)//origin_len
+
+    k = 0
+    result_to_split = [[],[],[],[]]
+    for i in range(set_len):
+        tmp_list = []
+        for j in range(origin_len):
+            tmp_list.append(result_list[k])
+            k += 1
+        result_to_split[i] += tmp_list
+
+
+    result1 = result_to_split[0]
+    result2 = result_to_split[1]
+    result3 = result_to_split[2]
+    result4 = result_to_split[3]
+
+    final_result = []
+    for i in range(origin_len):
+        result = result1[i] # format : ([[,],[,],[,],[,]], 'string', confidnece)
+        confidence = result1[i][2]
+
+        if result2:
+            if result2[i][2] > confidence:
+                if len(result2[i][1]) >= len(result[1]):
+                    result = result2[i]
+                    confidence = result2[i][2]
+
+        if result3:
+            if result3[i][2] > confidence:
+                if len(result3[i][1]) >= len(result[1]):
+                    result = result3[i]
+                    confidence = result3[i][2]
+
+        if result4:
+            if result4[i][2] > confidence:
+                if len(result4[i][1]) >= len(result[1]):
+                    result = result4[i]
+                    confidence = result4[i][2]
+
+        final_result.append(result)
+
+    return final_result
