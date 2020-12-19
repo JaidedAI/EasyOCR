@@ -67,5 +67,5 @@ model_url = {
     'tamil.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip', '4b93972fdacdcdabe6d57097025d4dc2'),
     'bengali.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.8/bengali.zip', 'cea9e897e2c0576b62cbb1554997ce1c'),
     'telugu.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.2/telugu.zip', 'f7576012a3abe593950c47bfa1bd8ddc'),
-    'kannada.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.21/kannada.zip', 'c240c97e4adb8773b53b3b3dec728627'),
+    'kannada.pth': ('https://github.com/JaidedAI/EasyOCR/releases/download/v1.2/kannada.zip', 'c240c97e4adb8773b53b3b3dec728627'),
 }
