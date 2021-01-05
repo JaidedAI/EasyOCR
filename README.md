@@ -9,6 +9,10 @@
 Ready-to-use OCR with 70+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new
+- 5 January 2021 - Version 1.2.2
+    - Add `optimal_num_chars` to `detect` method. If specified, bounding boxes with estimated number of characters near this value are returned first. (thanks [@adamfrees](https://github.com/adamfrees))
+    - Add `rotation_info` to `readtext` method. Allow EasyOCR to rotate each text box and return the one with the best confident score. Eligible values are 90, 180 and 270. For example, try [90, 180 ,270] for all possible text orientations. (thanks [@mijoo308](https://github.com/mijoo308))
+    - Update [documentation](https://www.jaided.ai/easyocr/documentation).
 - 17 November 2020 - Version 1.2
     - New language supports for Telugu and Kannada. These are experimental lite recognition models. Their file sizes are only around 7% of other models and they are ~6x faster at inference with CPU.
 - 12 October 2020 - Version 1.1.10
