@@ -317,7 +317,7 @@ class Reader(object):
             ignore_char = ''.join(set(self.character)-set(self.lang_char))
 
         image_len = len(image_list)
-        if rotation_info:
+        if rotation_info and image_list:
             image_list = make_rotated_img_list(rotation_info, image_list)
 
         if self.model_lang in ['chinese_tra','chinese_sim', 'japanese', 'korean']: decoder = 'greedy'
@@ -336,7 +336,7 @@ class Reader(object):
         if paragraph:
             result = get_paragraph(result, mode = direction_mode)
 
-        if rotation_info:
+        if rotation_info and image_list:
             result = set_result_with_confidence(result, image_len)
 
         if detail == 0:
