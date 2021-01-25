@@ -418,8 +418,10 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             y_min = min([poly[1],poly[3],poly[5],poly[7]])
             horizontal_list.append([x_min, x_max, y_min, y_max, 0.5*(y_min+y_max), y_max-y_min])
         else:
-            height = np.linalg.norm( [poly[6]-poly[0],poly[7]-poly[1]])
-            margin = int(1.44*add_margin*height)
+            height = np.linalg.norm([poly[6]-poly[0],poly[7]-poly[1]])
+            width = np.linalg.norm([poly[2]-poly[0],poly[3]-poly[1]])
+
+            margin = int(1.44*add_margin*height*min(width, height))
 
             theta13 = abs(np.arctan( (poly[1]-poly[5])/np.maximum(10, (poly[0]-poly[4]))))
             theta24 = abs(np.arctan( (poly[3]-poly[7])/np.maximum(10, (poly[2]-poly[6]))))
@@ -462,7 +464,7 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
     for boxes in combined_list:
         if len(boxes) == 1: # one box per line
             box = boxes[0]
-            margin = int(add_margin*box[5])
+            margin = int(add_margin*min(box[1]-box[0],box[5]))
             merged_list.append([box[0]-margin,box[1]+margin,box[2]-margin,box[3]+margin])
         else: # multiple boxes per line
             boxes = sorted(boxes, key=lambda item: item[0])
@@ -490,13 +492,18 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
                     y_min = min(mbox, key=lambda x: x[2])[2]
                     y_max = max(mbox, key=lambda x: x[3])[3]
 
-                    margin = int(add_margin*(y_max - y_min))
+                    box_width = x_max - x_min
+                    box_height = y_max - y_min
+                    margin = int(add_margin * (min(box_width, box_height)))
 
                     merged_list.append([x_min-margin, x_max+margin, y_min-margin, y_max+margin])
                 else: # non adjacent box in same line
                     box = mbox[0]
 
-                    margin = int(add_margin*(box[3] - box[2]))
+                    box_width = box[1] - box[0]
+                    box_height = box[3] - box[2]
+                    margin = int(add_margin * (min(box_width, box_height)))
+
                     merged_list.append([box[0]-margin,box[1]+margin,box[2]-margin,box[3]+margin])
     # may need to check if box is really in image
     return merged_list, free_list
