@@ -421,7 +421,7 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             height = np.linalg.norm([poly[6]-poly[0],poly[7]-poly[1]])
             width = np.linalg.norm([poly[2]-poly[0],poly[3]-poly[1]])
 
-            margin = int(1.44*add_margin*height*min(width, height))
+            margin = int(1.44*add_margin*min(width, height))
 
             theta13 = abs(np.arctan( (poly[1]-poly[5])/np.maximum(10, (poly[0]-poly[4]))))
             theta24 = abs(np.arctan( (poly[3]-poly[7])/np.maximum(10, (poly[2]-poly[6]))))
