@@ -474,7 +474,7 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
                     x_max = box[1]
                     new_box.append(box)
                 else:
-                    if (abs(np.mean(b_height) - box[5]) < height_ths*np.mean(b_height)) and (abs(box[0]-x_max) < width_ths *(box[1]-box[0])): # merge boxes
+                    if (abs(np.mean(b_height) - box[5]) < height_ths*np.mean(b_height)) and (abs(box[0]-x_max) < width_ths *(box[3]-box[2])): # merge boxes
                         b_height.append(box[5])
                         x_max = box[1]
                         new_box.append(box)
