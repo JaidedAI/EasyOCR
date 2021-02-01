@@ -218,14 +218,7 @@ class Reader(object):
                     assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
                     LOGGER.info('Download complete')
 
-        self.lang_char = []
-        for lang in lang_list:
-            char_file = os.path.join(BASE_PATH, 'character', lang + "_char.txt")
-            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
-                char_list =  input_file.read().splitlines()
-            self.lang_char += char_list
-        self.lang_char = set(self.lang_char).union(set(number+symbol))
-        self.lang_char = ''.join(self.lang_char)
+        self.setLanguageList(lang_list)
 
         dict_list = {}
         for lang in lang_list:
@@ -266,6 +259,15 @@ class Reader(object):
             char = ''.join(list)
         return char
 
+    def setLanguageList(self, lang_list):
+        self.lang_char = []
+        for lang in lang_list:
+            char_file = os.path.join(BASE_PATH, 'character', lang + "_char.txt")
+            with open(char_file, "r", encoding = "utf-8-sig") as input_file:
+                char_list =  input_file.read().splitlines()
+            self.lang_char += char_list
+        self.lang_char = set(self.lang_char).union(set(number+symbol))
+        self.lang_char = ''.join(self.lang_char)
 
     def detect(self, img, min_size = 20, text_threshold = 0.7, low_text = 0.4,\
                link_threshold = 0.4,canvas_size = 2560, mag_ratio = 1.,\
