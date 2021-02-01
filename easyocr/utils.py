@@ -447,7 +447,7 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             new_box.append(poly)
         else:
             # comparable height and comparable y_center level up to ths*height
-            if (abs(np.mean(b_height) - poly[5]) < height_ths*np.mean(b_height)) and (abs(np.mean(b_ycenter) - poly[4]) < ycenter_ths*np.mean(b_height)):
+            if abs(np.mean(b_ycenter) - poly[4]) < ycenter_ths*np.mean(b_height):    
                 b_height.append(poly[5])
                 b_ycenter.append(poly[4])
                 new_box.append(poly)
@@ -470,13 +470,16 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             merged_box, new_box = [],[]
             for box in boxes:
                 if len(new_box) == 0:
+                    b_height = [box[5]]
                     x_max = box[1]
                     new_box.append(box)
                 else:
-                    if abs(box[0]-x_max) < width_ths *(box[3]-box[2]): # merge boxes
+                    if (abs(np.mean(b_height) - box[5]) < height_ths*np.mean(b_height)) and (abs(box[0]-x_max) < width_ths *(box[3]-box[2])): # merge boxes
+                        b_height.append(box[5])
                         x_max = box[1]
                         new_box.append(box)
                     else:
+                        b_height = [box[5]]
                         x_max = box[1]
                         merged_box.append(new_box)
                         new_box = [box]
