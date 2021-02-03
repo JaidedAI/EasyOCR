@@ -302,15 +302,6 @@ class Reader(object):
         if reformat:
             img, img_cv_grey = reformat_input(img_cv_grey)
 
-        if (horizontal_list==None) and (free_list==None):
-            y_max, x_max = img_cv_grey.shape
-            ratio = x_max/y_max
-            max_width = int(imgH*ratio)
-            crop_img = cv2.resize(img_cv_grey, (max_width, imgH), interpolation =  Image.ANTIALIAS)
-            image_list = [([[0,0],[x_max,0],[x_max,y_max],[0,y_max]] ,crop_img)]
-        else:
-            image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
-
         if allowlist:
             ignore_char = ''.join(set(self.character)-set(allowlist))
         elif blocklist:
@@ -318,14 +309,45 @@ class Reader(object):
         else:
             ignore_char = ''.join(set(self.character)-set(self.lang_char))
 
-        image_len = len(image_list)
-        if rotation_info and image_list:
-            image_list = make_rotated_img_list(rotation_info, image_list)
-
         if self.model_lang in ['chinese_tra','chinese_sim', 'japanese', 'korean']: decoder = 'greedy'
-        result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
-                      ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
-                      workers, self.device)
+
+        if (horizontal_list==None) and (free_list==None):
+            y_max, x_max = img_cv_grey.shape
+            horizontal_list = [[0, x_max, 0, y_max]]
+
+        # without gpu/parallelization, it is faster to process image one by one
+        if ((batch_size == 1) or (self.device == 'cpu')) and not rotation_info:
+            result = []
+            for bbox in horizontal_list:
+                h_list = [bbox]
+                f_list = []
+                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
+                result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
+                              ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
+                              workers, self.device)
+                result += result0
+            for bbox in free_list:
+                h_list = []
+                f_list = [bbox]
+                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
+                result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
+                              ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
+                              workers, self.device)
+                result += result0
+        # default mode will try to process multiple boxes at the same time
+        else:
+            image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
+            image_len = len(image_list)
+            if rotation_info and image_list:
+                image_list = make_rotated_img_list(rotation_info, image_list)
+                max_width = max(max_width, imgH)
+
+            result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
+                          ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
+                          workers, self.device)
+
+            if rotation_info and (horizontal_list+free_list):
+                result = set_result_with_confidence(result, image_len)
 
         if self.model_lang == 'arabic':
             direction_mode = 'rtl'
@@ -337,9 +359,6 @@ class Reader(object):
 
         if paragraph:
             result = get_paragraph(result, mode = direction_mode)
-
-        if rotation_info and image_list:
-            result = set_result_with_confidence(result, image_len)
 
         if detail == 0:
             return [item[1] for item in result]
