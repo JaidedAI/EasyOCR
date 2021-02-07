@@ -1,3 +1,5 @@
+- 7 February 2021 - Version 1.2.4
+    - Faster CPU inference speed by using dynamic input shape (recognition rate increases by around 100% for images with a lot of text)
 - 1 February 2021 - Version 1.2.3
     - Add `setLanguageList` method to `Reader` class. This is a convenient api for changing languages (within the same model) after creating class instance.
     - Small change on text box merging. (thanks [z-pc](https://github.com/z-pc), see [PR](https://github.com/JaidedAI/EasyOCR/pull/338))

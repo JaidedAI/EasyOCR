@@ -9,6 +9,8 @@
 Ready-to-use OCR with 80+ languages supported including Chinese, Japanese, Korean and Thai.
 
 ## What's new
+- 7 February 2021 - Version 1.2.4
+    - Faster CPU inference speed by using dynamic input shape (recognition rate increases by around 100% for images with a lot of text)
 - 1 February 2021 - Version 1.2.3
     - Add `setLanguageList` method to `Reader` class. This is a convenient api for changing languages (within the same model) after creating class instance.
     - Small change on text box merging. (thanks [z-pc](https://github.com/z-pc), see [PR](https://github.com/JaidedAI/EasyOCR/pull/338))
@@ -17,14 +19,6 @@ Ready-to-use OCR with 80+ languages supported including Chinese, Japanese, Korea
     - Add `optimal_num_chars` to `detect` method. If specified, bounding boxes with estimated number of characters near this value are returned first. (thanks [@adamfrees](https://github.com/adamfrees))
     - Add `rotation_info` to `readtext` method. Allow EasyOCR to rotate each text box and return the one with the best confident score. Eligible values are 90, 180 and 270. For example, try [90, 180 ,270] for all possible text orientations. (thanks [@mijoo308](https://github.com/mijoo308))
     - Update [documentation](https://www.jaided.ai/easyocr/documentation).
-- 17 November 2020 - Version 1.2
-    - New language supports for Telugu and Kannada. These are experimental lite recognition models. Their file sizes are only around 7% of other models and they are ~6x faster at inference with CPU.
-- 12 October 2020 - Version 1.1.10
-    - Faster `beamsearch` decoder (thanks @amitbcp)
-    - Better code structure (thanks @susmith98)
-    - New language supports for Haryanvi(bgc), Sanskrit(sa) (Devanagari Script) and Manipuri(mni) (Bengari Script)
-- 31 August 2020 - Version 1.1.9
-    - Add `detect` and `recognize` method for performing text detection and recognition separately
 
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
@@ -44,6 +38,10 @@ Ready-to-use OCR with 80+ languages supported including Chinese, Japanese, Korea
 
 We are currently supporting 80+ languages. See [list of supported languages](https://www.jaided.ai/easyocr).
 
+## Demo
+
+[Try our demo on website: Jaided AI](https://www.jaided.ai/easyocr)
+
 ## Installation
 
 Install using `pip` for stable release,
@@ -61,12 +59,6 @@ pip install git+git://github.com/jaidedai/easyocr.git
 Note 1: for Windows, please install torch and torchvision first by following the official instruction here https://pytorch.org. On pytorch website, be sure to select the right CUDA version you have. If you intend to run on CPU mode only, select CUDA = None.
 
 Note 2: We also provide Dockerfile [here](https://github.com/JaidedAI/EasyOCR/blob/master/Dockerfile).
-
-#### Try Third-Party Demos
-
-1. [Google Colab](https://colab.fan/easyocr)
-2. [Dockerhub](https://hub.docker.com/r/challisa/easyocr)
-3. [Ainize](https://easyocrgpu-wook-2.endpoint.ainize.ai/)
 
 ## Usage
 
