@@ -30,7 +30,8 @@ class Reader(object):
 
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
                  user_network_directory=None, recog_network = 'standard',
-                 download_enabled=True, detector=True, recognizer=True):
+                 download_enabled=True, detector=True, recognizer=True,
+                 verbose=True):
         """Create an EasyOCR Reader.
 
         Parameters:
@@ -81,7 +82,7 @@ class Reader(object):
                     raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
                 LOGGER.warning('Downloading detection model, please wait. '
                                'This may take several minutes depending upon your network connection.')
-                download_and_unzip(model_url['detector'][0], DETECTOR_FILENAME, self.model_storage_directory)
+                download_and_unzip(model_url['detector'][0], DETECTOR_FILENAME, self.model_storage_directory, verbose)
                 assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
                 LOGGER.info('Download complete')
             elif calculate_md5(detector_path) != model_url['detector'][1]:
@@ -91,7 +92,7 @@ class Reader(object):
                 os.remove(detector_path)
                 LOGGER.warning('Re-downloading the detection model, please wait. '
                                'This may take several minutes depending upon your network connection.')
-                download_and_unzip(model_url['detector'][0], DETECTOR_FILENAME, self.model_storage_directory)
+                download_and_unzip(model_url['detector'][0], DETECTOR_FILENAME, self.model_storage_directory, verbose)
                 assert calculate_md5(detector_path) == model_url['detector'][1], corrupt_msg
 
         # recognition model
@@ -204,7 +205,7 @@ class Reader(object):
                         raise FileNotFoundError("Missing %s and downloads disabled" % model_path)
                     LOGGER.warning('Downloading recognition model, please wait. '
                                    'This may take several minutes depending upon your network connection.')
-                    download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
+                    download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory, verbose)
                     assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
                     LOGGER.info('Download complete.')
                 elif calculate_md5(model_path) != model_url[model_file][1]:
@@ -214,7 +215,7 @@ class Reader(object):
                     os.remove(model_path)
                     LOGGER.warning('Re-downloading the recognition model, please wait. '
                                    'This may take several minutes depending upon your network connection.')
-                    download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory)
+                    download_and_unzip(model_url[model_file][0], model_file, self.model_storage_directory, verbose)
                     assert calculate_md5(model_path) == model_url[model_file][1], corrupt_msg
                     LOGGER.info('Download complete')
 

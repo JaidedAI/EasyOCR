@@ -547,9 +547,10 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
         image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
 
-def download_and_unzip(url, filename, model_storage_directory):
+def download_and_unzip(url, filename, model_storage_directory, verbose=True):
     zip_path = os.path.join(model_storage_directory, 'temp.zip')
-    urlretrieve(url, zip_path,reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
+    reporthook = printProgressBar(prefix='Progress:', suffix='Complete', length=50) if verbose else None
+    urlretrieve(url, zip_path, reporthook=reporthook)
     with ZipFile(zip_path, 'r') as zipObj:
         zipObj.extract(filename, model_storage_directory)
     os.remove(zip_path)
