@@ -1,3 +1,6 @@
+- 22 February 2021 - Version 1.2.5
+    - Add dynamic quantization for faster CPU inference (it is enabled by default for CPU mode)
+    - More sensible confident score
 - 7 February 2021 - Version 1.2.4
     - Faster CPU inference speed by using dynamic input shape (recognition rate increases by around 100% for images with a lot of text)
 - 1 February 2021 - Version 1.2.3

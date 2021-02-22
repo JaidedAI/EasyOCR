@@ -6,19 +6,20 @@
 [![Tweet](https://img.shields.io/twitter/url/https/github.com/JaidedAI/EasyOCR.svg?style=social)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20library:%20EasyOCR%20https://github.com/JaidedAI/EasyOCR)
 [![Twitter](https://img.shields.io/badge/twitter-@JaidedAI-blue.svg?style=flat)](https://twitter.com/JaidedAI)
 
-Ready-to-use OCR with 80+ languages supported including Chinese, Japanese, Korean and Thai.
+Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) and all popular writing scripts including Latin, Chinese, Arabic, Devanagari, Cyrillic and etc.
+
+[Try Demo on our website](https://www.jaided.ai/easyocr)
 
 ## What's new
+- 22 February 2021 - Version 1.2.5
+    - Add dynamic quantization for faster CPU inference (it is enabled by default for CPU mode)
+    - More sensible confident score
 - 7 February 2021 - Version 1.2.4
     - Faster CPU inference speed by using dynamic input shape (recognition rate increases by around 100% for images with a lot of text)
 - 1 February 2021 - Version 1.2.3
     - Add `setLanguageList` method to `Reader` class. This is a convenient api for changing languages (within the same model) after creating class instance.
     - Small change on text box merging. (thanks [z-pc](https://github.com/z-pc), see [PR](https://github.com/JaidedAI/EasyOCR/pull/338))
     - [Basic Demo on website](https://www.jaided.ai/easyocr)
-- 5 January 2021 - Version 1.2.2
-    - Add `optimal_num_chars` to `detect` method. If specified, bounding boxes with estimated number of characters near this value are returned first. (thanks [@adamfrees](https://github.com/adamfrees))
-    - Add `rotation_info` to `readtext` method. Allow EasyOCR to rotate each text box and return the one with the best confident score. Eligible values are 90, 180 and 270. For example, try [90, 180 ,270] for all possible text orientations. (thanks [@mijoo308](https://github.com/mijoo308))
-    - Update [documentation](https://www.jaided.ai/easyocr/documentation).
 
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
@@ -34,13 +35,6 @@ Ready-to-use OCR with 80+ languages supported including Chinese, Japanese, Korea
 
 ![example3](examples/example3.png)
 
-## Supported Languages
-
-We are currently supporting 80+ languages. See [list of supported languages](https://www.jaided.ai/easyocr).
-
-## Demo
-
-[Try our demo on website: Jaided AI](https://www.jaided.ai/easyocr)
 
 ## Installation
 
@@ -141,7 +135,7 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 7. Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
-reader = easyocr.Reader(['en'], detection='DB', recognition = 'CNN_Transformer')
+reader = easyocr.Reader(['en'], detection='DB', recognition = 'Transformer')
 ```
 The idea is to be able to plug-in any state-of-the-art model into EasyOCR. There are a lot of geniuses trying to make better detection/recognition model. We are not trying to be a genius here, just make genius's works quickly accessible to the public ... for free. (well I believe most geniuses want their work to create positive impact as fast/big as possible) The pipeline should be something like below diagram. Grey slots are placeholders for changeable light blue modules.
 

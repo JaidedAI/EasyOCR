@@ -31,7 +31,7 @@ class Reader(object):
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
                  user_network_directory=None, recog_network = 'standard',
                  download_enabled=True, detector=True, recognizer=True,
-                 verbose=True):
+                 verbose=True, quantize=True):
         """Create an EasyOCR Reader.
 
         Parameters:
@@ -226,7 +226,7 @@ class Reader(object):
             dict_list[lang] = os.path.join(BASE_PATH, 'dict', lang + ".txt")
 
         if detector:
-            self.detector = get_detector(detector_path, self.device)
+            self.detector = get_detector(detector_path, self.device, quantize)
         if recognizer:
             if recog_network == 'standard':
                 network_params = {
@@ -244,7 +244,7 @@ class Reader(object):
                 network_params = recog_config['network_params']
             self.recognizer, self.converter = get_recognizer(recog_network, network_params,\
                                                          self.character, separator_list,\
-                                                         dict_list, model_path, device = self.device)
+                                                         dict_list, model_path, device = self.device, quantize=quantize)
 
     def setModelLanguage(self, language, lang_list, list_lang, list_lang_string):
         self.model_lang = language
@@ -315,6 +315,7 @@ class Reader(object):
         if (horizontal_list==None) and (free_list==None):
             y_max, x_max = img_cv_grey.shape
             horizontal_list = [[0, x_max, 0, y_max]]
+            free_list = []
 
         # without gpu/parallelization, it is faster to process image one by one
         if ((batch_size == 1) or (self.device == 'cpu')) and not rotation_info:
