@@ -11,7 +11,6 @@ from .utils import CTCLabelConverter
 import math
 
 def custom_mean(x):
-    x = np.array(x)
     return x.prod()**(2.0/np.sqrt(len(x)))
 
 def contrast_grey(img):
@@ -143,7 +142,7 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
                 if len(max_probs)>0:
                     preds_max_prob.append(max_probs)
                 else:
-                    preds_max_prob.append([0])
+                    preds_max_prob.append(np.array([0]))
 
             for pred, pred_max_prob in zip(preds_str, preds_max_prob):
                 confidence_score = custom_mean(pred_max_prob)
