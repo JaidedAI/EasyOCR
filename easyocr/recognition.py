@@ -11,6 +11,7 @@ from .utils import CTCLabelConverter
 import math
 
 def custom_mean(x):
+    x = np.array(x)
     return x.prod()**(2.0/np.sqrt(len(x)))
 
 def contrast_grey(img):
