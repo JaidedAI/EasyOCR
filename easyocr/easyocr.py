@@ -170,7 +170,6 @@ class Reader(object):
                     self.model_lang = 'latin'
                     model = recognition_models['gen2']['latin_g2']
                     recog_network = 'generation2'
-            print(model)
             self.character = model['characters']
 
             model_path = os.path.join(self.model_storage_directory, model['filename'])
