@@ -11,20 +11,21 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
 [Try Demo on our website](https://www.jaided.ai/easyocr)
 
 ## What's new
+- 21 March 2021 - Version 1.3
+    - Second-generation models: multiple times smaller size, multiple times faster inference, additional characters, comparable accuracy to the first generation models.
+    EasyOCR will choose the latest model by default but you can also specify which model to use by passing `recog_network` argument when creating `Reader` instance.
+    For example, `reader = easyocr.Reader(['en','fr'], recog_network = 'latin_g1')` will use the 1st generation Latin model.
+    - List of all models: [Model hub](https://www.jaided.ai/easyocr/modelhub)
 - 22 February 2021 - Version 1.2.5
     - Add dynamic quantization for faster CPU inference (it is enabled by default for CPU mode)
     - More sensible confident score
 - 7 February 2021 - Version 1.2.4
     - Faster CPU inference speed by using dynamic input shape (recognition rate increases by around 100% for images with a lot of text)
-- 1 February 2021 - Version 1.2.3
-    - Add `setLanguageList` method to `Reader` class. This is a convenient api for changing languages (within the same model) after creating class instance.
-    - Small change on text box merging. (thanks [z-pc](https://github.com/z-pc), see [PR](https://github.com/JaidedAI/EasyOCR/pull/338))
-    - [Basic Demo on website](https://www.jaided.ai/easyocr)
 
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next
-- Faster processing time
+- Custom models
 - [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
 
 ## Examples
@@ -93,22 +94,7 @@ Result:
 ```
 
 Model weight for chosen language will be automatically downloaded or you can
-download it manually from the following links and put it in '~/.EasyOCR/model' folder
-
-- [text detection model (CRAFT)](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/craft_mlt_25k.zip)
-- [latin model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/latin.zip)
-- [chinese (traditional) model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/chinese.zip)
-- [chinese (simplified) model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/chinese_sim.zip)
-- [japanese model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/japanese.zip)
-- [korean model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/korean.zip)
-- [thai model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/thai.zip)
-- [devanagari model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/devanagari.zip)
-- [cyrillic model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/cyrillic.zip)
-- [arabic model](https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/arabic.zip)
-- [tamil model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip)
-- [bengali model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.8/bengali.zip)
-- [telugu model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.2/telugu.zip)
-- [kannada model](https://github.com/JaidedAI/EasyOCR/releases/download/v1.2/kannada.zip)
+download it manually from the [model hub](https://www.jaided.ai/easyocr/modelhub) and put it in '~/.EasyOCR/model' folder
 
 In case you do not have GPU or your GPU has low memory, you can run it in CPU mode by adding gpu = False
 

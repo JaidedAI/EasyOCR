@@ -1,3 +1,3 @@
 from .easyocr import Reader
 
-__version__ = '1.2.5.1'
+__version__ = '1.3'

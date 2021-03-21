@@ -157,9 +157,9 @@ def get_recognizer(recog_network, network_params, character,\
     converter = CTCLabelConverter(character, separator_list, dict_list)
     num_class = len(converter.character)
 
-    if recog_network == 'standard':
+    if recog_network == 'generation1':
         model_pkg = importlib.import_module("easyocr.model.model")
-    elif recog_network == 'lite':
+    elif recog_network == 'generation2':
         model_pkg = importlib.import_module("easyocr.model.vgg_model")
     else:
         model_pkg = importlib.import_module(recog_network)

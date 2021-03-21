@@ -1,3 +1,8 @@
+- 21 March 2021 - Version 1.3
+    - Second-generation models: multiple times smaller size, multiple times faster inference, additional characters, comparable accuracy to the first generation models.
+    EasyOCR will choose the latest model by default but you can also specify which model to use by passing `recog_network` argument when creating `Reader` instance.
+    For example, `reader = easyocr.Reader(['en','fr'], recog_network = 'latin_g1')` will use the 1st generation Latin model.
+    - List of all models: [Model hub](https://www.jaided.ai/easyocr/modelhub)
 - 22 February 2021 - Version 1.2.5
     - Add dynamic quantization for faster CPU inference (it is enabled by default for CPU mode)
     - More sensible confident score
