@@ -74,27 +74,27 @@ class Reader(object):
             self.device = gpu
 
         # check and download detection model
-        detector = 'craft'
+        detector_model = 'craft'
         corrupt_msg = 'MD5 hash mismatch, possible file corruption'
-        detector_path = os.path.join(self.model_storage_directory, detection_models[detector]['filename'])
+        detector_path = os.path.join(self.model_storage_directory, detection_models[detector_model]['filename'])
         if detector:
             if os.path.isfile(detector_path) == False:
                 if not self.download_enabled:
                     raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
                 LOGGER.warning('Downloading detection model, please wait. '
                                'This may take several minutes depending upon your network connection.')
-                download_and_unzip(detection_models[detector]['url'], detection_models[detector]['filename'], self.model_storage_directory, verbose)
-                assert calculate_md5(detector_path) == detection_models[detector]['filesize'], corrupt_msg
+                download_and_unzip(detection_models[detector_model]['url'], detection_models[detector_model]['filename'], self.model_storage_directory, verbose)
+                assert calculate_md5(detector_path) == detection_models[detector_model]['filesize'], corrupt_msg
                 LOGGER.info('Download complete')
-            elif calculate_md5(detector_path) != detection_models[detector]['filesize']:
+            elif calculate_md5(detector_path) != detection_models[detector_model]['filesize']:
                 if not self.download_enabled:
                     raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % detector_path)
                 LOGGER.warning(corrupt_msg)
                 os.remove(detector_path)
                 LOGGER.warning('Re-downloading the detection model, please wait. '
                                'This may take several minutes depending upon your network connection.')
-                download_and_unzip(detection_models[detector]['url'], detection_models[detector]['filename'], self.model_storage_directory, verbose)
-                assert calculate_md5(detector_path) == detection_models[detector]['filesize'], corrupt_msg
+                download_and_unzip(detection_models[detector_model]['url'], detection_models[detector_model]['filename'], self.model_storage_directory, verbose)
+                assert calculate_md5(detector_path) == detection_models[detector_model]['filesize'], corrupt_msg
 
         # recognition model
         separator_list = {}
