@@ -24,7 +24,7 @@ latin_lang_list = ['af','az','bs','cs','cy','da','de','en','es','et','fr','ga',\
 arabic_lang_list = ['ar','fa','ug','ur']
 bengali_lang_list = ['bn','as','mni']
 cyrillic_lang_list = ['ru','rs_cyrillic','be','bg','uk','mn','abq','ady','kbd',\
-                      'ava','dar','inh','che','lbe','lez','tab']
+                      'ava','dar','inh','che','lbe','lez','tab','tjk']
 devanagari_lang_list = ['hi','mr','ne','bh','mai','ang','bho','mah','sck','new',\
                         'gom','sa','bgc']
 other_lang_list = ['th','ch_sim','ch_tra','ja','ko','ta','te','kn']
