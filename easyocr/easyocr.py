@@ -285,10 +285,9 @@ class Reader(object):
     def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
                   decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                   workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                  rotation_info = None,\
-                  paragraph = False,\
+                  rotation_info = None,paragraph = False,\
                   contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                  reformat=True):
+                  y_ths = 0.5, x_ths = 1.0, reformat=True):
 
         if reformat:
             img, img_cv_grey = reformat_input(img_cv_grey)
@@ -350,7 +349,7 @@ class Reader(object):
             direction_mode = 'ltr'
 
         if paragraph:
-            result = get_paragraph(result, mode = direction_mode)
+            result = get_paragraph(result, x_ths=x_ths, y_ths=y_ths, mode = direction_mode)
 
         if detail == 0:
             return [item[1] for item in result]
@@ -364,7 +363,7 @@ class Reader(object):
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
                  slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, add_margin = 0.1):
+                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1):
         '''
         Parameters:
         image: file path or numpy-array or a byte stream object
@@ -382,6 +381,6 @@ class Reader(object):
                                 decoder, beamWidth, batch_size,\
                                 workers, allowlist, blocklist, detail, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
-                                filter_ths, False)
+                                filter_ths, y_ths, x_ths, False)
 
         return result

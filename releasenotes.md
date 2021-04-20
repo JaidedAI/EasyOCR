@@ -1,3 +1,7 @@
+- 20 April 2021 - Version 1.3.1
+    - Add support for PIL image (thanks [@prays](https://github.com/prays))
+    - Update argument setting for command line
+    - Add `x_ths` and `y_ths` to control merging behavior when `paragraph=True`
 - 21 March 2021 - Version 1.3
     - Second-generation models: multiple times smaller size, multiple times faster inference, additional characters, comparable accuracy to the first generation models.
     EasyOCR will choose the latest model by default but you can also specify which model to use by passing `recog_network` argument when creating `Reader` instance.
