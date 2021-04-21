@@ -1,5 +1,6 @@
 - 20 April 2021 - Version 1.3.1
     - Add support for PIL image (thanks [@prays](https://github.com/prays))
+    - Add Tajik language (tjk)
     - Update argument setting for command line
     - Add `x_ths` and `y_ths` to control merging behavior when `paragraph=True`
 - 21 March 2021 - Version 1.3
