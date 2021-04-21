@@ -125,7 +125,7 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
                 # Select max probabilty (greedy decoding) then decode index to character
                 _, preds_index = preds_prob.max(2)
                 preds_index = preds_index.view(-1)
-                preds_str = converter.decode_greedy(preds_index.data, preds_size.data)
+                preds_str = converter.decode_greedy(preds_index.data.cpu().detach().numpy(), preds_size.data)
             elif decoder == 'beamsearch':
                 k = preds_prob.cpu().detach().numpy()
                 preds_str = converter.decode_beamsearch(k, beamWidth=beamWidth)
