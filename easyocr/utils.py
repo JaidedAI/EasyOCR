@@ -329,14 +329,14 @@ class CTCLabelConverter(object):
         index = 0
         for l in length:
             t = text_index[index:index + l]
-
-            char_list = []
-            for i in range(l):
-                # removing repeated characters and blank (and separator).
-                if t[i] not in self.ignore_idx and (not (i > 0 and t[i - 1] == t[i])):
-                    char_list.append(self.character[t[i]])
-            text = ''.join(char_list)
-
+            # Returns a boolean array where true is when the value is not repeated
+            a = np.insert(~((t[1:]==t[:-1])),0,True)
+            # Returns a boolean array where true is when the value is not in the ignore_idx list
+            b = ~np.isin(t,np.array(self.ignore_idx))
+            # Combine the two boolean array
+            c = a & b
+            # Gets the corresponding character according to the saved indexes
+            text = ''.join(np.array(self.character)[t[c.nonzero()]])
             texts.append(text)
             index += l
         return texts
@@ -449,7 +449,7 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             new_box.append(poly)
         else:
             # comparable height and comparable y_center level up to ths*height
-            if abs(np.mean(b_ycenter) - poly[4]) < ycenter_ths*np.mean(b_height):    
+            if abs(np.mean(b_ycenter) - poly[4]) < ycenter_ths*np.mean(b_height):
                 b_height.append(poly[5])
                 b_ycenter.append(poly[4])
                 new_box.append(poly)
@@ -674,6 +674,9 @@ def reformat_input(image):
         if len(image.shape) == 2: # grayscale
             img_cv_grey = image
             img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        elif len(image.shape) == 3 and image.shape[2] == 1:
+            img_cv_grey = np.squeeze(image)
+            img = cv2.cvtColor(img_cv_grey, cv2.COLOR_GRAY2BGR)
         elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
             img = image
             img_cv_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
