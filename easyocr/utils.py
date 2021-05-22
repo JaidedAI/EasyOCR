@@ -15,6 +15,25 @@ if sys.version_info[0] == 2:
     from six.moves.urllib.request import urlretrieve
 else:
     from urllib.request import urlretrieve
+    import requests 
+
+    requests.packages.urllib3.disable_warnings() 
+
+    import ssl 
+
+    try:
+
+        _create_unverified_https_context = ssl._create_unverified_context 
+
+    except AttributeError: 
+
+        pass 
+
+    else: 
+        ssl._create_default_https_context = _create_unverified_https_context
+       
+    #linking issue #264 solution by @jinjunsun here.
+    
 
 def consecutive(data, mode ='first', stepsize=1):
     group = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
