@@ -74,7 +74,8 @@ class Reader(object):
             self.device = 'cuda'
         else:
             self.device = gpu
-
+        self.recognition_models = recognition_models
+        
         # check and download detection model
         detector_model = 'craft'
         corrupt_msg = 'MD5 hash mismatch, possible file corruption'
