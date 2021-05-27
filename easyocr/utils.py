@@ -520,9 +520,14 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
         rect = np.array(box, dtype = "float32")
         transformed_img = four_point_transform(img, rect)
         ratio = transformed_img.shape[1]/transformed_img.shape[0]
-        crop_img = cv2.resize(transformed_img, (int(model_height*ratio), model_height), interpolation =  Image.ANTIALIAS)
-        image_list.append( (box,crop_img) ) # box = [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
-        max_ratio_free = max(ratio, max_ratio_free)
+        new_width = int(model_height*ratio)
+        if new_width == 0:
+            pass
+        else:
+            crop_img = cv2.resize(transformed_img, (new_width, model_height), interpolation =  Image.ANTIALIAS)
+            image_list.append( (box,crop_img) ) # box = [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+            max_ratio_free = max(ratio, max_ratio_free)
+
 
     max_ratio_free = math.ceil(max_ratio_free)
 
@@ -535,9 +540,13 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
         width = x_max - x_min
         height = y_max - y_min
         ratio = width/height
-        crop_img = cv2.resize(crop_img, (int(model_height*ratio), model_height), interpolation =  Image.ANTIALIAS)
-        image_list.append( ( [[x_min,y_min],[x_max,y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
-        max_ratio_hori = max(ratio, max_ratio_hori)
+        new_width = int(model_height*ratio)
+        if new_width == 0:
+            pass
+        else:
+            crop_img = cv2.resize(crop_img, (new_width, model_height), interpolation =  Image.ANTIALIAS)
+            image_list.append( ( [[x_min,y_min],[x_max,y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
+            max_ratio_hori = max(ratio, max_ratio_hori)
 
     max_ratio_hori = math.ceil(max_ratio_hori)
     max_ratio = max(max_ratio_hori, max_ratio_free)
