@@ -287,7 +287,7 @@ class Reader(object):
 
     def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
                   decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                  workers = 0, allowlist = None, blocklist = None, output_format = 'standard',\
                   rotation_info = None,paragraph = False,\
                   contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                   y_ths = 0.5, x_ths = 1.0, reformat=True):
@@ -354,13 +354,15 @@ class Reader(object):
         if paragraph:
             result = get_paragraph(result, x_ths=x_ths, y_ths=y_ths, mode = direction_mode)
 
-        if detail == 0:
+        if output_format == 'dict':
+            return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
+        elif output_format == 'simple':
             return [item[1] for item in result]
         else:
             return result
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                 workers = 0, allowlist = None, blocklist = None, output_format = 'standard',\
                  rotation_info = None, paragraph = False, min_size = 20,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
@@ -382,7 +384,7 @@ class Reader(object):
 
         result = self.recognize(img_cv_grey, horizontal_list, free_list,\
                                 decoder, beamWidth, batch_size,\
-                                workers, allowlist, blocklist, detail, rotation_info,\
+                                workers, allowlist, blocklist, output_format, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
                                 filter_ths, y_ths, x_ths, False)
 
