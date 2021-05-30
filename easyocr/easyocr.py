@@ -290,7 +290,7 @@ class Reader(object):
                   workers = 0, allowlist = None, blocklist = None, detail = 1,\
                   rotation_info = None,paragraph = False,\
                   contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                  y_ths = 0.5, x_ths = 1.0, reformat=True):
+                  y_ths = 0.5, x_ths = 1.0, reformat=True, output_format='standard'):
 
         if reformat:
             img, img_cv_grey = reformat_input(img_cv_grey)
@@ -356,6 +356,8 @@ class Reader(object):
 
         if detail == 0:
             return [item[1] for item in result]
+        elif output_format == 'dict':
+            return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
         else:
             return result
 
@@ -366,7 +368,7 @@ class Reader(object):
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
                  slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1):
+                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, output_format='standard'):
         '''
         Parameters:
         image: file path or numpy-array or a byte stream object
@@ -384,6 +386,6 @@ class Reader(object):
                                 decoder, beamWidth, batch_size,\
                                 workers, allowlist, blocklist, detail, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
-                                filter_ths, y_ths, x_ths, False)
+                                filter_ths, y_ths, x_ths, False,output_format)
 
         return result
