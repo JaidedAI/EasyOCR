@@ -1,3 +1,6 @@
+- 30 May 2021 - Version 1.3.2
+    - Faster greedy decoder (thanks [@samayala22](https://github.com/samayala22))
+    - Fix bug when text box's aspect ratio is disproportional (thanks [iQuartic](https://iquartic.com/) for bug report)
 - 20 April 2021 - Version 1.3.1
     - Add support for PIL image (thanks [@prays](https://github.com/prays))
     - Add Tajik language (tjk)

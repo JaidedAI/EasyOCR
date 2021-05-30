@@ -11,6 +11,9 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
 [Try Demo on our website](https://www.jaided.ai/easyocr)
 
 ## What's new
+- 30 May 2021 - Version 1.3.2
+    - Faster greedy decoder (thanks [@samayala22](https://github.com/samayala22)) 
+    - Fix bug when text box's aspect ratio is disproportional (thanks [iQuartic](https://iquartic.com/) for bug report)
 - 20 April 2021 - Version 1.3.1
     - Add support for PIL image (thanks [@prays](https://github.com/prays))
     - Add Tajik language (tjk)
@@ -21,11 +24,6 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
     EasyOCR will choose the latest model by default but you can also specify which model to use by passing `recog_network` argument when creating `Reader` instance.
     For example, `reader = easyocr.Reader(['en','fr'], recog_network = 'latin_g1')` will use the 1st generation Latin model.
     - List of all models: [Model hub](https://www.jaided.ai/easyocr/modelhub)
-- 22 February 2021 - Version 1.2.5
-    - Add dynamic quantization for faster CPU inference (it is enabled by default for CPU mode)
-    - More sensible confident score
-- 7 February 2021 - Version 1.2.4
-    - Faster CPU inference speed by using dynamic input shape (recognition rate increases by around 100% for images with a lot of text)
 
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
