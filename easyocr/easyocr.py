@@ -386,6 +386,6 @@ class Reader(object):
                                 decoder, beamWidth, batch_size,\
                                 workers, allowlist, blocklist, detail, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
-                                filter_ths, y_ths, x_ths, False,output_format)
+                                filter_ths, y_ths, x_ths, False, output_format)
 
         return result
