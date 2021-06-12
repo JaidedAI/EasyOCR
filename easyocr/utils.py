@@ -703,6 +703,35 @@ def reformat_input(image):
     return img, img_cv_grey
 
 
+def reformat_input_batched(image, n_width=None, n_height=None):
+    """
+    reformats an image or list of images or a 4D numpy image array &
+    returns a list of corresponding img, img_cv_grey nd.arrays
+    image:
+        [file path, numpy-array, byte stream object,
+        list of file paths, list of numpy-array, 4D numpy array,
+        list of byte stream objects]
+    """
+    if ((isinstance(image, np.ndarray) and len(image.shape) == 4) or isinstance(image, list)):
+        # process image batches if image is list of image np arr, paths, bytes
+        img, img_cv_grey = [], []
+        for single_img in image:
+            clr, gry = reformat_input(single_img)
+            if n_width is not None and n_height is not None:
+                clr = cv2.resize(clr, (n_width, n_height))
+                gry = cv2.resize(gry, (n_width, n_height))
+            img.append(clr)
+            img_cv_grey.append(gry)
+        img, img_cv_grey = np.array(img), np.array(img_cv_grey)
+        # ragged tensors created when all input imgs are not of the same size
+        if len(img.shape) == 1 and len(img_cv_grey.shape) == 1:
+            raise ValueError("The input image array contains images of different sizes. " +
+                             "Please resize all images to same shape or pass n_width, n_height to auto-resize")
+    else:
+        img, img_cv_grey = reformat_input(image)
+    return img, img_cv_grey
+
+
 def make_rotated_img_list(rotationInfo, img_list):
     result_img_list = img_list[:]
 
