@@ -1,6 +1,5 @@
 torch
 torchvision>=0.5
-opencv-python
 scipy
 numpy
 Pillow
