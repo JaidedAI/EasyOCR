@@ -1,3 +1,9 @@
+- 29 June 2021 - Version 1.4
+    - [Instruction](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md) on training/using custom recognition model
+    - [Example dataset](https://www.jaided.ai/easyocr/modelhub)
+    - Batched image inference for GPU (thanks [@SamSamhuns](https://github.com/SamSamhuns), see [PR](https://github.com/JaidedAI/EasyOCR/pull/458))
+    - Vertical text support (thanks [@interactivetech](https://github.com/interactivetech)). This is for rotated text, not to be confused with vertical Chinese or Japanese text. (see [PR](https://github.com/JaidedAI/EasyOCR/pull/450))
+    - Output in dictionary format (thanks [@A2va](https://github.com/A2va), see [PR](https://github.com/JaidedAI/EasyOCR/pull/441))
 - 30 May 2021 - Version 1.3.2
     - Faster greedy decoder (thanks [@samayala22](https://github.com/samayala22))
     - Fix bug when text box's aspect ratio is disproportional (thanks [iQuartic](https://iquartic.com/) for bug report)

@@ -11,8 +11,14 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
 [Try Demo on our website](https://www.jaided.ai/easyocr)
 
 ## What's new
+- 29 June 2021 - Version 1.4
+    - [Instruction](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md) on training/using custom recognition model
+    - Example [dataset](https://www.jaided.ai/easyocr/modelhub) for model training
+    - Batched image inference for GPU (thanks [@SamSamhuns](https://github.com/SamSamhuns), see [PR](https://github.com/JaidedAI/EasyOCR/pull/458))
+    - Vertical text support (thanks [@interactivetech](https://github.com/interactivetech)). This is for rotated text, not to be confused with vertical Chinese or Japanese text. (see [PR](https://github.com/JaidedAI/EasyOCR/pull/450))
+    - Output in dictionary format (thanks [@A2va](https://github.com/A2va), see [PR](https://github.com/JaidedAI/EasyOCR/pull/441))
 - 30 May 2021 - Version 1.3.2
-    - Faster greedy decoder (thanks [@samayala22](https://github.com/samayala22)) 
+    - Faster greedy decoder (thanks [@samayala22](https://github.com/samayala22))
     - Fix bug when text box's aspect ratio is disproportional (thanks [iQuartic](https://iquartic.com/) for bug report)
 - 20 April 2021 - Version 1.3.1
     - Add support for PIL image (thanks [@prays](https://github.com/prays))
@@ -28,8 +34,7 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
 - [Read all released notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
 ## What's coming next
-- Custom models
-- [New language support](https://github.com/JaidedAI/EasyOCR/issues/91)
+- Handwritten text support
 
 ## Examples
 
@@ -113,15 +118,14 @@ For more information, read [tutorial](https://www.jaided.ai/easyocr/tutorial) an
 $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 ```
 
+## Train/use your own model
+
+[read here](https://www.jaided.ai/custom_model.md)
+
 ## Implementation Roadmap
 
-1. Language packs: Expand support to more languages. We are aiming to cover > 80-90% of world's population. Also improve existing languages.
-2. Better documentation and api
-3. Language model for better decoding
-4. Handwritten support: The key is using GAN to generate realistic handwritten dataset.
-5. Faster processing time: model pruning (lite version) / quantization / export to other platforms (ONNX?)
-6. Open Dataset and model training pipeline
-7. Restructure code to support swappable detection and recognition algorithm.
+- Handwritten support
+- Restructure code to support swappable detection and recognition algorithm.
 The api should be as easy as
 ``` python
 reader = easyocr.Reader(['en'], detection='DB', recognition = 'Transformer')
