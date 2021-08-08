@@ -1,6 +1,6 @@
 torch
 torchvision>=0.5
-opencv-python
+opencv-python-headless
 scipy
 numpy
 Pillow<8.3.0
