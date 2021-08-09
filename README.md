@@ -120,7 +120,7 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 ## Train/use your own model
 
-[read here](https://www.jaided.ai/custom_model.md)
+[read here](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md)
 
 ## Implementation Roadmap
 
