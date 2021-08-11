@@ -755,43 +755,47 @@ def reformat_input_batched(image, n_width=None, n_height=None):
     return img, img_cv_grey
 
 
+def rotate(image, angle, center = None, scale = 1.0):
+        """ 
+        Rotate the image arount its center according to the angle chosen
+        
+        """
+        (h, w) = image.shape[:2]
+        if center is None:
+            center = (w / 2, h / 2)
+        # Perform the rotation
+        M = cv2.getRotationMatrix2D(center, angle, scale)
+        rotated = cv2.warpAffine(image, M, (w, h))
+        return rotated
+
+
+
+
 def make_rotated_img_list(rotationInfo, img_list):
+
     result_img_list = img_list[:]
 
     # add rotated images to original image_list
     max_ratio=1
-    if 90 in rotationInfo:
-        for img_info in img_list:
-            ninty_image = cv2.rotate(img_info[1],cv2.ROTATE_90_COUNTERCLOCKWISE)
-            height,width = ninty_image.shape
+    
+    for angle in rotationInfo:
+        for img_info in img_list : 
+            rotated = rotate (img_info[1],angle)
+            height,width = rotated.shape
             ratio = calculate_ratio(width,height)
             max_ratio = max(max_ratio,ratio)
-            result_img_list.append((img_info[0],ninty_image))
-
-    if 180 in rotationInfo:
-        for img_info in img_list:
-            one_eighty_image = cv2.rotate(img_info[1],cv2.ROTATE_180)
-            height,width = one_eighty_image.shape
-            ratio = calculate_ratio(width,height)
-            max_ratio = max(max_ratio,ratio)
-            result_img_list.append((img_info[0], one_eighty_image))
-
-    if 270 in rotationInfo:
-        for img_info in img_list:
-            two_seventy_image = cv2.rotate(img_info[1], cv2.ROTATE_90_CLOCKWISE)
-            height,width = two_seventy_image.shape
-            ratio = calculate_ratio(width,height)
-            max_ratio = max(max_ratio,ratio)
-            result_img_list.append((img_info[0],two_seventy_image))
-
+            result_img_list.append((img_info[0], rotated))
     return result_img_list
 
 
 def set_result_with_confidence(result_list, origin_len):
+    
     set_len = len(result_list)//origin_len
 
     k = 0
-    result_to_split = [[],[],[],[]]
+    result_to_split  =  [[] for i in range(set_len)] # list having the same length of the rotation_info list : each element is a list of rotated images in the same direction  
+    
+    # fill
     for i in range(set_len):
         tmp_list = []
         for j in range(origin_len):
@@ -800,33 +804,18 @@ def set_result_with_confidence(result_list, origin_len):
         result_to_split[i] += tmp_list
 
 
-    result1 = result_to_split[0]
-    result2 = result_to_split[1]
-    result3 = result_to_split[2]
-    result4 = result_to_split[3]
-
+    
+    
+    ## choose the best result from different rotations
+    
     final_result = []
-    for i in range(origin_len):
-        result = result1[i] # format : ([[,],[,],[,],[,]], 'string', confidnece)
-        confidence = result1[i][2]
-
-        if result2:
-            if result2[i][2] > confidence:
-                if len(result2[i][1]) >= len(result[1]):
-                    result = result2[i]
-                    confidence = result2[i][2]
-
-        if result3:
-            if result3[i][2] > confidence:
-                if len(result3[i][1]) >= len(result[1]):
-                    result = result3[i]
-                    confidence = result3[i][2]
-
-        if result4:
-            if result4[i][2] > confidence:
-                if len(result4[i][1]) >= len(result[1]):
-                    result = result4[i]
-                    confidence = result4[i][2]
+    for i in range(origin_len): 
+        result = result_to_split[0][i] # format : ([[,],[,],[,],[,]], 'string', confidnece)
+        confidence = result_to_split[0][i][2]
+        for rot in range (1,set_len):
+            if (result_to_split[rot] and len(result_to_split[rot][i][1]) >= len(result[1])):
+                result = result_to_split[rot][i]
+                confidence =  result_to_split[rot][i][2]
 
         final_result.append(result)
 
