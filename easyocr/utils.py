@@ -6,6 +6,7 @@ import numpy as np
 import math
 import cv2
 from PIL import Image, JpegImagePlugin
+from scipy import ndimage
 import hashlib
 import sys, os
 from zipfile import ZipFile
@@ -755,21 +756,6 @@ def reformat_input_batched(image, n_width=None, n_height=None):
     return img, img_cv_grey
 
 
-def rotate(image, angle, center = None, scale = 1.0):
-        """ 
-        Rotate the image arount its center according to the angle chosen
-        
-        """
-        (h, w) = image.shape[:2]
-        if center is None:
-            center = (w / 2, h / 2)
-        # Perform the rotation
-        M = cv2.getRotationMatrix2D(center, angle, scale)
-        rotated = cv2.warpAffine(image, M, (w, h))
-        return rotated
-
-
-
 
 def make_rotated_img_list(rotationInfo, img_list):
 
@@ -780,7 +766,7 @@ def make_rotated_img_list(rotationInfo, img_list):
     
     for angle in rotationInfo:
         for img_info in img_list : 
-            rotated = rotate (img_info[1],angle)
+            rotated = ndimage.rotate(img_info[1], angle, reshape=True) 
             height,width = rotated.shape
             ratio = calculate_ratio(width,height)
             max_ratio = max(max_ratio,ratio)
