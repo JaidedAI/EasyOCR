@@ -105,3 +105,4 @@ ENV/
 
 #virtual env
  .vscode/
+ .vs/

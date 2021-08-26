@@ -33,7 +33,7 @@ class Reader(object):
                  user_network_directory=None, recog_network = 'standard',
                  download_enabled=True, detector=True, recognizer=True,
                  verbose=True, quantize=True, cudnn_benchmark=False):
-        """Create an EasyOCR Reader.
+        """Create an EasyOCR Reader
 
         Parameters:
             lang_list (list): Language codes (ISO 639) for languages to be recognized during analysis.
