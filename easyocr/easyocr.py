@@ -200,7 +200,7 @@ class Reader(object):
             self.setLanguageList(lang_list, model)
 
         else: # user-defined model
-            with open(os.path.join(self.user_network_directory, recog_network+ '.yaml')) as file:
+            with open(os.path.join(self.user_network_directory, recog_network+ '.yaml'), encoding='utf8') as file:
                 recog_config = yaml.load(file, Loader=yaml.FullLoader)
             imgH = recog_config['imgH']
             available_lang = recog_config['lang_list']
