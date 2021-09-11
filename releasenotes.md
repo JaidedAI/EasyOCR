@@ -1,3 +1,7 @@
+- 11 September 2021 - Version 1.4.1
+    - Add trainer folder
+    - Add `readtextlang` method (thanks[@arkya-art](https://github.com/arkya-art), see [PR](https://github.com/JaidedAI/EasyOCR/pull/525))
+    - Extend `rotation_info` argument to support all possible angle (thanks[abde0103](https://github.com/abde0103), see [PR](https://github.com/JaidedAI/EasyOCR/pull/515))
 - 29 June 2021 - Version 1.4
     - [Instruction](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md) on training/using custom recognition model
     - [Example dataset](https://www.jaided.ai/easyocr/modelhub)
