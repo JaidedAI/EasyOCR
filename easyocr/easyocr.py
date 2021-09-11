@@ -397,6 +397,62 @@ class Reader(object):
                                 filter_ths, y_ths, x_ths, False, output_format)
 
         return result
+    
+    def readtextlang(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
+                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                 rotation_info = None, paragraph = False, min_size = 20,\
+                 contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
+                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
+                 canvas_size = 2560, mag_ratio = 1.,\
+                 slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
+                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, output_format='standard'):
+        '''
+        Parameters:
+        image: file path or numpy-array or a byte stream object
+        '''
+        img, img_cv_grey = reformat_input(image)
+
+        horizontal_list, free_list = self.detect(img, min_size, text_threshold,\
+                                                 low_text, link_threshold,\
+                                                 canvas_size, mag_ratio,\
+                                                 slope_ths, ycenter_ths,\
+                                                 height_ths,width_ths,\
+                                                 add_margin, False)
+        # get the 1st result from hor & free list as self.detect returns a list of depth 3
+        horizontal_list, free_list = horizontal_list[0], free_list[0]
+        result = self.recognize(img_cv_grey, horizontal_list, free_list,\
+                                decoder, beamWidth, batch_size,\
+                                workers, allowlist, blocklist, detail, rotation_info,\
+                                paragraph, contrast_ths, adjust_contrast,\
+                                filter_ths, y_ths, x_ths, False, output_format)
+       
+        char = []
+        directory = 'characters/'
+        for i in range(len(result)):
+            char.append(result[i][1])
+        
+        def search(arr,x):
+            g = False
+            for i in range(len(arr)):
+                if arr[i]==x:
+                    g = True
+                    return 1
+            if g == False:
+                return -1
+        def tupleadd(i):
+            a = result[i]
+            b = a + (filename[0:2],)
+            return b
+        
+        for filename in os.listdir(directory):
+            if filename.endswith(".txt"):
+                with open ('characters/'+ filename,'rt',encoding="utf8") as myfile:  
+                    chartrs = str(myfile.read().splitlines()).replace('\n','') 
+                    for i in range(len(char)):
+                        res = search(chartrs,char[i])
+                        if res != -1:
+                            if filename[0:2]=="en" or filename[0:2]=="ch":
+                                print(tupleadd(i))
 
     def readtext_batched(self, image, n_width=None, n_height=None,\
                          decoder = 'greedy', beamWidth= 5, batch_size = 1,\
