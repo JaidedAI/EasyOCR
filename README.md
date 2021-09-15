@@ -77,7 +77,7 @@ reader = easyocr.Reader(['ch_sim','en']) # this needs to run only once to load t
 result = reader.readtext('chinese.jpg')
 ```
 
-The output will be in a list format, each item represents the bounding box, text and confident level, respectively.
+The output will be in a list format, each item represents a bounding box, the text detected and confident level, respectively.
 
 ``` bash
 [([[189, 75], [469, 75], [469, 165], [189, 165]], '愚园路', 0.3754989504814148),
@@ -108,7 +108,7 @@ Result:
 ```
 
 Model weights for the chosen language will be automatically downloaded or you can
-download them manually from the [model hub](https://www.jaided.ai/easyocr/modelhub) and put them in a '~/.EasyOCR/model' folder
+download them manually from the [model hub](https://www.jaided.ai/easyocr/modelhub) and put them in the '~/.EasyOCR/model' folder
 
 In case you do not have a GPU, or your GPU has low memory, you can run the model in CPU-only mode by adding `gpu=False`.
 
