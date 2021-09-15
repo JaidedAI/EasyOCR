@@ -77,7 +77,7 @@ reader = easyocr.Reader(['ch_sim','en']) # this needs to run only once to load t
 result = reader.readtext('chinese.jpg')
 ```
 
-The utput will be in a list format, each item represents the bounding box, text and confident level, respectively.
+The output will be in a list format, each item represents the bounding box, text and confident level, respectively.
 
 ``` bash
 [([[189, 75], [469, 75], [469, 165], [189, 165]], '愚园路', 0.3754989504814148),
