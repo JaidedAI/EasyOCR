@@ -774,35 +774,20 @@ def make_rotated_img_list(rotationInfo, img_list):
     return result_img_list
 
 
-def set_result_with_confidence(result_list, origin_len):
-    
-    set_len = len(result_list)//origin_len
-
-    k = 0
-    result_to_split  =  [[] for i in range(set_len)] # list having the same length of the rotation_info list : each element is a list of rotated images in the same direction  
-    
-    # fill
-    for i in range(set_len):
-        tmp_list = []
-        for j in range(origin_len):
-            tmp_list.append(result_list[k])
-            k += 1
-        result_to_split[i] += tmp_list
-
-
-    
-    
-    ## choose the best result from different rotations
-    
+def set_result_with_confidence(results):
+    """ Select highest confidence augmentation for TTA
+    Given a list of lists of results (outer list has one list per augmentation,
+    inner lists index the images being recognized), choose the best result 
+    according to confidence level.
+    Each "result" is of the form (box coords, text, confidence)
+    A final_result is returned which contains one result for each image
+    """
     final_result = []
-    for i in range(origin_len): 
-        result = result_to_split[0][i] # format : ([[,],[,],[,],[,]], 'string', confidnece)
-        confidence = result_to_split[0][i][2]
-        for rot in range (1,set_len):
-            if (result_to_split[rot] and len(result_to_split[rot][i][1]) >= len(result[1])):
-                result = result_to_split[rot][i]
-                confidence =  result_to_split[rot][i][2]
-
-        final_result.append(result)
+    for col_ix in range(len(results[0])):
+        # Take the row_ix associated with the max confidence
+        best_row = max(
+            [(row_ix, results[row_ix][col_ix][2]) for row_ix in range(len(results))],
+            key=lambda x: x[1])[0]
+        final_result.append(results[best_row][col_ix])
 
     return final_result
