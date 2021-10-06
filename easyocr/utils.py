@@ -667,7 +667,7 @@ def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
     return result
 
 
-def printProgressBar (prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+def printProgressBar(prefix='', suffix='', decimals=1, length=100, fill='█'):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -683,7 +683,7 @@ def printProgressBar (prefix = '', suffix = '', decimals = 1, length = 100, fill
         percent = ("{0:." + str(decimals) + "f}").format(progress * 100)
         filledLength = int(length * progress)
         bar = fill * filledLength + '-' * (length - filledLength)
-        print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+        print(f'\r{prefix} |{bar}| {percent}% {suffix}', end='')
 
     return progress_hook
 
