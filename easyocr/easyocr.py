@@ -348,7 +348,10 @@ class Reader(object):
                           workers, self.device)
 
             if rotation_info and (horizontal_list+free_list):
-                result = set_result_with_confidence(result, image_len)
+                # Reshape result to be a list of lists, each row being for 
+                # one of the rotations (first row being no rotation)
+                result = set_result_with_confidence(
+                    [result[image_len*i:image_len*(i+1)] for i in range(len(rotation_info) + 1)])
 
         if self.model_lang == 'arabic':
             direction_mode = 'rtl'
