@@ -103,6 +103,7 @@ ENV/
 # macOS
 *.DS_Store
 
-#virtual env
- .vscode/
- .vs/
+# IDEs
+.vscode/
+.vs/
+.idea/
