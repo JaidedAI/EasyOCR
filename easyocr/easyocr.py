@@ -202,7 +202,11 @@ class Reader(object):
         else: # user-defined model
             with open(os.path.join(self.user_network_directory, recog_network+ '.yaml'), encoding='utf8') as file:
                 recog_config = yaml.load(file, Loader=yaml.FullLoader)
-            imgH = recog_config['imgH']
+            
+            global imgH # if custom model, save this variable. (from *.yaml)
+            if recog_config['imgH']:
+                imgH = recog_config['imgH']
+                
             available_lang = recog_config['lang_list']
             self.setModelLanguage(recog_network, lang_list, available_lang, available_lang)
             #char_file = os.path.join(self.user_network_directory, recog_network+ '.txt')
