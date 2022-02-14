@@ -1,5 +1,3 @@
-torch==1.8.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
-torchvision==0.9.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 opencv-python-headless<=4.5.4.60
 scipy
 numpy
