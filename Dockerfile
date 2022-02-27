@@ -17,7 +17,7 @@ RUN apt-get update -y && \
     # cleanup
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/li
+    && rm -rf /var/lib/apt/lists
 
 # Clone EasyOCR repo
 RUN mkdir "$service_home" \
