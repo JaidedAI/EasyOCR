@@ -65,6 +65,7 @@ For the latest development release:
 pip install git+git://github.com/jaidedai/easyocr.git
 ```
 For the Easyocr usage on Colab:
+
 Note: Because of the updated version of OpenCV on Google Colab the EasyOcr doesn't work. So if you run this command it will work.
 ``` bash
 !pip install opencv-python-headless==4.1.2.30
