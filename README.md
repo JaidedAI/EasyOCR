@@ -185,6 +185,10 @@ Lastly, please understand that our priority will have to go to popular languages
 
 See [List of languages in development](https://github.com/JaidedAI/EasyOCR/issues/91)
 
+## Github Issues
+
+Due to limited resources, an issue older than 6 months will be automatically closed. Please open an issue again if it is critical.
+
 ## Business Inquiries
 
 For Enterprise Support, [Jaided AI](https://www.jaided.ai/) offers full service for custom OCR/AI systems from building, to maintenance and deployment. Click [here](https://www.jaided.ai/contactus) to contact us.
