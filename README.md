@@ -11,6 +11,8 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
 [Try Demo on our website](https://www.jaided.ai/easyocr)
 
 ## What's new
+- 9 April 2022 - Version 1.4.2
+    - Update dependencies (opencv and pillow issues)
 - 11 September 2021 - Version 1.4.1
     - Add trainer folder
     - Add `readtextlang` method (thanks[@arkya-art](https://github.com/arkya-art), see [PR](https://github.com/JaidedAI/EasyOCR/pull/525))
