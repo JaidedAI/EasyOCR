@@ -10,6 +10,9 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
 
 [Try Demo on our website](https://www.jaided.ai/easyocr)
 
+Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [Gradio](https://github.com/gradio-app/gradio). Try out the Web Demo: [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/tomofi/EasyOCR)
+
+
 ## What's new
 - 9 April 2022 - Version 1.4.2
     - Update dependencies (opencv and pillow issues)
