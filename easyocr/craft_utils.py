@@ -9,12 +9,12 @@ import cv2
 import math
 from scipy.ndimage import label
 
-""" auxilary functions """
+""" auxiliary functions """
 # unwarp corodinates
 def warpCoord(Minv, pt):
     out = np.matmul(Minv, (pt[0], pt[1], 1))
     return np.array([out[0]/out[2], out[1]/out[2]])
-""" end of auxilary functions """
+""" end of auxiliary functions """
 
 
 def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text, estimate_num_chars=False):
