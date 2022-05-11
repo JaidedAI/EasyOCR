@@ -116,6 +116,52 @@ def build_optimizer(opt, filtered_parameters):
     return optimizer
 
 
+def training_step(model, optimizer, criterion, train_dataset, converter, opt, amp: bool, scaler):
+    if amp:
+        with autocast():
+            image_tensors, labels = train_dataset.get_batch()
+            image = image_tensors.to(device)
+            text, length = converter.encode(labels, batch_max_length=opt.batch_max_length)
+            batch_size = image.size(0)
+
+            if 'CTC' in opt.Prediction:
+                preds = model(image, text).log_softmax(2)
+                preds_size = torch.IntTensor([preds.size(1)] * batch_size)
+                preds = preds.permute(1, 0, 2)
+                torch.backends.cudnn.enabled = False
+                cost = criterion(preds, text.to(device), preds_size.to(device), length.to(device))
+                torch.backends.cudnn.enabled = True
+            else:
+                preds = model(image, text[:, :-1])  # align with Attention.forward
+                target = text[:, 1:]  # without [GO] Symbol
+                cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
+        scaler.scale(cost).backward()
+        scaler.unscale_(optimizer)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
+        scaler.step(optimizer)
+        scaler.update()
+    else:
+        image_tensors, labels = train_dataset.get_batch()
+        image = image_tensors.to(device)
+        text, length = converter.encode(labels, batch_max_length=opt.batch_max_length)
+        batch_size = image.size(0)
+        if 'CTC' in opt.Prediction:
+            preds = model(image, text).log_softmax(2)
+            preds_size = torch.IntTensor([preds.size(1)] * batch_size)
+            preds = preds.permute(1, 0, 2)
+            torch.backends.cudnn.enabled = False
+            cost = criterion(preds, text.to(device), preds_size.to(device), length.to(device))
+            torch.backends.cudnn.enabled = True
+        else:
+            preds = model(image, text[:, :-1])  # align with Attention.forward
+            target = text[:, 1:]  # without [GO] Symbol
+            cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
+        cost.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
+        optimizer.step()
+    return cost
+
+
 def train(opt, show_number=2, amp=False):
     """ dataset preparation """
     if not opt.data_filtering_off:
@@ -201,48 +247,8 @@ def train(opt, show_number=2, amp=False):
         # train part
         optimizer.zero_grad(set_to_none=True)
 
-        if amp:
-            with autocast():
-                image_tensors, labels = train_dataset.get_batch()
-                image = image_tensors.to(device)
-                text, length = converter.encode(labels, batch_max_length=opt.batch_max_length)
-                batch_size = image.size(0)
+        cost = training_step(model, optimizer, criterion, train_dataset, converter, opt, amp, scaler)
 
-                if 'CTC' in opt.Prediction:
-                    preds = model(image, text).log_softmax(2)
-                    preds_size = torch.IntTensor([preds.size(1)] * batch_size)
-                    preds = preds.permute(1, 0, 2)
-                    torch.backends.cudnn.enabled = False
-                    cost = criterion(preds, text.to(device), preds_size.to(device), length.to(device))
-                    torch.backends.cudnn.enabled = True
-                else:
-                    preds = model(image, text[:, :-1])  # align with Attention.forward
-                    target = text[:, 1:]  # without [GO] Symbol
-                    cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
-            scaler.scale(cost).backward()
-            scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            image_tensors, labels = train_dataset.get_batch()
-            image = image_tensors.to(device)
-            text, length = converter.encode(labels, batch_max_length=opt.batch_max_length)
-            batch_size = image.size(0)
-            if 'CTC' in opt.Prediction:
-                preds = model(image, text).log_softmax(2)
-                preds_size = torch.IntTensor([preds.size(1)] * batch_size)
-                preds = preds.permute(1, 0, 2)
-                torch.backends.cudnn.enabled = False
-                cost = criterion(preds, text.to(device), preds_size.to(device), length.to(device))
-                torch.backends.cudnn.enabled = True
-            else:
-                preds = model(image, text[:, :-1])  # align with Attention.forward
-                target = text[:, 1:]  # without [GO] Symbol
-                cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
-            cost.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
-            optimizer.step()
         loss_avg.add(cost)
 
         # validation part
