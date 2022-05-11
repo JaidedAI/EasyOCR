@@ -243,7 +243,7 @@ def train(opt, show_number=2, amp=False):
     scaler = GradScaler()
     t1 = time.time()
 
-    while (True):
+    while True:
         # train part
         optimizer.zero_grad(set_to_none=True)
 
