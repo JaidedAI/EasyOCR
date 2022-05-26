@@ -1,0 +1,100 @@
+wandb_opt: False
+
+results_dir: "./exp/"
+vis_test_dir: "./vis_result/"
+
+data_root_dir: "./data_root_dir/"
+score_gt_dir: None # "/data/ICDAR2015_official_supervision"
+mode: "weak_supervision"
+
+
+train:
+  backbone : vgg
+  use_synthtext: False # If you want to combine SynthText in train time as CRAFT did, you can turn on this option
+  synth_data_dir: "/data/SynthText/"
+  synth_ratio: 5
+  real_dataset: custom
+  ckpt_path: "./pretrained_model/CRAFT_clr_amp_29500.pth"
+  eval_interval: 10
+  batch_size: 5
+  st_iter: 0
+  end_iter: 25
+  lr: 0.0001
+  lr_decay: 7500
+  gamma: 0.2
+  weight_decay: 0.00001
+  num_workers: 0 # On single gpu, train.py execution only works when num worker = 0 / On multi-gpu, you can set num_worker > 0 to speed up
+  amp: True
+  loss: 2
+  neg_rto: 0.3
+  n_min_neg: 5000
+  data:
+    vis_opt: False
+    pseudo_vis_opt: False
+    output_size: 768
+    do_not_care_label: ['###', '']
+    mean: [0.485, 0.456, 0.406]
+    variance: [0.229, 0.224, 0.225]
+    enlarge_region : [0.5, 0.5] # x axis, y axis
+    enlarge_affinity: [0.5, 0.5]
+    gauss_init_size: 200
+    gauss_sigma: 40
+    watershed:
+      version: "skimage"
+      sure_fg_th: 0.75
+      sure_bg_th: 0.05
+    syn_sample: -1
+    custom_sample: -1
+    syn_aug:
+      random_scale:
+        range: [1.0, 1.5, 2.0]
+        option: False
+      random_rotate:
+        max_angle: 20
+        option: False
+      random_crop:
+        version: "random_resize_crop_synth"
+        option: True
+      random_horizontal_flip:
+        option: False
+      random_colorjitter:
+        brightness: 0.2
+        contrast: 0.2
+        saturation: 0.2
+        hue: 0.2
+        option: True
+    custom_aug:
+      random_scale:
+        range: [ 1.0, 1.5, 2.0 ]
+        option: False
+      random_rotate:
+        max_angle: 20
+        option: True
+      random_crop:
+        version: "random_resize_crop"
+        scale: [0.03, 0.4]
+        ratio: [0.75, 1.33]
+        rnd_threshold: 1.0
+        option: True
+      random_horizontal_flip:
+        option: True
+      random_colorjitter:
+        brightness: 0.2
+        contrast: 0.2
+        saturation: 0.2
+        hue: 0.2
+        option: True
+
+test:
+  trained_model : null
+  custom_data:
+    test_set_size: 500
+    test_data_dir: "./data_root_dir/"
+    text_threshold: 0.75
+    low_text: 0.5
+    link_threshold: 0.2
+    canvas_size: 2240
+    mag_ratio: 1.75
+    poly: False
+    cuda: True
+    vis_opt: False
