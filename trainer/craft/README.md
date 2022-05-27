@@ -67,16 +67,16 @@ pip install -r requirements.txt
     493,115,519,115,519,131,493,131,[06]
     374,155,409,155,409,170,374,170,###
     ```
-2. Download model pretrained with SynthText at the bottom of the link and put it in `pretrained_model/CRAFT_clr_amp_29500.pth`
+2. Download model pretrained with SynthText at the bottom of the link and put it in `exp/CRAFT_clr_amp_29500.pth`
 3. Write configuration in yaml format (refer to `config/custom_data_train.yaml` file)
-    * To speed up training time with multi-gpu, set num_worker as large as possible
+    * To speed up training time with multi-gpu, set num_worker > 0
 4. Put the yaml file in the config folder
 5. Run training script like below (If you have multi-gpu, run train_distributed.py)
 6. Then, experiment results will be saved to ```./exp/[yaml]``` by default.
 
 ```
 CUDA_VISIBLE_DEVICES=0 python3 train.py --yaml=custom_data_train               ## if you run on single GPU
-CUDA_VISIBLE_DEVICES=0,1 python3 train_distributed.py --yaml=custom_data_train   ## On multi GPU, 
+CUDA_VISIBLE_DEVICES=0,1 python3 train_distributed.py --yaml=custom_data_train   ## if you run on multi GPU
 
 ```
 
