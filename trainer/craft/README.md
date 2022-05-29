@@ -67,12 +67,14 @@ pip install -r requirements.txt
     493,115,519,115,519,131,493,131,[06]
     374,155,409,155,409,170,374,170,###
     ```
-2. Download model pretrained with SynthText at the bottom of the link and put it in `exp/CRAFT_clr_amp_29500.pth`
-3. Write configuration in yaml format (refer to `config/custom_data_train.yaml` file)
-    * To speed up training time with multi-gpu, set num_worker > 0
-4. Put the yaml file in the config folder
-5. Run training script like below (If you have multi-gpu, run train_distributed.py)
-6. Then, experiment results will be saved to ```./exp/[yaml]``` by default.
+2. Write configuration in yaml format (refer to `config/custom_data_train.yaml` file)
+    * To speed up training time with multi-gpu, set num_worker > 0   
+3. Put the yaml file in the config folder
+4. Run training script like below (If you have multi-gpu, run train_distributed.py)
+5. Then, experiment results will be saved to ```./exp/[yaml]``` by default.
+
+Note: Example config files are provided in `config` folder. Use `syn_train.yaml` to train SynthText dataset from scratch. It is used to train <a href="https://drive.google.com/file/d/1enVIsgNvBf3YiRsVkxodspOn55PIK-LJ/view?usp=sharing">this pretrain</a>. Use `ic15_train.yaml` to train SynthText + ICDAR2015 dataset. This config starts training from <a href="https://drive.google.com/file/d/1enVIsgNvBf3YiRsVkxodspOn55PIK-LJ/view?usp=sharing">this pretrain</a>. You can download and put it in `exp/CRAFT_clr_amp_29500.pth` and change `ckpt_path` in the config file according to your local setup.
+
 
 ```
 CUDA_VISIBLE_DEVICES=0 python3 train.py --yaml=custom_data_train               ## if you run on single GPU
