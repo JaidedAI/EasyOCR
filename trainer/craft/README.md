@@ -10,7 +10,6 @@ The trained model with this code recorded a level of performance similar to that
 ```bash
 ├── config
 │   ├── syn_train.yaml
-│   └── ic15_train.yaml
 │   └── custom_data_train.yaml
 ├── data
 │   ├── pseudo_label
