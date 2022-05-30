@@ -11,7 +11,7 @@ train:
   dataset: ["synthtext"]
   ckpt_path: null
   eval_interval: 1000
-  batch_size: 48
+  batch_size: 5
   st_iter: 0
   end_iter: 50000
   lr: 0.0001

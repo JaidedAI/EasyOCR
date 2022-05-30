@@ -11,6 +11,7 @@ The trained model with this code recorded a level of performance similar to that
 ├── config
 │   ├── syn_train.yaml
 │   └── ic15_train.yaml
+│   └── custom_data_train.yaml
 ├── data
 │   ├── pseudo_label
 │   │   ├── make_charbox.py
@@ -32,9 +33,13 @@ The trained model with this code recorded a level of performance similar to that
 │   ├── inference_boxes.py
 │   └── utils.py
 ├── trainSynth.py
-├── trainIC15.py
-└── eval.py
+├── train.py
+├── train_distributed.py
+├── eval.py
+├── data_root_dir   (place dataset folder here)
+└── exp             (model and experiment result files will saved here)
 ```
+
 ### Installation
 
 Install using `pip`
@@ -67,20 +72,23 @@ pip install -r requirements.txt
     493,115,519,115,519,131,493,131,[06]
     374,155,409,155,409,170,374,170,###
     ```
-2. Write configuration in yaml format (refer to `config/custom_data_train.yaml` file)
+2. Write configuration in yaml format (example config files are provided in `config` folder.)
     * To speed up training time with multi-gpu, set num_worker > 0   
 3. Put the yaml file in the config folder
 4. Run training script like below (If you have multi-gpu, run train_distributed.py)
 5. Then, experiment results will be saved to ```./exp/[yaml]``` by default.
 
-Note: Example config files are provided in `config` folder. Use `syn_train.yaml` to train SynthText dataset from scratch. It is used to train <a href="https://drive.google.com/file/d/1enVIsgNvBf3YiRsVkxodspOn55PIK-LJ/view?usp=sharing">this pretrain</a>. Use `ic15_train.yaml` to train SynthText + ICDAR2015 dataset. This config starts training from <a href="https://drive.google.com/file/d/1enVIsgNvBf3YiRsVkxodspOn55PIK-LJ/view?usp=sharing">this pretrain</a>. You can download and put it in `exp/CRAFT_clr_amp_29500.pth` and change `ckpt_path` in the config file according to your local setup.
+* Step 1 : To train CRAFT with SynthText dataset from scratch
+    * Note : This step is not necessary if you use <a href="https://drive.google.com/file/d/1enVIsgNvBf3YiRsVkxodspOn55PIK-LJ/view?usp=sharing">this pretrain</a> as a checkpoint when start training step 2. You can download and put it in `exp/CRAFT_clr_amp_29500.pth` and change `ckpt_path` in the config file according to your local setup.
+    ```
+    CUDA_VISIBLE_DEVICES=0 python3 trainSynth.py --yaml=syn_train
+    ```
 
-
-```
-CUDA_VISIBLE_DEVICES=0 python3 train.py --yaml=custom_data_train               ## if you run on single GPU
-CUDA_VISIBLE_DEVICES=0,1 python3 train_distributed.py --yaml=custom_data_train   ## if you run on multi GPU
-
-```
+* Step 2 : To train CRAFT with [SynthText + IC15] or custom dataset
+    ```
+    CUDA_VISIBLE_DEVICES=0 python3 train.py --yaml=custom_data_train               ## if you run on single GPU
+    CUDA_VISIBLE_DEVICES=0,1 python3 train_distributed.py --yaml=custom_data_train   ## if you run on multi GPU
+    ```
 
 ### Arguments
 * ```--yaml``` : configuration file name
