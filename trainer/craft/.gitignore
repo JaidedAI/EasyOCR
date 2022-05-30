@@ -1,0 +1,4 @@
+__pycache__/
+model/__pycache__/
+wandb/*
+vis_result/*

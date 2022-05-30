@@ -1,0 +1,68 @@
+wandb_opt: False
+
+results_dir: "./exp/"
+vis_test_dir: "./vis_result/"
+data_dir:
+  synthtext: "/data/SynthText/"
+  synthtext_gt: NULL
+
+train:
+  backbone : vgg
+  dataset: ["synthtext"]
+  ckpt_path: null
+  eval_interval: 1000
+  batch_size: 5
+  st_iter: 0
+  end_iter: 50000
+  lr: 0.0001
+  lr_decay: 15000
+  gamma: 0.2
+  weight_decay: 0.00001
+  num_workers: 4
+  amp: True
+  loss: 3
+  neg_rto: 1
+  n_min_neg: 1000
+  data:
+    vis_opt: False
+    output_size: 768
+    mean: [0.485, 0.456, 0.406]
+    variance: [0.229, 0.224, 0.225]
+    enlarge_region : [0.5, 0.5] # x axis, y axis
+    enlarge_affinity: [0.5, 0.5]
+    gauss_init_size: 200
+    gauss_sigma: 40
+    syn_sample : -1
+    syn_aug:
+      random_scale:
+        range: [1.0, 1.5, 2.0]
+        option: False
+      random_rotate:
+        max_angle: 20
+        option: False
+      random_crop:
+        version: "random_resize_crop_synth"
+        rnd_threshold : 1.0
+        option: True
+      random_horizontal_flip:
+        option: False
+      random_colorjitter:
+        brightness: 0.2
+        contrast: 0.2
+        saturation: 0.2
+        hue: 0.2
+        option: True
+
+test:
+  trained_model: null
+  icdar2013:
+    test_set_size: 233
+    cuda: True
+    vis_opt: True
+    test_data_dir : "/data/ICDAR2013/"
+    text_threshold: 0.85
+    low_text: 0.5
+    link_threshold: 0.2
+    canvas_size: 960
+    mag_ratio: 1.5
+    poly: False
