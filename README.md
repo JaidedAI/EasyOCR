@@ -133,7 +133,7 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 For recognition model, [Read here](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md).
 
-For detection model (CRAFT), [Read here]([https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md](https://github.com/JaidedAI/EasyOCR/tree/master/trainer/craft)). 
+For detection model (CRAFT), [Read here](https://github.com/JaidedAI/EasyOCR/blob/master/trainer/craft/README.md). 
 
 ## Implementation Roadmap
 
