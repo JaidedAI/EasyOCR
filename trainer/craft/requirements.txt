@@ -1,6 +1,6 @@
 conda==4.10.3
 opencv-python==4.5.3.56
-Pillow==8.2.0
+Pillow==9.0.1
 Polygon3==3.0.9.1
 PyYAML==5.4.1
 scikit-image==0.17.2
