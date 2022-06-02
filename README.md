@@ -14,6 +14,8 @@ Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [
 
 
 ## What's new
+- 2 June 2022 - Version 1.5.0
+    - Add trainer for CRAFT detection model (thanks[@gmuffiness](https://github.com/gmuffiness), see [PR](https://github.com/JaidedAI/EasyOCR/pull/739))
 - 9 April 2022 - Version 1.4.2
     - Update dependencies (opencv and pillow issues)
 - 11 September 2021 - Version 1.4.1
@@ -133,7 +135,7 @@ $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 
 For recognition model, [Read here](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md).
 
-For detection model (CRAFT), [Read here](https://github.com/JaidedAI/EasyOCR/blob/master/trainer/craft/README.md). 
+For detection model (CRAFT), [Read here](https://github.com/JaidedAI/EasyOCR/blob/master/trainer/craft/README.md).
 
 ## Implementation Roadmap
 

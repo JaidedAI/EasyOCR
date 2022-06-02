@@ -1,3 +1,5 @@
+- 2 June 2022 - Version 1.5.0
+    - Add trainer for CRAFT detection model (thanks[@gmuffiness](https://github.com/gmuffiness), see [PR](https://github.com/JaidedAI/EasyOCR/pull/739))
 - 9 April 2022 - Version 1.4.2
     - Update dependencies (opencv and pillow issues)
 - 11 September 2021 - Version 1.4.1
