@@ -200,4 +200,4 @@ Due to limited resources, an issue older than 6 months will be automatically clo
 
 ## Business Inquiries
 
-For Enterprise Support, [Jaided AI](https://www.jaided.ai/) offers full service for custom OCR/AI systems from building, to maintenance and deployment. Click [here](https://www.jaided.ai/contactus) to contact us.
+For Enterprise Support, [Jaided AI](https://www.jaided.ai/) offers full service for custom OCR/AI systems from implementation, training/finetuning and deployment. Click [here](https://www.jaided.ai/contactus?ref=github) to contact us.
