@@ -251,7 +251,7 @@ def load_icdar2015_gt(dataFolder, isTraing=False):
 
 def load_icdar2013_gt(dataFolder, isTraing=False):
 
-    # choise test dataset
+    # choose test dataset
     if isTraing:
         img_folderName = "Challenge2_Test_Task12_Images"
         gt_folderName = "Challenge2_Test_Task1_GT"
