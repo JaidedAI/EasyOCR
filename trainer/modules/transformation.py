@@ -80,7 +80,7 @@ class LocalizationNetwork(nn.Module):
 
 
 class GridGenerator(nn.Module):
-    """ Grid Generator of RARE, which produces P_prime by multipling T with P """
+    """ Grid Generator of RARE, which produces P_prime by multiplying T with P """
 
     def __init__(self, F, I_r_size):
         """ Generate P_hat and inv_delta_C for later """

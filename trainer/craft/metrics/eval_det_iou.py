@@ -136,7 +136,7 @@ class DetectionIoUEvaluator(object):
             if len(detDontCarePolsNum) > 0 else "\n")
 
         if len(gtPols) > 0 and len(detPols) > 0:
-            # Calculate IoU and precision matrixs
+            # Calculate IoU and precision matrices
             outputShape = [len(gtPols), len(detPols)]
             iouMat = np.empty(outputShape)
             gtRectMat = np.zeros(len(gtPols), np.int8)
