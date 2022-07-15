@@ -213,7 +213,7 @@ class Reader(object):
             self.character = recog_config['character_list']
             model_file = recog_network+ '.pth'
             model_path = os.path.join(self.model_storage_directory, model_file)
-            self.setLanguageList(lang_list, None)
+            self.setLanguageList(lang_list, recog_config)
 
         dict_list = {}
         for lang in lang_list:
@@ -261,8 +261,10 @@ class Reader(object):
             with open(char_file, "r", encoding = "utf-8-sig") as input_file:
                 char_list =  input_file.read().splitlines()
             self.lang_char += char_list
-        if model:
+        if model.get('symbols'):
             symbol = model['symbols']
+        elif model.get('character_list'):
+            symbol = model['character_list']
         else:
             symbol = '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
         self.lang_char = set(self.lang_char).union(set(symbol))
