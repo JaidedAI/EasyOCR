@@ -4,6 +4,7 @@ import torch.backends.cudnn as cudnn
 import torch.utils.data
 import torch.nn.functional as F
 import torchvision.transforms as transforms
+import torchvision.transforms.functional as transforms_F
 import numpy as np
 from collections import OrderedDict
 import importlib
@@ -29,22 +30,28 @@ def adjust_contrast_grey(img, target = 0.4):
 
 class NormalizePAD(object):
 
-    def __init__(self, max_size, PAD_type='right'):
+    def __init__(self, max_size, PAD_type='right',PAD_mode='edge'):
         self.toTensor = transforms.ToTensor()
         self.max_size = max_size
         self.max_width_half = math.floor(max_size[2] / 2)
         self.PAD_type = PAD_type
+        self.PAD_mode = PAD_mode
 
     def __call__(self, img):
         img = self.toTensor(img)
         img.sub_(0.5).div_(0.5)
         c, h, w = img.size()
-        Pad_img = torch.FloatTensor(*self.max_size).fill_(0)
-        Pad_img[:, :, :w] = img  # right pad
-        if self.max_size[2] != w:  # add border Pad
-            Pad_img[:, :, w:] = img[:, :, w - 1].unsqueeze(2).expand(c, h, self.max_size[2] - w)
+        if self.PAD_type=="right":
+            self.pad_right=self.max_size[2]-w
+        if self.PAD_type=="center":
+            self.pad_right=int(math.ceil((self.max_size[2]-w)/2))
+            self.pad_left=self.max_size[2]-w-self.pad_right
+        if self.PAD_type=='left':
+            self.pad_left=self.max_size[2]-w
 
-        return Pad_img
+        # change PAD_mode to 'constant' for zero/black padding
+        return transforms_F.pad(img,(self.pad_left,0,self.pad_right,0),padding_mode=self.PAD_mode)
+
 
 class ListDataset(torch.utils.data.Dataset):
 
