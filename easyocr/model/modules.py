@@ -81,14 +81,6 @@ class BidirectionalLSTM(nn.Module):
         self.linear = nn.Linear(hidden_size * 2, output_size)
 
     def forward(self, input):
-        """
-        input : visual feature [batch_size x T x input_size]
-        output : contextual feature [batch_size x T x output_size]
-        """
-        try: # multi gpu needs this
-            self.rnn.flatten_parameters()
-        except: # quantization doesn't work with this 
-            pass
         recurrent, _ = self.rnn(input)  # batch_size x T x input_size -> batch_size x T x (2*hidden_size)
         output = self.linear(recurrent)  # batch_size x T x output_size
         return output
@@ -118,6 +110,7 @@ class VGG_FeatureExtractor(nn.Module):
     def forward(self, input):
         return self.ConvNet(input)
 
+
 class ResNet_FeatureExtractor(nn.Module):
     """ FeatureExtractor of FAN (http://openaccess.thecvf.com/content_ICCV_2017/papers/Cheng_Focusing_Attention_Towards_ICCV_2017_paper.pdf) """
 
@@ -127,6 +120,7 @@ class ResNet_FeatureExtractor(nn.Module):
 
     def forward(self, input):
         return self.ConvNet(input)
+
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -158,10 +152,12 @@ class BasicBlock(nn.Module):
 
         if self.downsample is not None:
             residual = self.downsample(x)
+
         out += residual
         out = self.relu(out)
 
         return out
+
 
 class ResNet(nn.Module):
 
