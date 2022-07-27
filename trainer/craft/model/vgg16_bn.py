@@ -68,6 +68,4 @@ class vgg16_bn(torch.nn.Module):
         h_relu5_3 = h
         h = self.slice5(h)
         h_fc7 = h
-        vgg_outputs = namedtuple("VggOutputs", ['fc7', 'relu5_3', 'relu4_3', 'relu3_2', 'relu2_2'])
-        out = vgg_outputs(h_fc7, h_relu5_3, h_relu4_3, h_relu3_2, h_relu2_2)
-        return out
+        return h_fc7, h_relu5_3, h_relu4_3, h_relu3_2, h_relu2_2
