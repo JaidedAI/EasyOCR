@@ -68,9 +68,9 @@ class vgg16_bn(torch.nn.Module):
         h_relu5_3 = h
         h = self.slice5(h)
         h_fc7 = h
-        vgg_outputs = namedtuple("VggOutputs", ['fc7', 'relu5_3', 'relu4_3', 'relu3_2', 'relu2_2'])
-        out = vgg_outputs(h_fc7, h_relu5_3, h_relu4_3, h_relu3_2, h_relu2_2)
-        return out
+
+        return h_fc7, h_relu5_3, h_relu4_3, h_relu3_2, h_relu2_2
+
 
 class BidirectionalLSTM(nn.Module):
 
@@ -91,6 +91,7 @@ class BidirectionalLSTM(nn.Module):
         recurrent, _ = self.rnn(input)  # batch_size x T x input_size -> batch_size x T x (2*hidden_size)
         output = self.linear(recurrent)  # batch_size x T x output_size
         return output
+
 
 class VGG_FeatureExtractor(nn.Module):
 
