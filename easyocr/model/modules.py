@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.nn.init as init
+
 from torchvision import models
 from torchvision.models.vgg import model_urls
-from collections import namedtuple
+
 
 def init_weights(modules):
     for m in modules:
@@ -18,6 +18,7 @@ def init_weights(modules):
         elif isinstance(m, nn.Linear):
             m.weight.data.normal_(0, 0.01)
             m.bias.data.zero_()
+
 
 class vgg16_bn(torch.nn.Module):
     def __init__(self, pretrained=True, freeze=True):
@@ -68,9 +69,9 @@ class vgg16_bn(torch.nn.Module):
         h_relu5_3 = h
         h = self.slice5(h)
         h_fc7 = h
-        vgg_outputs = namedtuple("VggOutputs", ['fc7', 'relu5_3', 'relu4_3', 'relu3_2', 'relu2_2'])
-        out = vgg_outputs(h_fc7, h_relu5_3, h_relu4_3, h_relu3_2, h_relu2_2)
-        return out
+
+        return h_fc7, h_relu5_3, h_relu4_3, h_relu3_2, h_relu2_2
+
 
 class BidirectionalLSTM(nn.Module):
 
@@ -80,17 +81,10 @@ class BidirectionalLSTM(nn.Module):
         self.linear = nn.Linear(hidden_size * 2, output_size)
 
     def forward(self, input):
-        """
-        input : visual feature [batch_size x T x input_size]
-        output : contextual feature [batch_size x T x output_size]
-        """
-        try: # multi gpu needs this
-            self.rnn.flatten_parameters()
-        except: # quantization doesn't work with this 
-            pass
         recurrent, _ = self.rnn(input)  # batch_size x T x input_size -> batch_size x T x (2*hidden_size)
         output = self.linear(recurrent)  # batch_size x T x output_size
         return output
+
 
 class VGG_FeatureExtractor(nn.Module):
 
@@ -116,6 +110,7 @@ class VGG_FeatureExtractor(nn.Module):
     def forward(self, input):
         return self.ConvNet(input)
 
+
 class ResNet_FeatureExtractor(nn.Module):
     """ FeatureExtractor of FAN (http://openaccess.thecvf.com/content_ICCV_2017/papers/Cheng_Focusing_Attention_Towards_ICCV_2017_paper.pdf) """
 
@@ -125,6 +120,7 @@ class ResNet_FeatureExtractor(nn.Module):
 
     def forward(self, input):
         return self.ConvNet(input)
+
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -156,10 +152,12 @@ class BasicBlock(nn.Module):
 
         if self.downsample is not None:
             residual = self.downsample(x)
+
         out += residual
         out = self.relu(out)
 
         return out
+
 
 class ResNet(nn.Module):
 
