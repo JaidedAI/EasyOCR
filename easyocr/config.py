@@ -13,6 +13,16 @@ detection_models = {
         'filename': 'craft_mlt_25k.pth',
         'url': 'https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/craft_mlt_25k.zip',
         'md5sum': '2f8227d2def4037cdb3b34389dcf9ec1'
+    },
+    'dbnet18' : {
+        'filename': 'pretrained_ic15_res18.pt',
+        'url': '',
+        'md5sum': 'aee04f8ffe5fc5bd5abea73223800425'
+    },
+    'dbnet50' : {
+        'filename': 'pretrained_ic15_res50.pt',
+        'url': '',
+        'md5sum': 'a8e90144c131c2467d1eb7886c2e93a6'
     }
 }
 
@@ -188,5 +198,14 @@ recognition_models = {
             'symbols': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ',
             'characters': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZಂಃಅಆಇಈಉಊಋಎಏಐಒಓಔಕಖಗಘಙಚಛಜಝಞಟಠಡಢಣತಥದಧನಪಫಬಭಮಯರಲಳವಶಷಸಹಾಿೀುೂೃೆೇೈೊೋೌ್೦೧೨೩೪೫೬೭೮೯'
         },
+        'cyrillic_g2':{
+            'filename': 'cyrillic_g2.pth',
+            'model_script': 'cyrillic',
+            'url': 'https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/cyrillic.zip',
+            'md5sum': '19f85f43d9128a89ac21b8d6a06973fe',
+            'symbols': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ €₽',
+            'characters': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ €₽ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяЂђЃѓЄєІіЇїЈјЉљЊњЋћЌќЎўЏџҐґҒғҚқҮүҲҳҶҷӀӏӢӣӨөӮӯ'
+        },
+
     }
 }

@@ -4,3 +4,5 @@ include README.md
 include easyocr/model/*
 include easyocr/character/*
 include easyocr/dict/*
+include easyocr/scripts/compile_dbnet_dcn.py
+recursive-include easyocr/DBNet *

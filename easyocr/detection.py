@@ -89,7 +89,7 @@ def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=Fal
     net.eval()
     return net
 
-def get_textbox(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device, optimal_num_chars=None):
+def get_textbox(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device, optimal_num_chars=None, **kwargs):
     result = []
     estimate_num_chars = optimal_num_chars is not None
     bboxes_list, polys_list = test_net(canvas_size, mag_ratio, detector,
