@@ -24,14 +24,16 @@ def main():
             subprocess.run(
                 "touch dcn_compiling_success", shell=True, stdout = fid
             )
-            os.chdir(cwd)
-            print("DCN operator is compiled successfully.")
+            print("DCN operator is compiled successfully at {}.".format(os.path.join(parent_dir,'DBNet')))
         except Exception as error:
             print("Failed to compile dcn operator for DBNet with the following error.", file = fid)
             print("{}".format(error), file = fid)
             print("Failed to compile dcn operator for DBNet.")
             print("EasyOCR can still be used with CRAFT text detector (default).")
             print("To use DBNet text detector, please check {} for troubleshoot and compile dcn operator manually.".format(url))
+        finally:
+            os.chdir(cwd)
 
 if __name__ == '__main__':
     main()
+
