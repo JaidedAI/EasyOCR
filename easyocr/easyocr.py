@@ -32,7 +32,7 @@ class Reader(object):
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
                  user_network_directory=None, recog_network = 'standard',
                  download_enabled=True, detector=True, recognizer=True,
-                 verbose=True, quantize=True, cudnn_benchmark=False, vert=True):
+                 verbose=True, quantize=True, cudnn_benchmark=False, vert=False):
         """Create an EasyOCR Reader
 
         Parameters:
@@ -76,6 +76,8 @@ class Reader(object):
         else:
             self.device = gpu
         self.recognition_models = recognition_models
+
+        self.vert = vert
 
         # check and download detection model
         detector_model = 'craft'
