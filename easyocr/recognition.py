@@ -1,30 +1,22 @@
-import importlib
-import math
-import types
-
-from collections import OrderedDict
-
+from PIL import Image
 import torch
-import torch.nn.functional as F
+import torch.backends.cudnn as cudnn
 import torch.utils.data
+import torch.nn.functional as F
 import torchvision.transforms as transforms
 import numpy as np
-
-from PIL import Image
-
-from .model.modules import BidirectionalLSTM
+from collections import OrderedDict
+import importlib
 from .utils import CTCLabelConverter
-
+import math
 
 def custom_mean(x):
     return x.prod()**(2.0/np.sqrt(len(x)))
-
 
 def contrast_grey(img):
     high = np.percentile(img, 90)
     low  = np.percentile(img, 10)
     return (high-low)/np.maximum(10, high+low), high, low
-
 
 def adjust_contrast_grey(img, target = 0.4):
     contrast, high, low = contrast_grey(img)
@@ -35,8 +27,8 @@ def adjust_contrast_grey(img, target = 0.4):
         img = np.maximum(np.full(img.shape, 0) ,np.minimum(np.full(img.shape, 255), img)).astype(np.uint8)
     return img
 
-
 class NormalizePAD(object):
+
     def __init__(self, max_size, PAD_type='right'):
         self.toTensor = transforms.ToTensor()
         self.max_size = max_size
@@ -54,8 +46,8 @@ class NormalizePAD(object):
 
         return Pad_img
 
-
 class ListDataset(torch.utils.data.Dataset):
+
     def __init__(self, image_list):
         self.image_list = image_list
         self.nSamples = len(image_list)
@@ -67,8 +59,8 @@ class ListDataset(torch.utils.data.Dataset):
         img = self.image_list[index]
         return Image.fromarray(img, 'L')
 
-
 class AlignCollate(object):
+
     def __init__(self, imgH=32, imgW=100, keep_ratio_with_pad=False, adjust_contrast = 0.):
         self.imgH = imgH
         self.imgW = imgW
@@ -104,9 +96,8 @@ class AlignCollate(object):
         image_tensors = torch.cat([t.unsqueeze(0) for t in resized_images], 0)
         return image_tensors
 
-
-def recognizer_predict(model, converter, test_loader, batch_max_length,
-                       ignore_idx, char_group_idx, decoder='greedy', beamWidth=5, device='cpu'):
+def recognizer_predict(model, converter, test_loader, batch_max_length,\
+                       ignore_idx, char_group_idx, decoder = 'greedy', beamWidth= 5, device = 'cpu'):
     model.eval()
     result = []
     with torch.no_grad():
@@ -159,10 +150,9 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,
 
     return result
 
-
-def get_recognizer(recog_network, network_params, character,
-                   separator_list, dict_list, model_path,
-                   device='cpu', quantize=True):
+def get_recognizer(recog_network, network_params, character,\
+                   separator_list, dict_list, model_path,\
+                   device = 'cpu', quantize = True):
 
     converter = CTCLabelConverter(character, separator_list, dict_list)
     num_class = len(converter.character)
@@ -188,21 +178,10 @@ def get_recognizer(recog_network, network_params, character,
             except:
                 pass
     else:
-        # Override the forward method to flatten parameters when in a multi-GPU environment
-        def dp_forward(self, input):
-            self.rnn.flatten_parameters()
-            return self.forward_(input)
-
-        for m in model.modules():
-            if type(m) is BidirectionalLSTM:
-                m.forward_ = m.forward
-                m.forward = types.MethodType(dp_forward, m)
-
         model = torch.nn.DataParallel(model).to(device)
         model.load_state_dict(torch.load(model_path, map_location=device))
 
     return model, converter
-
 
 def get_text(character, imgH, imgW, recognizer, converter, image_list,\
              ignore_char = '',decoder = 'greedy', beamWidth =5, batch_size=1, contrast_ths=0.1,\

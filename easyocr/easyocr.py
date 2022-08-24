@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .detection import get_detector, get_textbox
 from .recognition import get_recognizer, get_text
 from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
                    download_and_unzip, printProgressBar, diff, reformat_input,\
@@ -30,9 +29,10 @@ LOGGER = getLogger(__name__)
 class Reader(object):
 
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
-                 user_network_directory=None, recog_network = 'standard',
-                 download_enabled=True, detector=True, recognizer=True,
-                 verbose=True, quantize=True, cudnn_benchmark=False):
+                 user_network_directory=None, detect_network="craft", 
+                 recog_network='standard', download_enabled=True, 
+                 detector=True, recognizer=True, verbose=True, 
+                 quantize=True, cudnn_benchmark=False):
         """Create an EasyOCR Reader
 
         Parameters:
@@ -50,6 +50,7 @@ class Reader(object):
 
             download_enabled (bool): Enabled downloading of model data via HTTP (default).
         """
+        self.verbose = verbose
         self.download_enabled = download_enabled
 
         self.model_storage_directory = MODULE_PATH + '/model'
@@ -75,31 +76,17 @@ class Reader(object):
             self.device = 'cuda'
         else:
             self.device = gpu
+
+        self.detection_models = detection_models
         self.recognition_models = recognition_models
 
         # check and download detection model
-        detector_model = 'craft'
-        corrupt_msg = 'MD5 hash mismatch, possible file corruption'
-        detector_path = os.path.join(self.model_storage_directory, detection_models[detector_model]['filename'])
+        self.support_detection_network = ['craft', 'dbnet18']
+        self.quantize=quantize, 
+        self.cudnn_benchmark=cudnn_benchmark
         if detector:
-            if os.path.isfile(detector_path) == False:
-                if not self.download_enabled:
-                    raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
-                LOGGER.warning('Downloading detection model, please wait. '
-                               'This may take several minutes depending upon your network connection.')
-                download_and_unzip(detection_models[detector_model]['url'], detection_models[detector_model]['filename'], self.model_storage_directory, verbose)
-                assert calculate_md5(detector_path) == detection_models[detector_model]['md5sum'], corrupt_msg
-                LOGGER.info('Download complete')
-            elif calculate_md5(detector_path) != detection_models[detector_model]['md5sum']:
-                if not self.download_enabled:
-                    raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % detector_path)
-                LOGGER.warning(corrupt_msg)
-                os.remove(detector_path)
-                LOGGER.warning('Re-downloading the detection model, please wait. '
-                               'This may take several minutes depending upon your network connection.')
-                download_and_unzip(detection_models[detector_model]['url'], detection_models[detector_model]['filename'], self.model_storage_directory, verbose)
-                assert calculate_md5(detector_path) == detection_models[detector_model]['md5sum'], corrupt_msg
-
+            detector_path = self.getDetectorPath(detect_network)
+        
         # recognition model
         separator_list = {}
 
@@ -168,8 +155,8 @@ class Reader(object):
                 elif set(lang_list) & set(cyrillic_lang_list):
                     self.setModelLanguage('cyrillic', lang_list, cyrillic_lang_list+['en'],
                                           '["ru","rs_cyrillic","be","bg","uk","mn","en"]')
-                    model = recognition_models['gen1']['cyrillic_g1']
-                    recog_network = 'generation1'
+                    model = recognition_models['gen2']['cyrillic_g2']
+                    recog_network = 'generation2'
                 else:
                     self.model_lang = 'latin'
                     model = recognition_models['gen2']['latin_g2']
@@ -220,7 +207,8 @@ class Reader(object):
             dict_list[lang] = os.path.join(BASE_PATH, 'dict', lang + ".txt")
 
         if detector:
-            self.detector = get_detector(detector_path, self.device, quantize, cudnn_benchmark=cudnn_benchmark)
+            self.detector = self.initDetector(detector_path)
+            
         if recognizer:
             if recog_network == 'generation1':
                 network_params = {
@@ -240,6 +228,53 @@ class Reader(object):
                                                          self.character, separator_list,\
                                                          dict_list, model_path, device = self.device, quantize=quantize)
 
+    def getDetectorPath(self, detect_network):
+        if detect_network in self.support_detection_network:
+            self.detect_network = detect_network
+            if self.detect_network == 'craft':
+                from .detection import get_detector, get_textbox
+            elif self.detect_network == 'dbnet18':
+                if os.path.isfile(os.path.join( os.path.dirname(__file__),  "DBNet", "dcn_compiling_success")):
+                    from .detection_db import get_detector, get_textbox
+                else:
+                    trouble_url = "https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/DBNet"
+                    raise RuntimeError("dbnet is selected as the detection network, but DBNet is not compiled successfully during installation \
+                                       or the indicating flag is missing. Please check {} for troubleshooting.".format(trouble_url))
+            else:
+                raise RuntimeError("Unsupport detector network. Support networks are craft and dbnet18.")
+            self.get_textbox = get_textbox
+            self.get_detector = get_detector
+            corrupt_msg = 'MD5 hash mismatch, possible file corruption'
+            detector_path = os.path.join(self.model_storage_directory, self.detection_models[self.detect_network]['filename'])
+            if os.path.isfile(detector_path) == False:
+                if not self.download_enabled:
+                    raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
+                LOGGER.warning('Downloading detection model, please wait. '
+                               'This may take several minutes depending upon your network connection.')
+                download_and_unzip(self.detection_models[self.detect_network]['url'], self.detection_models[self.detect_network]['filename'], self.model_storage_directory, self.verbose)
+                assert calculate_md5(detector_path) == self.detection_models[self.detect_network]['md5sum'], corrupt_msg
+                LOGGER.info('Download complete')
+            elif calculate_md5(detector_path) != self.detection_models[self.detect_network]['md5sum']:
+                if not self.download_enabled:
+                    raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % detector_path)
+                LOGGER.warning(corrupt_msg)
+                os.remove(detector_path)
+                LOGGER.warning('Re-downloading the detection model, please wait. '
+                               'This may take several minutes depending upon your network connection.')
+                download_and_unzip(self.detection_models[self.detect_network]['url'], self.detection_models[self.detect_network]['filename'], self.model_storage_directory, self.verbose)
+                assert calculate_md5(detector_path) == self.detection_models[self.detect_network]['md5sum'], corrupt_msg
+        else:
+            raise RuntimeError("Unsupport detector network. Support networks are {}.".format(', '.join(self.support_detection_network)))
+        
+        return detector_path
+
+    def initDetector(self, detector_path):
+        return self.get_detector(detector_path, self.device, self.quantize, cudnn_benchmark=self.cudnn_benchmark)
+    
+    def setDetector(self, detect_network):
+        detector_path = self.getDetectorPath(detect_network)
+        self.detector = self.initDetector(detector_path)
+    
     def setModelLanguage(self, language, lang_list, list_lang, list_lang_string):
         self.model_lang = language
         if set(lang_list) - set(list_lang) != set():
@@ -273,14 +308,28 @@ class Reader(object):
     def detect(self, img, min_size = 20, text_threshold = 0.7, low_text = 0.4,\
                link_threshold = 0.4,canvas_size = 2560, mag_ratio = 1.,\
                slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-               width_ths = 0.5, add_margin = 0.1, reformat=True, optimal_num_chars=None):
+               width_ths = 0.5, add_margin = 0.1, reformat=True, optimal_num_chars=None,
+               threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
+               ):
 
         if reformat:
             img, img_cv_grey = reformat_input(img)
 
-        text_box_list = get_textbox(self.detector, img, canvas_size, mag_ratio,
-                                    text_threshold, link_threshold, low_text,
-                                    False, self.device, optimal_num_chars)
+        text_box_list = self.get_textbox(self.detector, 
+                                    img, 
+                                    canvas_size = canvas_size, 
+                                    mag_ratio = mag_ratio,
+                                    text_threshold = text_threshold, 
+                                    link_threshold = link_threshold, 
+                                    low_text = low_text,
+                                    poly = False, 
+                                    device = self.device, 
+                                    optimal_num_chars = optimal_num_chars,
+                                    threshold = threshold, 
+                                    bbox_min_score = bbox_min_score, 
+                                    bbox_min_size = bbox_min_size, 
+                                    max_candidates = max_candidates,
+                                    )
 
         horizontal_list_agg, free_list_agg = [], []
         for text_box in text_box_list:
@@ -384,19 +433,25 @@ class Reader(object):
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
                  slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, output_format='standard'):
+                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
+                 threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
+                 output_format='standard'):
         '''
         Parameters:
         image: file path or numpy-array or a byte stream object
         '''
         img, img_cv_grey = reformat_input(image)
 
-        horizontal_list, free_list = self.detect(img, min_size, text_threshold,\
-                                                 low_text, link_threshold,\
-                                                 canvas_size, mag_ratio,\
-                                                 slope_ths, ycenter_ths,\
-                                                 height_ths,width_ths,\
-                                                 add_margin, False)
+        horizontal_list, free_list = self.detect(img, 
+                                                 min_size = min_size, text_threshold = text_threshold,\
+                                                 low_text = low_text, link_threshold = link_threshold,\
+                                                 canvas_size = canvas_size, mag_ratio = mag_ratio,\
+                                                 slope_ths = slope_ths, ycenter_ths = ycenter_ths,\
+                                                 height_ths = height_ths, width_ths= width_ths,\
+                                                 add_margin = add_margin, reformat = False,\
+                                                 threshold = threshold, bbox_min_score = bbox_min_score,\
+                                                 bbox_min_size = bbox_min_size, max_candidates = max_candidates
+                                                 )
         # get the 1st result from hor & free list as self.detect returns a list of depth 3
         horizontal_list, free_list = horizontal_list[0], free_list[0]
         result = self.recognize(img_cv_grey, horizontal_list, free_list,\
@@ -414,19 +469,25 @@ class Reader(object):
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
                  slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, output_format='standard'):
+                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
+                 threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
+                 output_format='standard'):
         '''
         Parameters:
         image: file path or numpy-array or a byte stream object
         '''
         img, img_cv_grey = reformat_input(image)
 
-        horizontal_list, free_list = self.detect(img, min_size, text_threshold,\
-                                                 low_text, link_threshold,\
-                                                 canvas_size, mag_ratio,\
-                                                 slope_ths, ycenter_ths,\
-                                                 height_ths,width_ths,\
-                                                 add_margin, False)
+        horizontal_list, free_list = self.detect(img, 
+                                                 min_size = min_size, text_threshold = text_threshold,\
+                                                 low_text = low_text, link_threshold = link_threshold,\
+                                                 canvas_size = canvas_size, mag_ratio = mag_ratio,\
+                                                 slope_ths = slope_ths, ycenter_ths = ycenter_ths,\
+                                                 height_ths = height_ths, width_ths= width_ths,\
+                                                 add_margin = add_margin, reformat = False,\
+                                                 threshold = threshold, bbox_min_score = bbox_min_score,\
+                                                 bbox_min_size = bbox_min_size, max_candidates = max_candidates
+                                                 )
         # get the 1st result from hor & free list as self.detect returns a list of depth 3
         horizontal_list, free_list = horizontal_list[0], free_list[0]
         result = self.recognize(img_cv_grey, horizontal_list, free_list,\
@@ -471,7 +532,9 @@ class Reader(object):
                          text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                          canvas_size = 2560, mag_ratio = 1.,\
                          slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                         width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, output_format='standard'):
+                         width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
+                         threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
+                         output_format='standard'):
         '''
         Parameters:
         image: file path or numpy-array or a byte stream object
@@ -482,12 +545,16 @@ class Reader(object):
         '''
         img, img_cv_grey = reformat_input_batched(image, n_width, n_height)
 
-        horizontal_list_agg, free_list_agg = self.detect(img, min_size, text_threshold,\
-                                                         low_text, link_threshold,\
-                                                         canvas_size, mag_ratio,\
-                                                         slope_ths, ycenter_ths,\
-                                                         height_ths, width_ths,\
-                                                         add_margin, False)
+        horizontal_list_agg, free_list_agg = self.detect(img, 
+                                                 min_size = min_size, text_threshold = text_threshold,\
+                                                 low_text = low_text, link_threshold = link_threshold,\
+                                                 canvas_size = canvas_size, mag_ratio = mag_ratio,\
+                                                 slope_ths = slope_ths, ycenter_ths = ycenter_ths,\
+                                                 height_ths = height_ths, width_ths= width_ths,\
+                                                 add_margin = add_margin, reformat = False,\
+                                                 threshold = threshold, bbox_min_score = bbox_min_score,\
+                                                 bbox_min_size = bbox_min_size, max_candidates = max_candidates
+                                                 )
         result_agg = []
         # put img_cv_grey in a list if its a single img
         img_cv_grey = [img_cv_grey] if len(img_cv_grey.shape) == 2 else img_cv_grey
