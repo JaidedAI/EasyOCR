@@ -202,11 +202,15 @@ class Reader(object):
         else: # user-defined model
             with open(os.path.join(self.user_network_directory, recog_network+ '.yaml'), encoding='utf8') as file:
                 recog_config = yaml.load(file, Loader=yaml.FullLoader)
-            
+
             global imgH # if custom model, save this variable. (from *.yaml)
             if recog_config['imgH']:
                 imgH = recog_config['imgH']
-                
+
+            global imgW # if custom model, save this variable. (from *.yaml)
+            if recog_config['imgW']:
+                imgW = recog_config['imgW']
+
             available_lang = recog_config['lang_list']
             self.setModelLanguage(recog_network, lang_list, available_lang, str(available_lang))
             #char_file = os.path.join(self.user_network_directory, recog_network+ '.txt')
@@ -329,7 +333,7 @@ class Reader(object):
                 h_list = [bbox]
                 f_list = []
                 image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
-                result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
+                result0 = get_text(self.character, imgH, imgW, self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                               workers, self.device)
                 result += result0
@@ -337,7 +341,7 @@ class Reader(object):
                 h_list = []
                 f_list = [bbox]
                 image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
-                result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
+                result0 = get_text(self.character, imgH, imgW, self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                               workers, self.device)
                 result += result0
@@ -349,12 +353,12 @@ class Reader(object):
                 image_list = make_rotated_img_list(rotation_info, image_list)
                 max_width = max(max_width, imgH)
 
-            result = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
+            result = get_text(self.character, imgH, imgW, self.recognizer, self.converter, image_list,\
                           ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                           workers, self.device)
 
             if rotation_info and (horizontal_list+free_list):
-                # Reshape result to be a list of lists, each row being for 
+                # Reshape result to be a list of lists, each row being for
                 # one of the rotations (first row being no rotation)
                 result = set_result_with_confidence(
                     [result[image_len*i:image_len*(i+1)] for i in range(len(rotation_info) + 1)])
@@ -406,7 +410,7 @@ class Reader(object):
                                 filter_ths, y_ths, x_ths, False, output_format)
 
         return result
-    
+
     def readtextlang(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
                  rotation_info = None, paragraph = False, min_size = 20,\
@@ -434,12 +438,12 @@ class Reader(object):
                                 workers, allowlist, blocklist, detail, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
                                 filter_ths, y_ths, x_ths, False, output_format)
-       
+
         char = []
         directory = 'characters/'
         for i in range(len(result)):
             char.append(result[i][1])
-        
+
         def search(arr,x):
             g = False
             for i in range(len(arr)):
@@ -452,11 +456,11 @@ class Reader(object):
             a = result[i]
             b = a + (filename[0:2],)
             return b
-        
+
         for filename in os.listdir(directory):
             if filename.endswith(".txt"):
-                with open ('characters/'+ filename,'rt',encoding="utf8") as myfile:  
-                    chartrs = str(myfile.read().splitlines()).replace('\n','') 
+                with open ('characters/'+ filename,'rt',encoding="utf8") as myfile:
+                    chartrs = str(myfile.read().splitlines()).replace('\n','')
                     for i in range(len(char)):
                         res = search(chartrs,char[i])
                         if res != -1:
