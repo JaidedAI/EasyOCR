@@ -195,6 +195,7 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
         except: pass
 
     coord = [item[0] for item in image_list]
+    print("coord",coord)
     img_list = [item[1] for item in image_list]
     AlignCollate_normal = AlignCollate(imgH=imgH, imgW=imgW, keep_ratio_with_pad=True)
     test_data = ListDataset(img_list)
