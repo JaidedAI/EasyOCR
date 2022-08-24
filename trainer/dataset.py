@@ -1,12 +1,9 @@
 import os
-import sys
 import re
-import six
 import math
 import torch
 import pandas  as pd
 
-from natsort import natsorted
 from PIL import Image
 import numpy as np
 from torch.utils.data import Dataset, ConcatDataset, Subset
@@ -30,13 +27,14 @@ def adjust_contrast_grey(img, target = 0.4):
 
 class Batch_Balanced_Dataset(object):
 
-    def __init__(self, opt):
+    def __init__(self, opt, outdir):
         """
         Modulate the data ratio in the batch.
         For example, when select_data is "MJ-ST" and batch_ratio is "0.5-0.5",
         the 50% of the batch is filled with MJ and the other 50% of the batch is filled with ST.
         """
-        log = open(f'./saved_models/{opt.experiment_name}/log_dataset.txt', 'a')
+        log = open(os.path.join(outdir, 'log_dataset.txt'), 'a')
+
         dashed_line = '-' * 80
         print(dashed_line)
         log.write(dashed_line + '\n')

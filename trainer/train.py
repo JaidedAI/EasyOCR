@@ -1,7 +1,10 @@
 import os
 import sys
+import shutil
+import argparse
 import time
 import random
+
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
@@ -9,13 +12,36 @@ import torch.nn.init as init
 import torch.optim as optim
 import torch.utils.data
 from torch.cuda.amp import autocast, GradScaler
+from tqdm import tqdm
 import numpy as np
+import yaml
+import pandas as pd
 
-from utils import CTCLabelConverter, AttnLabelConverter, Averager
+from utils import CTCLabelConverter, AttnLabelConverter, Averager, AttrDict
 from dataset import hierarchical_dataset, AlignCollate, Batch_Balanced_Dataset
 from model import Model
 from test import validation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+cudnn.benchmark = True
+cudnn.deterministic = False
+def get_config(file_path):
+    with open(file_path, 'r', encoding="utf8") as stream:
+        opt = yaml.safe_load(stream)
+    opt = AttrDict(opt)
+    if opt.lang_char == 'None':
+        characters = ''
+        for data in opt['select_data'].split('-'):
+            #csv_path = opt['label_path']
+            csv_path = os.path.join(opt['train_data'], data, 'labels.csv')
+            df = pd.read_csv(csv_path, usecols=['filename', 'words'], keep_default_na=False)
+            all_char = ''.join(df['words'])
+            characters += ''.join(set(all_char))
+        characters = sorted(set(characters))
+        opt.character= ''.join(characters)
+    else:
+        opt.character = opt.number + opt.symbol + opt.lang_char
+    return opt
 
 def count_parameters(model):
     print("Modules, Parameters")
@@ -29,7 +55,15 @@ def count_parameters(model):
     print(f"Total Trainable Params: {total_params}")
     return total_params
 
-def train(opt, show_number = 2, amp=False):
+def train(opt, outrootdir='./saved_models', name=None, show_number=2, amp=False):
+
+    if name is not None:
+        opt.experiment_name = name
+
+    outdir = os.path.join(outrootdir, opt.experiment_name)
+
+    os.makedirs(outdir, exist_ok=True)
+
     """ dataset preparation """
     if not opt.data_filtering_off:
         print('Filtering the images containing characters which are not in opt.character')
@@ -37,9 +71,9 @@ def train(opt, show_number = 2, amp=False):
 
     opt.select_data = opt.select_data.split('-')
     opt.batch_ratio = opt.batch_ratio.split('-')
-    train_dataset = Batch_Balanced_Dataset(opt)
+    train_dataset = Batch_Balanced_Dataset(opt, outdir)
 
-    log = open(f'./saved_models/{opt.experiment_name}/log_dataset.txt', 'a', encoding="utf8")
+    log = open(os.path.join(outdir, 'log_dataset.txt'), 'a', encoding='utf8')
     AlignCollate_valid = AlignCollate(imgH=opt.imgH, imgW=opt.imgW, keep_ratio_with_pad=opt.PAD, contrast_adjust=opt.contrast_adjust)
     valid_dataset, valid_dataset_log = hierarchical_dataset(root=opt.valid_data, opt=opt)
     valid_loader = torch.utils.data.DataLoader(
@@ -51,7 +85,7 @@ def train(opt, show_number = 2, amp=False):
     print('-' * 80)
     log.write('-' * 80 + '\n')
     log.close()
-    
+
     """ model configuration """
     if 'CTC' in opt.Prediction:
         converter = CTCLabelConverter(opt.character)
@@ -64,27 +98,27 @@ def train(opt, show_number = 2, amp=False):
     model = Model(opt)
     print('model input parameters', opt.imgH, opt.imgW, opt.num_fiducial, opt.input_channel, opt.output_channel,
           opt.hidden_size, opt.num_class, opt.batch_max_length, opt.Transformation, opt.FeatureExtraction,
-          opt.SequenceModeling, opt.Prediction)
+          opt.SequenceModeling, opt.Prediction, opt.Direction)
 
     if opt.saved_model != '':
         pretrained_dict = torch.load(opt.saved_model)
         if opt.new_prediction:
-            model.Prediction = nn.Linear(model.SequenceModeling_output, len(pretrained_dict['module.Prediction.weight']))  
-        
-        model = torch.nn.DataParallel(model).to(device) 
+            model.Prediction = nn.Linear(model.SequenceModeling_output, len(pretrained_dict['module.Prediction.weight']))
+
+        model = torch.nn.DataParallel(model).to(device)
         print(f'loading pretrained model from {opt.saved_model}')
         if opt.FT:
             model.load_state_dict(pretrained_dict, strict=False)
         else:
             model.load_state_dict(pretrained_dict)
         if opt.new_prediction:
-            model.module.Prediction = nn.Linear(model.module.SequenceModeling_output, opt.num_class)  
+            model.module.Prediction = nn.Linear(model.module.SequenceModeling_output, opt.num_class)
             for name, param in model.module.Prediction.named_parameters():
                 if 'bias' in name:
                     init.constant_(param, 0.0)
                 elif 'weight' in name:
                     init.kaiming_normal_(param)
-            model = model.to(device) 
+            model = model.to(device)
     else:
         # weight initialization
         for name, param in model.named_parameters():
@@ -101,12 +135,12 @@ def train(opt, show_number = 2, amp=False):
                     param.data.fill_(1)
                 continue
         model = torch.nn.DataParallel(model).to(device)
-    
-    model.train() 
+
+    model.train()
     print("Model:")
     print(model)
     count_parameters(model)
-    
+
     """ setup loss """
     if 'CTC' in opt.Prediction:
         criterion = torch.nn.CTCLoss(zero_infinity=True).to(device)
@@ -117,7 +151,7 @@ def train(opt, show_number = 2, amp=False):
 
     # freeze some layers
     try:
-        if opt.freeze_FeatureFxtraction:
+        if opt.freeze_FeatureExtraction:
             for param in model.module.FeatureExtraction.parameters():
                 param.requires_grad = False
         if opt.freeze_SequenceModeling:
@@ -125,7 +159,7 @@ def train(opt, show_number = 2, amp=False):
                 param.requires_grad = False
     except:
         pass
-    
+
     # filter that only require gradient decent
     filtered_parameters = []
     params_num = []
@@ -146,7 +180,7 @@ def train(opt, show_number = 2, amp=False):
 
     """ final options """
     # print(opt)
-    with open(f'./saved_models/{opt.experiment_name}/opt.txt', 'a', encoding="utf8") as opt_file:
+    with open(f'{outdir}/opt.txt', 'a', encoding="utf8") as opt_file:
         opt_log = '------------ Options -------------\n'
         args = vars(opt)
         for k, v in args.items():
@@ -171,11 +205,12 @@ def train(opt, show_number = 2, amp=False):
 
     scaler = GradScaler()
     t1= time.time()
-        
-    while(True):
+
+    for i in tqdm(range(start_iter, opt.num_iter)):
+
         # train part
         optimizer.zero_grad(set_to_none=True)
-        
+
         if amp:
             with autocast():
                 image_tensors, labels = train_dataset.get_batch()
@@ -216,17 +251,17 @@ def train(opt, show_number = 2, amp=False):
                 target = text[:, 1:]  # without [GO] Symbol
                 cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
             cost.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip) 
+            torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
             optimizer.step()
         loss_avg.add(cost)
 
         # validation part
         if (i % opt.valInterval == 0) and (i!=0):
-            print('training time: ', time.time()-t1)
+            tqdm.write(f'training time: {time.time()-t1}')
             t1=time.time()
             elapsed_time = time.time() - start_time
             # for log
-            with open(f'./saved_models/{opt.experiment_name}/log_train.txt', 'a', encoding="utf8") as log:
+            with open(f'{outdir}/log_train.txt', 'a', encoding="utf8") as log:
                 model.eval()
                 with torch.no_grad():
                     valid_loss, current_accuracy, current_norm_ED, preds, confidence_score, labels,\
@@ -242,24 +277,24 @@ def train(opt, show_number = 2, amp=False):
                 # keep best accuracy model (on valid dataset)
                 if current_accuracy > best_accuracy:
                     best_accuracy = current_accuracy
-                    torch.save(model.state_dict(), f'./saved_models/{opt.experiment_name}/best_accuracy.pth')
+                    torch.save(model.state_dict(), f'{outdir}/best_accuracy.pth')
                 if current_norm_ED > best_norm_ED:
                     best_norm_ED = current_norm_ED
-                    torch.save(model.state_dict(), f'./saved_models/{opt.experiment_name}/best_norm_ED.pth')
+                    torch.save(model.state_dict(), f'{outdir}/best_norm_ED.pth')
                 best_model_log = f'{"Best_accuracy":17s}: {best_accuracy:0.3f}, {"Best_norm_ED":17s}: {best_norm_ED:0.4f}'
 
                 loss_model_log = f'{loss_log}\n{current_model_log}\n{best_model_log}'
-                print(loss_model_log)
+                tqdm.write(loss_model_log)
                 log.write(loss_model_log + '\n')
 
                 # show some predicted results
                 dashed_line = '-' * 80
                 head = f'{"Ground Truth":25s} | {"Prediction":25s} | Confidence Score & T/F'
                 predicted_result_log = f'{dashed_line}\n{head}\n{dashed_line}\n'
-                
-                #show_number = min(show_number, len(labels))
-                
-                start = random.randint(0,len(labels) - show_number )    
+
+                show_number = min(show_number, len(labels))
+
+                start = random.randint(0,len(labels) - show_number )
                 for gt, pred, confidence in zip(labels[start:start+show_number], preds[start:start+show_number], confidence_score[start:start+show_number]):
                     if 'Attn' in opt.Prediction:
                         gt = gt[:gt.find('[s]')]
@@ -267,16 +302,45 @@ def train(opt, show_number = 2, amp=False):
 
                     predicted_result_log += f'{gt:25s} | {pred:25s} | {confidence:0.4f}\t{str(pred == gt)}\n'
                 predicted_result_log += f'{dashed_line}'
-                print(predicted_result_log)
+                tqdm.write(predicted_result_log)
                 log.write(predicted_result_log + '\n')
-                print('validation time: ', time.time()-t1)
+                tqdm.write(f'validation time: {time.time()-t1}')
                 t1=time.time()
         # save model per 1e+4 iter.
         if (i + 1) % 1e+4 == 0:
             torch.save(
-                model.state_dict(), f'./saved_models/{opt.experiment_name}/iter_{i+1}.pth')
+                model.state_dict(), f'{outdir}/iter_{i+1}.pth')
 
-        if i == opt.num_iter:
-            print('end the training')
-            sys.exit()
-        i += 1
+    print('end the training')
+    shutil.copy('custom_model.py', os.path.join(outdir, opt.experiment_name + '.py'))
+    shutil.copy(os.path.join(outdir, 'best_accuracy.pth'), os.path.join(outdir, opt.experiment_name + '.pth'))
+    model_config = {
+        'network_params':{
+            'input_channel':opt.input_channel,
+            'output_channel':opt.output_channel,
+            'hidden_size':opt.hidden_size,
+            'direction':opt.Direction if 'Direction' in opt else 'Horizontal',
+        },
+        'imgW': opt.imgW,
+        'imgH': opt.imgH,
+        'lang_list':[
+            'ja',
+            'en'
+        ],
+        'character_list': opt.character
+    }
+    with open(os.path.join(outdir, opt.experiment_name + '.yaml'), 'w') as f:
+        yaml.dump(model_config, f, allow_unicode=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-c', '--config')
+    parser.add_argument('-o', '--outrootdir')
+    parser.add_argument('-n', '--name', default=None)
+
+    args = parser.parse_args()
+
+    opt = get_config(args.config)
+    train(opt, args.outrootdir, args.name)
