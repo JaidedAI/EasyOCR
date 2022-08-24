@@ -1,3 +1,6 @@
+- 24 August 2022 - Version 1.6.0
+    - Restructure code to support alternative text detectors.
+    - Add detector `DBNET`, see [paper](https://arxiv.org/abs/2202.10304v1). It can be used by initializing like this `reader = easyocr.Reader(['en'], detect_network = 'dbnet18')`.
 - 2 June 2022 - Version 1.5.0
     - Add trainer for CRAFT detection model (thanks[@gmuffiness](https://github.com/gmuffiness), see [PR](https://github.com/JaidedAI/EasyOCR/pull/739))
 - 9 April 2022 - Version 1.4.2
