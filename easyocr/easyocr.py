@@ -32,7 +32,7 @@ class Reader(object):
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
                  user_network_directory=None, recog_network = 'standard',
                  download_enabled=True, detector=True, recognizer=True,
-                 verbose=True, quantize=True, cudnn_benchmark=False):
+                 verbose=True, quantize=True, cudnn_benchmark=False, vert=True):
         """Create an EasyOCR Reader
 
         Parameters:
@@ -277,7 +277,7 @@ class Reader(object):
     def detect(self, img, min_size = 20, text_threshold = 0.7, low_text = 0.4,\
                link_threshold = 0.4,canvas_size = 2560, mag_ratio = 1.,\
                slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-               width_ths = 0.5, add_margin = 0.1, reformat=True, optimal_num_chars=None, vert=False):
+               width_ths = 0.5, add_margin = 0.1, reformat=True, optimal_num_chars=None):
 
         if reformat:
             img, img_cv_grey = reformat_input(img)
@@ -289,7 +289,7 @@ class Reader(object):
         horizontal_list_agg, free_list_agg = [], []
         for text_box in text_box_list:
 
-            if not vert:
+            if not self.vert:
                 horizontal_list, free_list = group_text_box(text_box, slope_ths,
                                                             ycenter_ths, height_ths,
                                                             width_ths, add_margin,
