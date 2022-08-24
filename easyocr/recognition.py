@@ -208,7 +208,11 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
                                  ignore_idx, char_group_idx, decoder, beamWidth, device = device)
 
     # predict second round
+    print("result1",result1)
     low_confident_idx = [i for i,item in enumerate(result1) if (item[1] < contrast_ths)]
+
+    print(low_confident_idx)
+
     if len(low_confident_idx) > 0:
         img_list2 = [img_list[i] for i in low_confident_idx]
         AlignCollate_contrast = AlignCollate(imgH=imgH, imgW=imgW, keep_ratio_with_pad=True, adjust_contrast=adjust_contrast)
@@ -218,7 +222,7 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
                         num_workers=int(workers), collate_fn=AlignCollate_contrast, pin_memory=True)
         result2 = recognizer_predict(recognizer, converter, test_loader, batch_max_length,\
                                      ignore_idx, char_group_idx, decoder, beamWidth, device = device)
-
+        print("result2",result2)
     result = []
     for i, zipped in enumerate(zip(coord, result1)):
         box, pred1 = zipped
