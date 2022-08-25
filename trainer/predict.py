@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir ))
 import easyocr
 import img_utils
 

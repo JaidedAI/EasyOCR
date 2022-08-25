@@ -8,6 +8,7 @@ import csv
 import cv2
 from tqdm import tqdm
 
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir ))
 import easyocr
 
 
