@@ -512,9 +512,9 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
     # may need to check if box is really in image
     return merged_list, free_list
 
-def group_text_box_vert(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, width_ths = 1.0, add_margin = 0.05, sort_output = True):
+def group_text_box_vertical(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, width_ths = 1.0, add_margin = 0.05, sort_output = True):
     # poly top-left, top-right, low-right, low-left
-    horizontal_list, free_list,combined_list, merged_list = [],[],[],[]
+    vertical_list, free_list,combined_list, merged_list = [],[],[],[]
 
     for poly in polys:
         slope_up = (poly[3]-poly[1])/np.maximum(10, (poly[2]-poly[0]))
@@ -524,7 +524,7 @@ def group_text_box_vert(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 
             x_min = min([poly[0],poly[2],poly[4],poly[6]])
             y_max = max([poly[1],poly[3],poly[5],poly[7]])
             y_min = min([poly[1],poly[3],poly[5],poly[7]])
-            horizontal_list.append([x_min, x_max, y_min, y_max, 0.5*(x_min+x_max), x_max-x_min])
+            vertical_list.append([x_min, x_max, y_min, y_max, 0.5*(x_min+x_max), x_max-x_min])
         else:
             height = np.linalg.norm([poly[6]-poly[0],poly[7]-poly[1]])
             width = np.linalg.norm([poly[2]-poly[0],poly[3]-poly[1]])
@@ -545,25 +545,26 @@ def group_text_box_vert(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 
 
             free_list.append([[x1,y1],[x2,y2],[x3,y3],[x4,y4]])
     if sort_output:
-        horizontal_list = sorted(horizontal_list, key=lambda item: item[4])
+        vertical_list = sorted(vertical_list, key=lambda item: item[4])
 
     # combine box
     new_box = []
-    for poly in horizontal_list:
+    for poly in vertical_list:
+        # x_min, x_max, y_min, y_max, 0.5*(x_min+x_max), x_max-x_min
 
         if len(new_box) == 0:
-            b_height = [poly[5]]
-            b_ycenter = [poly[4]]
+            b_width = [poly[5]]
+            b_xcenter = [poly[4]]
             new_box.append(poly)
         else:
             # comparable height and comparable y_center level up to ths*height
-            if abs(np.mean(b_ycenter) - poly[4]) < ycenter_ths*np.mean(b_height):
-                b_height.append(poly[5])
-                b_ycenter.append(poly[4])
+            if abs(np.mean(b_xcenter) - poly[4]) < ycenter_ths*np.mean(b_width):
+                b_width.append(poly[5])
+                b_xcenter.append(poly[4])
                 new_box.append(poly)
             else:
-                b_height = [poly[5]]
-                b_ycenter = [poly[4]]
+                b_width = [poly[5]]
+                b_xcenter = [poly[4]]
                 combined_list.append(new_box)
                 new_box = [poly]
     combined_list.append(new_box)
@@ -581,16 +582,16 @@ def group_text_box_vert(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 
             for box in boxes:
                 if len(new_box) == 0:
                     b_height = [box[5]]
-                    x_max = box[3]
+                    y_max = box[3]
                     new_box.append(box)
                 else:
-                    if (abs(np.mean(b_height) - box[5]) < height_ths*np.mean(b_height)) and ((box[2]-x_max) < width_ths *(box[1]-box[0])): # merge boxes
-                        b_height.append(box[5])
-                        x_max = box[3]
+                    if (abs(np.mean(b_width) - box[5]) < width_ths*np.mean(b_width)) and ((box[2]-y_max) < height_ths *(box[1]-box[0])): # merge boxes
+                        b_width.append(box[5])
+                        y_max = box[3]
                         new_box.append(box)
                     else:
-                        b_height = [box[5]]
-                        x_max = box[3]
+                        b_width = [box[5]]
+                        y_max = box[3]
                         merged_box.append(new_box)
                         new_box = [box]
             if len(new_box) >0: merged_box.append(new_box)

@@ -2,7 +2,7 @@
 
 from .detection import get_detector, get_textbox
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, group_text_box_vert, get_image_list, calculate_md5, get_paragraph,\
+from .utils import group_text_box, group_text_box_vertical, get_image_list, calculate_md5, get_paragraph,\
                    download_and_unzip, printProgressBar, diff, reformat_input,\
                    make_rotated_img_list, set_result_with_confidence,\
                    reformat_input_batched
@@ -32,7 +32,7 @@ class Reader(object):
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
                  user_network_directory=None, recog_network = 'standard',
                  download_enabled=True, detector=True, recognizer=True,
-                 verbose=True, quantize=True, cudnn_benchmark=False, vert=False):
+                 verbose=True, quantize=True, cudnn_benchmark=False, vertical=False):
         """Create an EasyOCR Reader
 
         Parameters:
@@ -77,7 +77,7 @@ class Reader(object):
             self.device = gpu
         self.recognition_models = recognition_models
 
-        self.vert = vert
+        self.vertical = vertical
 
         # check and download detection model
         detector_model = 'craft'
@@ -291,13 +291,13 @@ class Reader(object):
         horizontal_list_agg, free_list_agg = [], []
         for text_box in text_box_list:
 
-            if not self.vert:
+            if not self.vertical:
                 horizontal_list, free_list = group_text_box(text_box, slope_ths,
                                                             ycenter_ths, height_ths,
                                                             width_ths, add_margin,
                                                             (optimal_num_chars is None))
             else:
-                horizontal_list, free_list = group_text_box_vert(text_box, slope_ths,
+                horizontal_list, free_list = group_text_box_vertical(text_box, slope_ths,
                                                             ycenter_ths, height_ths,
                                                             width_ths, add_margin,
                                                             (optimal_num_chars is None))
