@@ -107,3 +107,6 @@ ENV/
 .vscode/
 .vs/
 .idea/
+
+# virtual environment:
+.easyocr_venv
