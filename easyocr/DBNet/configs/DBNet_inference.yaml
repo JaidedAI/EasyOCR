@@ -1,0 +1,50 @@
+resnet18:
+  model:
+    class: model.detector.Detector
+    structure: 
+      class: model.detector.Model
+      builder: 
+        class: model.detector.Builder
+        model: SegDetectorModel
+        model_args: 
+          backbone: deformable_resnet18
+          decoder: SegDetector
+          decoder_args: 
+            adaptive: True
+            in_channels: 
+              - 64
+              - 128
+              - 256
+              - 512
+            k: 50
+          loss_class: L1BalanceCELoss
+  weight:
+    pretrained: pretrained_ic15_res18.pt
+resnet50:
+  model:
+    class: model.detector.Detector
+    structure: 
+      class: model.detector.Model
+      builder: 
+        class: model.detector.Builder
+        model: SegDetectorModel
+        model_args: 
+          backbone: deformable_resnet50
+          decoder: SegDetector
+          decoder_args: 
+            adaptive: True
+            in_channels: 
+              - 256
+              - 512
+              - 1024
+              - 2048
+            k: 50
+          loss_class: L1BalanceCELoss
+  weight:
+    pretrained: pretrained_ic15_res50.pt
+BGR_MEAN:
+  - 122.67891434
+  - 116.66876762
+  - 104.00698793
+min_detection_size: 640
+max_detection_size: 2560

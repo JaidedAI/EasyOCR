@@ -7,3 +7,6 @@ Pillow
 scikit-image
 python-bidi
 PyYAML
+Shapely
+pyclipper
+ninja
