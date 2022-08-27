@@ -675,7 +675,7 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     for box in horizontal_list:
         x_min = max(0,box[0])
         x_max = min(box[1],maximum_x)
-        y_min = max(0,box[2])　
+        y_min = max(0,box[2])
         y_max = min(box[3],maximum_y)
         crop_img = img[y_min : y_max, x_min:x_max]
         width = x_max - x_min
