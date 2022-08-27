@@ -32,7 +32,7 @@ class Reader(object):
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
                  user_network_directory=None, recog_network = 'standard',
                  download_enabled=True, detector=True, recognizer=True,
-                 verbose=True, quantize=True, cudnn_benchmark=False, vertical=False):
+                 verbose=True, quantize=True, cudnn_benchmark=False):
         """Create an EasyOCR Reader
 
         Parameters:
@@ -76,8 +76,6 @@ class Reader(object):
         else:
             self.device = gpu
         self.recognition_models = recognition_models
-
-        self.vertical = vertical
 
         # check and download detection model
         detector_model = 'craft'
@@ -208,10 +206,12 @@ class Reader(object):
             global imgH # if custom model, save this variable. (from *.yaml)
             if 'imgH' in recog_config and recog_config['imgH']:
                 imgH = recog_config['imgH']
-
+i
             global imgW # if custom model, save this variable. (from *.yaml)
             if 'imgW' in recog_config and recog_config['imgW']:
                 imgW = recog_config['imgW']
+
+            self.vertical = recog_config['network_params']['direction'] == 'Vertical'
 
             available_lang = recog_config['lang_list']
             self.setModelLanguage(recog_network, lang_list, available_lang, str(available_lang))
