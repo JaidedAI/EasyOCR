@@ -206,7 +206,7 @@ class Reader(object):
             global imgH # if custom model, save this variable. (from *.yaml)
             if 'imgH' in recog_config and recog_config['imgH']:
                 imgH = recog_config['imgH']
-i
+
             global imgW # if custom model, save this variable. (from *.yaml)
             if 'imgW' in recog_config and recog_config['imgW']:
                 imgW = recog_config['imgW']
