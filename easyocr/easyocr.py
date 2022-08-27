@@ -2,7 +2,7 @@
 
 from .detection import get_detector, get_textbox
 from .recognition import get_recognizer, get_text
-from .utils import group_text_box, group_text_box_vertical, get_image_list, calculate_md5, get_paragraph,\
+from .utils import get_image_list_vertical, group_text_box, group_text_box_vertical, get_image_list, calculate_md5, get_paragraph,\
                    download_and_unzip, printProgressBar, diff, reformat_input,\
                    make_rotated_img_list, set_result_with_confidence,\
                    reformat_input_batched
@@ -206,11 +206,11 @@ class Reader(object):
                 recog_config = yaml.load(file, Loader=yaml.FullLoader)
 
             global imgH # if custom model, save this variable. (from *.yaml)
-            if recog_config['imgH']:
+            if 'imgH' in recog_config and recog_config['imgH']:
                 imgH = recog_config['imgH']
 
             global imgW # if custom model, save this variable. (from *.yaml)
-            if recog_config['imgW']:
+            if 'imgW' in recog_config and recog_config['imgW']:
                 imgW = recog_config['imgW']
 
             available_lang = recog_config['lang_list']
@@ -342,28 +342,45 @@ class Reader(object):
             for bbox in horizontal_list:
                 h_list = [bbox]
                 f_list = []
-                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
-                result0 = get_text(self.character, imgH, imgW, self.recognizer, self.converter, image_list,\
+
+                if self.vertical:
+                    img_w = imgW
+                    image_list, max_height = get_image_list_vertical(h_list, f_list, img_cv_grey, model_width = img_w)
+                    img_h = int(max_height)
+                else:
+                    img_h = imgH
+                    image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = img_h)
+                    img_w = int(max_width)
+
+                result0 = get_text(self.character, img_h, img_w, self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                               workers, self.device)
                 result += result0
             for bbox in free_list:
                 h_list = []
                 f_list = [bbox]
-                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
-                result0 = get_text(self.character, imgH, imgW, self.recognizer, self.converter, image_list,\
+                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = img_h)
+                result0 = get_text(self.character, img_h, img_w, self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                               workers, self.device)
                 result += result0
         # default mode will try to process multiple boxes at the same time
         else:
-            image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
+            if self.vertical:
+                img_w = imgW
+                image_list, max_height = get_image_list_vertical(horizontal_list, free_list, img_cv_grey, model_width = img_w)
+                img_h = int(max_height)
+            else:
+                img_h = imgH
+                image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = img_h)
+                img_w = int(max_width)
+
             image_len = len(image_list)
             if rotation_info and image_list:
                 image_list = make_rotated_img_list(rotation_info, image_list)
-                max_width = max(max_width, imgH)
+                max_width = max(max_width, img_h)
 
-            result = get_text(self.character, imgH, imgW, self.recognizer, self.converter, image_list,\
+            result = get_text(self.character, img_h, img_w, self.recognizer, self.converter, image_list,\
                           ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                           workers, self.device)
 

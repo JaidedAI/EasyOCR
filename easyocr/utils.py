@@ -629,7 +629,7 @@ def calculate_ratio(width,height):
         ratio = 1./ratio
     return ratio
 
-def compute_ratio_and_resize(img,width,height,model_height):
+def compute_ratio_and_resize(img, width, height, model_height):
     '''
     Calculate ratio and resize correctly for both horizontal text
     and vertical case
@@ -642,6 +642,15 @@ def compute_ratio_and_resize(img,width,height,model_height):
         img = cv2.resize(img,(int(model_height*ratio),model_height),interpolation=Image.ANTIALIAS)
     return img,ratio
 
+def compute_ratio_and_resize_widthbase(img, width, height, model_width):
+
+    ratio = width/height
+    if ratio<1.0:
+        ratio = calculate_ratio(width,height)
+        img = cv2.resize(img,(model_width,int(model_width*ratio)), interpolation=Image.ANTIALIAS)
+    else:
+        img = cv2.resize(img,(int(model_width),model_width/ratio),interpolation=Image.ANTIALIAS)
+    return ratio
 
 def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_output = True):
     image_list = []
@@ -666,7 +675,7 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     for box in horizontal_list:
         x_min = max(0,box[0])
         x_max = min(box[1],maximum_x)
-        y_min = max(0,box[2])
+        y_min = max(0,box[2])　
         y_max = min(box[3],maximum_y)
         crop_img = img[y_min : y_max, x_min:x_max]
         width = x_max - x_min
@@ -687,6 +696,52 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     if sort_output:
         image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
+
+def get_image_list_vertical(horizontal_list, free_list, img, model_width = 64, sort_output = True):
+    image_list = []
+    maximum_y,maximum_x = img.shape
+
+    max_ratio_vert, max_ratio_free = 1,1
+    for box in free_list:
+        rect = np.array(box, dtype = "float32")
+        transformed_img = four_point_transform(img, rect)
+        ratio = calculate_ratio(transformed_img.shape[1],transformed_img.shape[0])
+        new_height = int(model_width*ratio)
+        if new_height == 0:
+            pass
+        else:
+            crop_img,ratio = compute_ratio_and_resize_widthbase(transformed_img,transformed_img.shape[1],transformed_img.shape[0],model_width)
+            image_list.append( (box,crop_img) ) # box = [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+            max_ratio_free = max(ratio, max_ratio_free)
+
+
+    max_ratio_free = math.ceil(max_ratio_free)
+
+    for box in horizontal_list:
+        x_min = max(0,box[0])
+        x_max = min(box[1],maximum_x)
+        y_min = max(0,box[2])
+        y_max = min(box[3],maximum_y)
+        crop_img = img[y_min : y_max, x_min:x_max]
+        width = x_max - x_min
+        height = y_max - y_min
+        ratio = calculate_ratio(width,height)
+        new_height = int(model_width*ratio)
+        if new_height == 0:
+            pass
+        else:
+            crop_img,ratio = compute_ratio_and_resize(crop_img,width,height,model_width)
+            image_list.append( ( [[x_min,y_min],[x_max,y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
+            max_ratio_vert = max(ratio, max_ratio_vert)
+
+    max_ratio_vert = math.ceil(max_ratio_vert)
+    max_ratio = max(max_ratio_vert, max_ratio_free)
+    max_height = math.ceil(max_ratio)*model_width
+
+    if sort_output:
+        image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
+    return image_list, max_height
+
 
 def download_and_unzip(url, filename, model_storage_directory, verbose=True):
     zip_path = os.path.join(model_storage_directory, 'temp.zip')
