@@ -62,7 +62,7 @@ class Predictor():
 
     def run_ocr(self, img_path):
 
-        results = self.model.readtext(img_path, blocklist=[])
+        results = self.model.readtext(img_path, blocklist='')
 
         annotations = []
         for points, word, conf in results:

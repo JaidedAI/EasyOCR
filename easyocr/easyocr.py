@@ -314,7 +314,7 @@ i
 
     def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
                   decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                  workers = 0, allowlist = None, blocklist = '', detail = 1,\
                   rotation_info = None,paragraph = False,\
                   contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                   y_ths = 0.5, x_ths = 1.0, reformat=True, output_format='standard'):
@@ -322,9 +322,9 @@ i
         if reformat:
             img, img_cv_grey = reformat_input(img_cv_grey)
 
-        if allowlist:
+        if allowlist is not None:
             ignore_char = ''.join(set(self.character)-set(allowlist))
-        elif blocklist:
+        elif blocklist is not None:
             ignore_char = ''.join(set(blocklist))
         else:
             ignore_char = ''.join(set(self.character)-set(self.lang_char))
@@ -409,7 +409,7 @@ i
             return result
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                 workers = 0, allowlist = None, blocklist = '', detail = 1,\
                  rotation_info = None, paragraph = False, min_size = 20,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
@@ -439,7 +439,7 @@ i
         return result
 
     def readtextlang(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                 workers = 0, allowlist = None, blocklist = '', detail = 1,\
                  rotation_info = None, paragraph = False, min_size = 20,\
                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
@@ -496,7 +496,7 @@ i
 
     def readtext_batched(self, image, n_width=None, n_height=None,\
                          decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                         workers = 0, allowlist = None, blocklist = None, detail = 1,\
+                         workers = 0, allowlist = None, blocklist = '', detail = 1,\
                          rotation_info = None, paragraph = False, min_size = 20,\
                          contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
                          text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
