@@ -20,7 +20,7 @@ from .model.constructor import Configurable
 class DBNet:
     def __init__(self, 
                  backbone = "resnet18",
-                 weight_dir = "./DBNet/weights/",
+                 weight_dir = None,
                  weight_name = 'pretrained',
                  initialize_model = True,
                  dynamic_import_relative_path = None,
@@ -34,7 +34,8 @@ class DBNet:
         backbone : str, optional
             Backbone to use. Options are "resnet18" and "resnet50". The default is "resnet18".
         weight_dir : str, optional
-            Path to directory that contains weight files. The default is "./DBNet/weights/".
+            Path to directory that contains weight files. If set to None, the path will be set
+            to "../weights/". The default is None.
         weight_name : str, optional
             Name of the weight to use as specified in DBNet_inference.yaml or a filename 
             in weight_dir. The default is 'pretrained'.
@@ -77,12 +78,18 @@ class DBNet:
         else:
             raise ValueError("Invalid backbone. Current support backbone are {}.".format(",".join(self.configs.keys())))
 
+        if weight_dir is not None:
+            self.weight_dir = weight_dir
+        else:    
+            self.weight_dir = os.path.join(os.path.dirname(__file__), 'weights')
+
+
         if initialize_model:
             if weight_name in self.configs[backbone]['weight'].keys():
-                weight_path = os.path.join(os.path.dirname(__file__), 'weights', self.configs[backbone]['weight'][weight_name])
+                weight_path = os.path.join(self.weight_dir, self.configs[backbone]['weight'][weight_name])
                 error_message = "A weight with a name {} is found in DBNet_inference.yaml but cannot be find file: {}."
             else:
-                weight_path = os.path.join(os.path.dirname(__file__), 'weights', weight_name)
+                weight_path = os.path.join(self.weight_dir, weight_name)
                 error_message = "A weight with a name {} is not found in DBNet_inference.yaml and cannot be find file: {}."
                 
             if not os.path.isfile(weight_path):
@@ -411,9 +418,10 @@ class DBNet:
             scores_batch.append(scores)
             
         boxes_batch, scores_batch = zip(*[zip(*[(box, score) 
-                                                for (box,score) in zip(boxes, scores) if score > 0]) 
-                                     for (boxes, scores) in zip(boxes_batch, scores_batch)]
-                                     )
+                                                for (box,score) in zip(boxes, scores) if score > 0]
+                                             ) if any(scores > 0) else [(),()]
+                                         for (boxes, scores) in zip(boxes_batch, scores_batch)]
+                                       )
             
         return boxes_batch, scores_batch
     
@@ -755,4 +763,3 @@ class DBNet:
             return batch_boxes, batch_scores
         else:
             return batch_boxes
-    

@@ -4,6 +4,7 @@ Released Date: 18/08/2022
 Description:
 A wrapper for DBNet text detection module for EasyOCR
 '''
+import os
 import numpy as np
 
 import torch
@@ -122,7 +123,7 @@ def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=Fal
         DBNet text detection object.
     '''
     dbnet = DBNet(initialize_model = False, 
-                  dynamic_import_relative_path = "easyocr/DBNet",
+                  dynamic_import_relative_path = os.path.join("easyocr", "DBNet"),
                   device = device, 
                   verbose = 0)
     dbnet.construct_model(dbnet.configs['resnet18']['model'])
