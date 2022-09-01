@@ -201,7 +201,7 @@ recognition_models = {
         'cyrillic_g2':{
             'filename': 'cyrillic_g2.pth',
             'model_script': 'cyrillic',
-            'url': 'https://github.com/JaidedAI/EasyOCR/releases/download/pre-v1.1.6/cyrillic.zip',
+            'url': 'https://github.com/JaidedAI/EasyOCR/releases/download/v1.6.1/cyrillic_g2.zip',
             'md5sum': '19f85f43d9128a89ac21b8d6a06973fe',
             'symbols': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ €₽',
             'characters': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ €₽ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяЂђЃѓЄєІіЇїЈјЉљЊњЋћЌќЎўЏџҐґҒғҚқҮүҲҳҶҷӀӏӢӣӨөӮӯ'

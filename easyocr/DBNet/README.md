@@ -2,7 +2,7 @@
 This text detection module is adapted from [DBNet++](https://github.com/MhLiao/DB).
 
 ## Overview
-DBNet works as an image segmentation which performs classification at pixel-level. The model classifies if each pixel from the input image is a part of a text region. This module uses dynamic import and class construction from a config file. Config files are expected to be found in `./configs/`. At the input, the input image are expected to have width and height as multiple of 32. Input images that does not have these dimension will be resized accordingly. In addition, minimum and maximum sizes can be specified in the config file.
+DBNet works as an image segmentation which performs classification at pixel-level. The model classifies if each pixel from the input image is a part of a text region. This module uses dynamic import and class construction from a config file. Config files are expected to be found in `./configs/`. At the input, the input image are expected to have width and height as multiple of 32. Input images that does not have these dimension will be resized accordingly. In addition, minimum and maximum sizes can be specified in the config file. *Currently, DBNet text detector requires running with GPU.*
 
 ### Terminology
   * Probability Heatmap: A tensor represent classification confidence of each pixel for being a part of text region.
@@ -11,7 +11,7 @@ DBNet works as an image segmentation which performs classification at pixel-leve
   * detection_size: This term is used to refer to the size of the image on which the detection routine will be performed. Input images that are not of this size will be resized accordingly.
 
 ### Compiling DCN operator
-DBNet requires DCN operator to be compiled. The instruction from the original repo can be found [here](https://github.com/MhLiao/DB#requirements). If EasyOCR is install via `pypi`, this process should be done automatically. If the operator is compiled successfully, a flag `dcn_compiling_success` will be added to `./DBNet/`. If the compilation failed during installation, the flag will be missing. Although, EasyOCR **can work** without DBNet and DCN operator by using CRAFT text detection (default).
+DBNet requires DCN operator to be compiled with GPU. The instruction from the original repo can be found [here](https://github.com/MhLiao/DB#requirements). If EasyOCR is install via `pypi`, this process should be done automatically. If the operator is compiled successfully, a flag `dcn_compiling_success` will be added to `./DBNet/`. If the compilation failed during installation, the flag will be missing. Although, EasyOCR **can work** without DBNet and DCN operator by using CRAFT text detection (default).
 
 ### Changes from the original repo
   1. Scripts inside `./concerns/` and multiple `.yaml` files are consolidated and pruned for inference-only implementation and dependencies reduction.
