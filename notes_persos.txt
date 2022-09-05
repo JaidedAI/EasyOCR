@@ -1,5 +1,0 @@
-dict_list = {'en': '/home/ystoll/PixelForest/easyocr/easyocr/dict/en.txt',
-            'fr': '/home/ystoll/PixelForest/easyocr/easyocr/dict/fr.txt'}
-
-
-utils.BeamState.wordsearch() uses dict_list to decode NN outputted matrix to a specific word.
