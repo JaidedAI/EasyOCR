@@ -11,7 +11,7 @@ from setuptools.command.install import install
 
 def compile_dbnet_dcn(script_dir):
     script_path = os.path.join(script_dir, "easyocr", "scripts", "compile_dbnet_dcn.py")
-    subprocess.run("python {}".format(script_path), shell=True)
+    subprocess.run(["python", script_path])
 
 
 class CustomCommand_install(install):

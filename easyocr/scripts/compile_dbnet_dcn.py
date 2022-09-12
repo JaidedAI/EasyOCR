@@ -39,14 +39,11 @@ def main():
     try:
         print("Compiling DCN operator...")
         os.chdir(os.path.join(parent_dir,'DBNet','assets','ops','dcn'))
-        result = subprocess.run(
-            "python setup.py build_ext --inplace", shell=True, capture_output = True
-        )
-        if result.returncode == 0:   
+        result = subprocess.run(["python", "setup.py", "build_ext", "--inplace"], capture_output=True)
+        if result.returncode == 0:
             os.chdir(os.path.join(parent_dir,'DBNet'))
-            result = subprocess.run(
-                "touch dcn_compiling_success", shell=True, capture_output = True
-            )
+            with open("dcn_compiling_success", "w+") as fp:
+                fp.write("")
             success_message = "DCN operator is compiled successfully at {}.".format(os.path.abspath(os.path.join(parent_dir,'DBNet')))
             print_success(success_message, log_path)
         else:
