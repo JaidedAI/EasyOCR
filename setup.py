@@ -1,31 +1,3 @@
-"""
-End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution
-"""
-import os
-import subprocess
-
-from setuptools import setup
-from setuptools.command.develop import develop
-from setuptools.command.install import install
-
-
-def compile_dbnet_dcn(script_dir):
-    script_path = os.path.join(script_dir, "easyocr", "scripts", "compile_dbnet_dcn.py")
-    subprocess.run(["python", script_path])
-
-
-class CustomCommand_install(install):
-    def run(self):
-        install.run(self)
-        compile_dbnet_dcn(self.install_lib)
-
-
-class CustomCommand_develop(develop):
-    def run(self):
-        develop.run(self)
-        compile_dbnet_dcn(self.install_dir)
-
-
 from setuptools import setup
 
 if __name__ == "__main__":
