@@ -102,7 +102,7 @@ def test_net(image,
 
     return bboxes, polys
 
-def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=False):
+def get_detector(trained_model, backbone = 'resnet18', device='cpu', quantize=True, cudnn_benchmark=False):
     '''
     A wrapper to initialize DBNet text detection model
 
@@ -110,6 +110,8 @@ def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=Fal
     ----------
     trained_model : str
         Path to trained weight to use.
+    backbone : str
+        Backbone to use. Options are 'resnet18' or 'resnet50'. The default is 'resnet18'.
     device : str, optional
         Device to use. Options are "cpu" and "cuda". The default is 'cpu'.
     quantize : boolean, optional
@@ -126,16 +128,17 @@ def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=Fal
                   dynamic_import_relative_path = os.path.join("easyocr", "DBNet"),
                   device = device, 
                   verbose = 0)
-    dbnet.construct_model(dbnet.configs['resnet18']['model'])
-    if device == 'cpu':
-        dbnet.load_weight(trained_model)
+    if backbone not in ['resnet18', 'resnet50']:
+        raise ValueError("Invalid backbone. Options are 'resnet18' or 'resnet50'.")
+    dbnet.initialize_model(dbnet.configs[backbone]['model'],
+                           trained_model)
+    if torch.device(device).type == 'cpu':
         if quantize:
             try:
                 torch.quantization.quantize_dynamic(dbnet, dtype=torch.qint8, inplace=True)
             except:
                 pass
     else:
-        dbnet.load_weight(trained_model)
         dbnet.model = torch.nn.DataParallel(dbnet.model).to(device)
         cudnn.benchmark = cudnn_benchmark
     
@@ -194,6 +197,13 @@ def get_textbox(detector,
     result : list of lists
         List of text bounding boxes in format [left, right, top, bottom].
     '''
+    if torch.device(device).type != detector.device:
+        raise RuntimeError(' '.join([
+            "DBNet detector is initialized with {} device, but detection routine",
+            "is called with device = {}.",
+            "To use this detector both have to be the same."
+            ]).format(detector.device, device))
+
     _, polys_list = test_net(image, 
                              detector, 
                              threshold = threshold, 
