@@ -9,6 +9,9 @@ source =
     */site-packages/
 
 [report]
+# Require 100% coverage for tests to succeed
+fail_under = 100
+
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
