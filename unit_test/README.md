@@ -9,7 +9,7 @@ This module can be used as a typical python module. One python wrapper script an
 ### Python script (*recommneded*)
 The script can be called with (assuming calling from `EasyOCR/`);
 ```
-python ./unit_test/run_unit_test.py --easyocr ./easyocr --verbose 2 --test ./unit_test/EasyOcrUnitTestPackage.pickle --data_dir ./examples 
+python ./unit_test/run_unit_test.py --easyocr ./easyocr --verbose 2 --test_data ./unit_test/data/EasyOcrUnitTestPackage.pickle --image_data_dir ./examples
 ```
 
 #### Script arguments
@@ -21,7 +21,7 @@ python ./unit_test/run_unit_test.py --easyocr ./easyocr --verbose 2 --test ./uni
     * 3: Same as 2 and also the calculated and the expected outputs of each test.
     * 4 or higher: Same as 3 and also the inputs of each test. (This will produce a lot of text on console).
  * test_data (-t): [Optional] Path to test package to use (The default is `./unit_test/data/EasyOcrUnitTestPackage.pickle`).
- * data_dir (-d): [Optional] Path to EasyOCR example images directory. (The default is `./examples/`
+ * image_data_dir (-d): [Optional] Path to EasyOCR example images directory. (The default is `./examples/`)
  
 ### Ipython notebook
 Please see `demo.ipynb` for documentation.
