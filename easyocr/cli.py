@@ -226,6 +226,13 @@ def parse_args():
         default=0.1,
         help="Extend bounding boxes in all direction by certain value. This is important for language with complex script (E.g. Thai).",
     )
+    parser.add_argument(
+        "--output_format",
+        type=str,
+        choices=["standard", 'dict'],
+        default='standard',
+        help="output format.",
+    )
 
     args = parser.parse_args()
     return args
@@ -267,7 +274,8 @@ def main():
                                 width_ths=args.width_ths,\
                                 y_ths=args.y_ths,\
                                 x_ths=args.x_ths,\
-                                add_margin=args.add_margin):
+                                add_margin=args.add_margin,\
+                                output_format=args.output_format):
         print(line)
 
 
