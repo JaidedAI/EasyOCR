@@ -229,7 +229,7 @@ def parse_args():
     parser.add_argument(
         "--output_format",
         type=str,
-        choices=["standard", 'dict'],
+        choices=["standard", 'dict', 'json'],
         default='standard',
         help="output format.",
     )
