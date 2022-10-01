@@ -83,7 +83,6 @@ class DBNet:
         else:    
             self.weight_dir = os.path.join(os.path.dirname(__file__), 'weights')
 
-
         if initialize_model:
             if weight_name in self.configs[backbone]['weight'].keys():
                 weight_path = os.path.join(self.weight_dir, self.configs[backbone]['weight'][weight_name])
@@ -158,7 +157,7 @@ class DBNet:
             raise RuntimeError("model has not yet been constructed.")
         self.model.load_state_dict(torch.load(weight_path, map_location=self.device), strict=False)
         self.model.eval()
-
+        
     def construct_model(self, config):
         '''
         Contruct text detection model based on the configuration in .yaml file.
@@ -192,7 +191,9 @@ class DBNet:
         '''
         self.construct_model(model_config)
         self.load_weight(weight_path)
-        
+        if isinstance(self.model.model, torch.nn.DataParallel) and self.device == 'cpu':
+            self.model.model = self.model.model.module.to(self.device)    
+
     def get_cv2_image(self, image):
         '''
         Load or convert input to OpenCV BGR image numpy array.

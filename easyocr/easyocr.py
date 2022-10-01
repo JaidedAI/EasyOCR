@@ -233,13 +233,8 @@ class Reader(object):
             self.detect_network = detect_network
             if self.detect_network == 'craft':
                 from .detection import get_detector, get_textbox
-            elif self.detect_network == 'dbnet18':
-                if os.path.isfile(os.path.join( os.path.dirname(__file__),  "DBNet", "dcn_compiling_success")):
-                    from .detection_db import get_detector, get_textbox
-                else:
-                    trouble_url = "https://github.com/JaidedAI/EasyOCR/tree/master/easyocr/DBNet"
-                    raise RuntimeError("dbnet is selected as the detection network, but DBNet is not compiled successfully during installation \
-                                       or the indicating flag is missing. Please check {} for troubleshooting.".format(trouble_url))
+            elif self.detect_network in ['dbnet18']:
+                from .detection_db import get_detector, get_textbox
             else:
                 raise RuntimeError("Unsupport detector network. Support networks are craft and dbnet18.")
             self.get_textbox = get_textbox
@@ -269,7 +264,11 @@ class Reader(object):
         return detector_path
 
     def initDetector(self, detector_path):
-        return self.get_detector(detector_path, self.device, self.quantize, cudnn_benchmark=self.cudnn_benchmark)
+        return self.get_detector(detector_path, 
+                                 device = self.device, 
+                                 quantize = self.quantize, 
+                                 cudnn_benchmark = self.cudnn_benchmark
+                                 )
     
     def setDetector(self, detect_network):
         detector_path = self.getDetectorPath(detect_network)

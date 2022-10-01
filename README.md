@@ -14,12 +14,15 @@ Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [
 
 
 ## What's new
+- 15 September 2022 - Version 1.6.2
+    - Add CPU support for DBnet
+    - DBnet will only be compiled when users initialize DBnet detector.  
 - 1 September 2022 - Version 1.6.1
-    - Fix DBNET path bug for Windows
+    - Fix DBnet path bug for Windows
     - Add new built-in model `cyrillic_g2`. This model is a new default for Cyrillic script.
 - 24 August 2022 - Version 1.6.0
     - Restructure code to support alternative text detectors.
-    - Add detector `DBNET`, see [paper](https://arxiv.org/abs/2202.10304v1). It can be used by initializing like this `reader = easyocr.Reader(['en'], detect_network = 'dbnet18')`. *Currently, DBNet text detector requires running with GPU.*
+    - Add detector `DBnet`, see [paper](https://arxiv.org/abs/2202.10304v1). It can be used by initializing like this `reader = easyocr.Reader(['en'], detect_network = 'dbnet18')`.
 - 2 June 2022 - Version 1.5.0
     - Add trainer for CRAFT detection model (thanks[@gmuffiness](https://github.com/gmuffiness), see [PR](https://github.com/JaidedAI/EasyOCR/pull/739))
 - 9 April 2022 - Version 1.4.2
