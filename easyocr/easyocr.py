@@ -68,6 +68,9 @@ class Reader(object):
             self.device = 'cpu'
             if verbose:
                 LOGGER.warning('Using CPU. Note: This module is much faster with a GPU.')
+        elif torch.backends.mps.is_available():
+            LOGGER.warning('Using MPS. Note: This module is much faster with a GPU.')
+            self.device = 'mps'
         elif not torch.cuda.is_available():
             self.device = 'cpu'
             if verbose:
