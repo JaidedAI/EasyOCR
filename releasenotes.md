@@ -3,7 +3,7 @@
     - DBNet will only be compiled when users initialize DBnet detector.  
 - 1 September 2022 - Version 1.6.1
     - Fix DBNet path bug for Windows
-    - Add new built-in model `cyrillic_g2`. This model is a new default for Cyrillic script.
+    - Add new built-in model `cyrillic_g2`. This model is a new default for Cyrillic script. (partial financial support by Alejandro Cabrerizo)
 - 24 August 2022 - Version 1.6.0
     - Restructure code to support alternative text detectors.
     - Add detector `DBNet`, see [paper](https://arxiv.org/abs/2202.10304v1). It can be used by initializing like this `reader = easyocr.Reader(['en'], detect_network = 'dbnet18')`. *Currently, DBNet text detector requires running with GPU.*
