@@ -15,6 +15,7 @@ import sys
 from PIL import Image
 from logging import getLogger
 import yaml
+import json
 
 if sys.version_info[0] == 2:
     from io import open
@@ -422,6 +423,8 @@ class Reader(object):
             return [item[1] for item in result]
         elif output_format == 'dict':
             return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
+        elif output_format == 'json':
+            return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
         else:
             return result
 
