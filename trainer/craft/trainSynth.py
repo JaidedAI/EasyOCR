@@ -291,8 +291,9 @@ class Trainer(object):
                             + repr(train_step)
                             + ".pth"
                         )
-
-                    torch.save(save_param_dic, save_param_path)
+                        
+                    if self.gpu == 0:
+                        torch.save(save_param_dic, save_param_path)
 
                     # validation
                     self.iou_eval(
