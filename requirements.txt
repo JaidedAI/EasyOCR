@@ -10,3 +10,4 @@ PyYAML
 Shapely
 pyclipper
 ninja
+cv2
