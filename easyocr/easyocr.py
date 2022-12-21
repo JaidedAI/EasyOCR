@@ -6,6 +6,7 @@ from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,
                    make_rotated_img_list, set_result_with_confidence,\
                    reformat_input_batched
 from .config import *
+from .style_detector import *
 from bidi.algorithm import get_display
 import numpy as np
 import cv2
@@ -347,12 +348,12 @@ class Reader(object):
 
         return horizontal_list_agg, free_list_agg
 
-    def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
-                  decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                  rotation_info = None,paragraph = False,\
-                  contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                  y_ths = 0.5, x_ths = 1.0, reformat=True, output_format='standard'):
+    def recognize(self, image, img_cv_grey, horizontal_list=None, free_list=None, \
+                  decoder='greedy', beamWidth=5, batch_size=1, \
+                  workers=0, allowlist=None, blocklist=None, detail=1, \
+                  rotation_info=None, paragraph=False, \
+                  contrast_ths=0.1, adjust_contrast=0.5, filter_ths=0.003, \
+                  y_ths=0.5, x_ths=1.0, reformat=True, output_format='standard'):
 
         if reformat:
             img, img_cv_grey = reformat_input(img_cv_grey)
@@ -419,14 +420,24 @@ class Reader(object):
         if paragraph:
             result = get_paragraph(result, x_ths=x_ths, y_ths=y_ths, mode = direction_mode)
 
+        output = []
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        for item in result:
+            content = item[1]
+            boundary = list(np.array(item[0][0] + item[0][2]).astype(int)[:4])
+            current_text_properties = StyleDetector(image, boundary).get_text_properties(content)
+            dict1 = {'boxes': item[0], 'text': item[1], 'confident': item[2]}
+            output.append({**dict1, **current_text_properties})
+
         if detail == 0:
             return [item[1] for item in result]
         elif output_format == 'dict':
-            return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
+            return output
         elif output_format == 'json':
-            return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
+            return [json.dumps(item, ensure_ascii=False,  cls=NpEncoder) for item in output]
         else:
-            return result
+            return output
 
     def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
@@ -456,10 +467,10 @@ class Reader(object):
                                                  )
         # get the 1st result from hor & free list as self.detect returns a list of depth 3
         horizontal_list, free_list = horizontal_list[0], free_list[0]
-        result = self.recognize(img_cv_grey, horizontal_list, free_list,\
-                                decoder, beamWidth, batch_size,\
-                                workers, allowlist, blocklist, detail, rotation_info,\
-                                paragraph, contrast_ths, adjust_contrast,\
+        result = self.recognize(image, img_cv_grey, horizontal_list, free_list, \
+                                decoder, beamWidth, batch_size, \
+                                workers, allowlist, blocklist, detail, rotation_info, \
+                                paragraph, contrast_ths, adjust_contrast, \
                                 filter_ths, y_ths, x_ths, False, output_format)
 
         return result
@@ -492,10 +503,10 @@ class Reader(object):
                                                  )
         # get the 1st result from hor & free list as self.detect returns a list of depth 3
         horizontal_list, free_list = horizontal_list[0], free_list[0]
-        result = self.recognize(img_cv_grey, horizontal_list, free_list,\
-                                decoder, beamWidth, batch_size,\
-                                workers, allowlist, blocklist, detail, rotation_info,\
-                                paragraph, contrast_ths, adjust_contrast,\
+        result = self.recognize(image, img_cv_grey, horizontal_list, free_list, \
+                                decoder, beamWidth, batch_size, \
+                                workers, allowlist, blocklist, detail, rotation_info, \
+                                paragraph, contrast_ths, adjust_contrast, \
                                 filter_ths, y_ths, x_ths, False, output_format)
        
         char = []
