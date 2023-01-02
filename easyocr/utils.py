@@ -455,8 +455,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             x_max = max([poly[0],poly[2],poly[4],poly[6]])
             x_min = min([poly[0],poly[2],poly[4],poly[6]])
             y_max = max([poly[1],poly[3],poly[5],poly[7]])
-            axis_y_min = min([poly[1],poly[3],poly[5],poly[7]])
-            horizontal_list.append([x_min, x_max, axis_y_min, y_max, 0.5*(axis_y_min+y_max), y_max-axis_y_min])
+            y_min = min([poly[1],poly[3],poly[5],poly[7]])
+            horizontal_list.append([x_min, x_max, y_min, y_max, 0.5*(y_min+y_max), y_max-y_min])
         else:
             height = np.linalg.norm([poly[6]-poly[0],poly[7]-poly[1]])
             width = np.linalg.norm([poly[2]-poly[0],poly[3]-poly[1]])
@@ -532,14 +532,14 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
                     # do I need to add margin here?
                     x_min = min(mbox, key=lambda x: x[0])[0]
                     x_max = max(mbox, key=lambda x: x[1])[1]
-                    axis_y_min = min(mbox, key=lambda x: x[2])[2]
+                    y_min = min(mbox, key=lambda x: x[2])[2]
                     y_max = max(mbox, key=lambda x: x[3])[3]
 
                     box_width = x_max - x_min
-                    box_height = y_max - axis_y_min
+                    box_height = y_max - y_min
                     margin = int(add_margin * (min(box_width, box_height)))
 
-                    merged_list.append([x_min-margin, x_max+margin, axis_y_min-margin, y_max+margin])
+                    merged_list.append([x_min-margin, x_max+margin, y_min-margin, y_max+margin])
                 else: # non adjacent box in same line
                     box = mbox[0]
 
@@ -597,18 +597,18 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     for box in horizontal_list:
         x_min = max(0,box[0])
         x_max = min(box[1],maximum_x)
-        axis_y_min = max(0,box[2])
+        y_min = max(0,box[2])
         y_max = min(box[3],maximum_y)
-        crop_img = img[axis_y_min : y_max, x_min:x_max]
+        crop_img = img[y_min : y_max, x_min:x_max]
         width = x_max - x_min
-        height = y_max - axis_y_min
+        height = y_max - y_min
         ratio = calculate_ratio(width,height)
         new_width = int(model_height*ratio)
         if new_width == 0:
             pass
         else:
             crop_img,ratio = compute_ratio_and_resize(crop_img,width,height,model_height)
-            image_list.append( ( [[x_min,axis_y_min],[x_max,axis_y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
+            image_list.append( ( [[x_min,y_min],[x_max,y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
             max_ratio_hori = max(ratio, max_ratio_hori)
 
     max_ratio_hori = math.ceil(max_ratio_hori)
