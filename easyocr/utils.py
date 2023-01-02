@@ -383,6 +383,96 @@ class CTCLabelConverter(object):
             texts.append(string)
         return texts
 
+def merge_to_free(merge_result, free_list):
+    free_flag = False
+    result_buf, r_buf, free_list_buf = [], [], []
+    axis_y_min = {}
+    idx_min = 0
+
+    def append_to_buf(axis_y_min, idx_min, result_buf, r_buf):
+        axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
+        result_buf.append(r_buf)
+        return axis_y_min, idx_min+1, result_buf, []
+
+    for idx, r in enumerate(merge_result):
+        # free True
+        if len(free_list) != 0 and idx >= len(merge_result)-len(free_list):
+            if free_flag == False:
+                axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
+                ###
+                # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
+                # idx_min += 1
+                # result_buf.append(r_buf)
+                # r_buf = []
+                ###
+                free_flag = True
+
+            r_buf.append(r)
+
+            if idx == len(merge_result)-1:
+                axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
+                ###
+                # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
+                # idx_min += 1
+                # result_buf.append(r_buf)
+                # r_buf = []
+                ###
+            continue
+
+        # end
+        if idx == len(merge_result)-1:
+            r_buf.append(r)
+            axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
+            ###
+            # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
+            # idx_min += 1
+            # result_buf.append(r_buf)
+            # r_buf = []
+            ###
+            continue
+
+        if (r_buf == []) or (r_buf[-1][0] < r[0]):
+            r_buf.append(r)
+        else:
+            axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
+            ###
+            # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
+            # idx_min += 1
+            # result_buf.append(r_buf)
+            # r_buf = []
+            ###
+            r_buf.append(r)
+
+    if len(free_list) != 0:
+        merge_result = []
+        # remove free_list buffer
+        print(result_buf)
+        free_list_buf = result_buf.pop(-1)
+        print(result_buf)
+        print(free_list_buf)
+        # remove free_list buffer
+        axis_y_min.pop(len(axis_y_min)-1)
+        print(axis_y_min)
+        
+        # sort(searching)
+        for fl in free_list_buf:
+            free_list_merged = False
+            for k, v in axis_y_min.items():
+                if free_list_merged == True:
+                    break
+
+                if v > fl[0][0][1]:
+                    if k == 0:  k = 1
+                    for r_idx, r_b in enumerate(result_buf[k-1]):
+                        if r_b[0][0][0] > fl[0][0][0]:
+                            result_buf[k-1].insert(r_idx, fl)
+                            free_list_merged = True
+                            break
+    
+    for r in result_buf:
+        merge_result.extend(r)
+    return merge_result
+
 def four_point_transform(image, rect):
     (tl, tr, br, bl) = rect
 
@@ -416,8 +506,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             x_max = max([poly[0],poly[2],poly[4],poly[6]])
             x_min = min([poly[0],poly[2],poly[4],poly[6]])
             y_max = max([poly[1],poly[3],poly[5],poly[7]])
-            y_min = min([poly[1],poly[3],poly[5],poly[7]])
-            horizontal_list.append([x_min, x_max, y_min, y_max, 0.5*(y_min+y_max), y_max-y_min])
+            axis_y_min = min([poly[1],poly[3],poly[5],poly[7]])
+            horizontal_list.append([x_min, x_max, axis_y_min, y_max, 0.5*(axis_y_min+y_max), y_max-axis_y_min])
         else:
             height = np.linalg.norm([poly[6]-poly[0],poly[7]-poly[1]])
             width = np.linalg.norm([poly[2]-poly[0],poly[3]-poly[1]])
@@ -493,14 +583,14 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
                     # do I need to add margin here?
                     x_min = min(mbox, key=lambda x: x[0])[0]
                     x_max = max(mbox, key=lambda x: x[1])[1]
-                    y_min = min(mbox, key=lambda x: x[2])[2]
+                    axis_y_min = min(mbox, key=lambda x: x[2])[2]
                     y_max = max(mbox, key=lambda x: x[3])[3]
 
                     box_width = x_max - x_min
-                    box_height = y_max - y_min
+                    box_height = y_max - axis_y_min
                     margin = int(add_margin * (min(box_width, box_height)))
 
-                    merged_list.append([x_min-margin, x_max+margin, y_min-margin, y_max+margin])
+                    merged_list.append([x_min-margin, x_max+margin, axis_y_min-margin, y_max+margin])
                 else: # non adjacent box in same line
                     box = mbox[0]
 
@@ -558,18 +648,18 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     for box in horizontal_list:
         x_min = max(0,box[0])
         x_max = min(box[1],maximum_x)
-        y_min = max(0,box[2])
+        axis_y_min = max(0,box[2])
         y_max = min(box[3],maximum_y)
-        crop_img = img[y_min : y_max, x_min:x_max]
+        crop_img = img[axis_y_min : y_max, x_min:x_max]
         width = x_max - x_min
-        height = y_max - y_min
+        height = y_max - axis_y_min
         ratio = calculate_ratio(width,height)
         new_width = int(model_height*ratio)
         if new_width == 0:
             pass
         else:
             crop_img,ratio = compute_ratio_and_resize(crop_img,width,height,model_height)
-            image_list.append( ( [[x_min,y_min],[x_max,y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
+            image_list.append( ( [[x_min,axis_y_min],[x_max,axis_y_min],[x_max,y_max],[x_min,y_max]] ,crop_img) )
             max_ratio_hori = max(ratio, max_ratio_hori)
 
     max_ratio_hori = math.ceil(max_ratio_hori)

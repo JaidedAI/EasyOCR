@@ -4,7 +4,7 @@ from .recognition import get_recognizer, get_text
 from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
                    download_and_unzip, printProgressBar, diff, reformat_input,\
                    make_rotated_img_list, set_result_with_confidence,\
-                   reformat_input_batched
+                   reformat_input_batched, merge_to_free
 from .config import *
 from bidi.algorithm import get_display
 import numpy as np
@@ -425,6 +425,8 @@ class Reader(object):
             return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
         elif output_format == 'json':
             return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
+        elif output_format == 'free_merge':
+            return merge_to_free(result, free_list)
         else:
             return result
 
