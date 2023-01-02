@@ -384,93 +384,42 @@ class CTCLabelConverter(object):
         return texts
 
 def merge_to_free(merge_result, free_list):
-    free_flag = False
-    result_buf, r_buf, free_list_buf = [], [], []
-    axis_y_min = {}
-    idx_min = 0
+    merge_result_buf, mr_buf = [], []
 
-    def append_to_buf(axis_y_min, idx_min, result_buf, r_buf):
-        axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
-        result_buf.append(r_buf)
-        return axis_y_min, idx_min+1, result_buf, []
+    free_list_buf = merge_result[-len(free_list):]
+    merge_result = merge_result[:-len(free_list)]
 
     for idx, r in enumerate(merge_result):
-        # free True
-        if len(free_list) != 0 and idx >= len(merge_result)-len(free_list):
-            if free_flag == False:
-                axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
-                ###
-                # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
-                # idx_min += 1
-                # result_buf.append(r_buf)
-                # r_buf = []
-                ###
-                free_flag = True
-
-            r_buf.append(r)
-
-            if idx == len(merge_result)-1:
-                axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
-                ###
-                # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
-                # idx_min += 1
-                # result_buf.append(r_buf)
-                # r_buf = []
-                ###
-            continue
-
-        # end
         if idx == len(merge_result)-1:
-            r_buf.append(r)
-            axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
-            ###
-            # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
-            # idx_min += 1
-            # result_buf.append(r_buf)
-            # r_buf = []
-            ###
+            mr_buf.append(r)
+            merge_result_buf.append(mr_buf)
+            mr_buf=[]
             continue
 
-        if (r_buf == []) or (r_buf[-1][0] < r[0]):
-            r_buf.append(r)
+        if (mr_buf == []) or (mr_buf[-1][0] < r[0]):
+            mr_buf.append(r)
         else:
-            axis_y_min, idx_min, result_buf, r_buf = append_to_buf(axis_y_min, idx_min, result_buf, r_buf)
-            ###
-            # axis_y_min[idx_min] = min([i[0][0][1] for i in r_buf])
-            # idx_min += 1
-            # result_buf.append(r_buf)
-            # r_buf = []
-            ###
-            r_buf.append(r)
+            merge_result_buf.append(mr_buf)
+            mr_buf=[]
+            mr_buf.append(r)
 
-    if len(free_list) != 0:
-        merge_result = []
-        # remove free_list buffer
-        print(result_buf)
-        free_list_buf = result_buf.pop(-1)
-        print(result_buf)
-        print(free_list_buf)
-        # remove free_list buffer
-        axis_y_min.pop(len(axis_y_min)-1)
-        print(axis_y_min)
-        
-        # sort(searching)
-        for fl in free_list_buf:
-            free_list_merged = False
-            for k, v in axis_y_min.items():
-                if free_list_merged == True:
-                    break
+    for free_pos in free_list_buf:
+        y_pos = len(merge_result_buf)
+        x_pos = len(merge_result_buf[y_pos-1])
+        for i, result_pos in enumerate(merge_result_buf[1:]):
+            if free_pos[0][0][1] < result_pos[0][0][0][1]:
+                y_pos = i
+                break
 
-                if v > fl[0][0][1]:
-                    if k == 0:  k = 1
-                    for r_idx, r_b in enumerate(result_buf[k-1]):
-                        if r_b[0][0][0] > fl[0][0][0]:
-                            result_buf[k-1].insert(r_idx, fl)
-                            free_list_merged = True
-                            break
-    
-    for r in result_buf:
-        merge_result.extend(r)
+        for i, result_pos in enumerate(merge_result_buf[y_pos]):
+            if free_pos[0][0][0] < result_pos[0][0][0]:
+                x_pos = i
+                break
+                
+        merge_result_buf[y_pos].insert(x_pos, free_pos)
+
+    merge_result = []
+    [merge_result.extend(r) for r in merge_result_buf]
     return merge_result
 
 def four_point_transform(image, rect):
