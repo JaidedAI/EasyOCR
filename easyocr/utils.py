@@ -386,6 +386,9 @@ class CTCLabelConverter(object):
 def merge_to_free(merge_result, free_list):
     merge_result_buf, mr_buf = [], []
 
+    if not free_list:
+        return merge_result
+
     free_list_buf = merge_result[-len(free_list):]
     merge_result = merge_result[:-len(free_list)]
 
