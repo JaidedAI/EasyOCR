@@ -130,7 +130,7 @@ recognition_models = {
             'url': 'https://github.com/JaidedAI/EasyOCR/releases/download/v1.1.7/tamil.zip',
             'md5sum': '4b93972fdacdcdabe6d57097025d4dc2',
             'symbols': "0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ ",
-            'characters': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZஃஅஆஇஈஉஊஎஏஐஒஓஔகஙசஜஞடணதநனபமயரறலளழவஷஸஹாிீுூெேைொோௌ்'
+            'characters': '0123456789!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZஃஅஆஇஈஉஊஎஏஐஒஓஔகஙசஜஞடணதநனபமயரறலளழ'
         },
         'bengali_g1':{
             'filename': 'bengali.pth',
