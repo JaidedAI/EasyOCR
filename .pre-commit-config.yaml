@@ -1,0 +1,56 @@
+exclude: '^docs/conf.py'
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: trailing-whitespace
+  - id: check-added-large-files
+  - id: check-ast
+  - id: check-json
+  - id: check-merge-conflict
+  - id: check-xml
+  - id: check-yaml
+  - id: debug-statements
+  - id: end-of-file-fixer
+  - id: requirements-txt-fixer
+  - id: mixed-line-ending
+    args: ['--fix=auto']
+    exclude: tests
+
+- repo: https://github.com/myint/autoflake
+  rev: v1.4
+  hooks:
+  - id: autoflake
+    args: [
+      --in-place,
+      --remove-all-unused-imports,
+      --remove-unused-variables,
+    ]
+    exclude: tests
+
+- repo: https://github.com/pycqa/isort
+  rev: 5.10.1
+  hooks:
+  - id: isort
+    exclude: tests
+
+- repo: https://github.com/psf/black
+  rev: 22.6.0
+  hooks:
+  - id: black
+    language_version: python3
+    exclude: tests
+
+# - repo: https://github.com/PyCQA/flake8
+#   rev: 4.0.1
+#   hooks:
+#   - id: flake8
+#     additional_dependencies: [wemake-python-styleguide]  # Comment to disable wemake
+#     exclude: tests
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v0.971
+  hooks:
+  - id: mypy
+    exclude: tests
