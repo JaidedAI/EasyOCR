@@ -580,20 +580,28 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
         image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
     return image_list, max_width
 
-def download_and_unzip(url, filename, model_storage_directory, verbose=True):
+def download_and_unzip(url, filename, md5, model_storage_directory, verbose=True):
+    desired_file = os.path.join(model_storage_directory, filename)
+    if os.path.isfile(desired_file):
+        if file_md5_matches(desired_file, md5):
+            return
+        else:
+            os.remove(desired_file)
     zip_path = os.path.join(model_storage_directory, 'temp.zip')
     reporthook = printProgressBar(prefix='Progress:', suffix='Complete', length=50) if verbose else None
     urlretrieve(url, zip_path, reporthook=reporthook)
     with ZipFile(zip_path, 'r') as zipObj:
         zipObj.extract(filename, model_storage_directory)
     os.remove(zip_path)
+    if not file_md5_matches(desired_file, md5):
+        raise Exception('MD5 hash mismatch after download, possible file corruption')
 
-def calculate_md5(fname):
+def file_md5_matches(fname, expected_md5):
     hash_md5 = hashlib.md5()
     with open(fname, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+    return hash_md5.hexdigest() == expected_md5
 
 def diff(input_list):
     return max(input_list)-min(input_list)
