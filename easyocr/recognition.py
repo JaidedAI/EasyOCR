@@ -152,7 +152,7 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
 
 def get_recognizer(recog_network, network_params, character,\
                    separator_list, dict_list, model_path,\
-                   device = 'cpu', quantize = True):
+                   device = None, quantize = True):
 
     converter = CTCLabelConverter(character, separator_list, dict_list)
     num_class = len(converter.character)
@@ -231,3 +231,36 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
             result.append( (box, pred1[0], pred1[1]) )
 
     return result
+
+def get_recognizer_custom(recog_network, network_params, character,\
+                   separator_list, dict_list, model_path,\
+                   device = 'cpu', quantize = True):
+
+    converter = CTCLabelConverter(character, separator_list, dict_list)
+    num_class = len(converter.character)
+
+    if recog_network == 'generation1':
+        model_pkg = importlib.import_module("easyocr.model.model")
+    elif recog_network == 'generation2':
+        model_pkg = importlib.import_module("easyocr.model.vgg_model")
+    else:
+        model_pkg = importlib.import_module(recog_network)
+    model = model_pkg.Model(num_class=num_class, **network_params)
+
+    if device == 'cpu':
+        state_dict = torch.load(model_path, map_location=device)['easyocr_weight']
+        new_state_dict = OrderedDict()
+        for key, value in state_dict.items():
+            new_key = key[7:]
+            new_state_dict[new_key] = value
+        model.load_state_dict(new_state_dict)
+        if quantize:
+            try:
+                torch.quantization.quantize_dynamic(model, dtype=torch.qint8, inplace=True)
+            except:
+                pass
+    else:
+        model = torch.nn.DataParallel(model).to(device)
+        model.load_state_dict(torch.load(model_path, map_location=device)['easyocr_weight'])
+
+    return model, converter
