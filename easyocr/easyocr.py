@@ -599,17 +599,17 @@ class Custom_Reader(object):
         Parameters:
             lang_list (list): Language codes (ISO 639) for languages to be recognized during analysis.
 
-            gpu (bool): Enable GPU support (default)
+            device (bool): either 'cpu' or 'gpu'
 
-            model_storage_directory (string): Path to directory for model data. If not specified,
-            models will be read from a directory as defined by the environment variable
-            EASYOCR_MODULE_PATH (preferred), MODULE_PATH (if defined), or ~/.EasyOCR/.
+            model_path (string): Path to file .pth or .pt for model data.
 
-            user_network_directory (string): Path to directory for custom network architecture.
-            If not specified, it is as defined by the environment variable
-            EASYOCR_MODULE_PATH (preferred), MODULE_PATH (if defined), or ~/.EasyOCR/.
+            model_arch (string): Path to file .py for custom network architecture.
 
-            download_enabled (bool): Enabled downloading of model data via HTTP (default).
+            yaml_path (string): Path to file .yaml
+
+            recognizer (bool): Must be True to recognize the characters.
+
+
         """
         self.verbose = verbose
         self.device = device
