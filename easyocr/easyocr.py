@@ -641,7 +641,7 @@ class Custom_Reader(object):
             # model_path = 
             self.setLanguageList(lang_list, recog_config)
         except:
-            print('user-defined model is not provided')
+            raise Exception('User-defined model is not provided')
 
         dict_list = {}
         for lang in lang_list:
