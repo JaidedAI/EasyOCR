@@ -589,13 +589,10 @@ class Reader(object):
         return result_agg
 
 
-
-
 class Custom_Reader(object):
 
-    def __init__(self, lang_list, opt=None, device=None, model_storage_directory=None,
-                 user_network_directory=None, detect_network="craft", download_enabled=True, 
-                 detector=True, recognizer=True, verbose=True, 
+    def __init__(self, lang_list, device=None,
+                 recognizer=True, verbose=True, 
                  quantize=True, cudnn_benchmark=False, model_path=None ,yaml_path=None, model_arch=None):
         """Create an EasyOCR Reader
 
@@ -615,112 +612,20 @@ class Custom_Reader(object):
             download_enabled (bool): Enabled downloading of model data via HTTP (default).
         """
         self.verbose = verbose
-        self.download_enabled = download_enabled
         self.device = device
-        self.model_storage_directory = MODULE_PATH + '/model'
-        if model_storage_directory:
-            self.model_storage_directory = model_storage_directory
-        Path(self.model_storage_directory).mkdir(parents=True, exist_ok=True)
-
-        self.user_network_directory = MODULE_PATH + '/user_network'
-        if user_network_directory:
-            self.user_network_directory = user_network_directory
-        Path(self.user_network_directory).mkdir(parents=True, exist_ok=True)
-        sys.path.append(self.user_network_directory)
-
-
-        self.detection_models = detection_models
-        self.recognition_models = recognition_models
 
         # check and download detection model
-        self.support_detection_network = ['craft', 'dbnet18']
         self.quantize=quantize, 
         self.cudnn_benchmark=cudnn_benchmark
-        if detector:
-            detector_path = self.getDetectorPath(detect_network)
+        self.model_path=model_path
+        self.yaml_path=yaml_path
+        self.model_arch=model_arch
         
         # recognition model
         separator_list = {}
         recog_network = model_arch.split('/')[-1].split('.')[0]
 
-        if recog_network in ['standard'] + [model for model in recognition_models['gen1']] + [model for model in recognition_models['gen2']]:
-            if recog_network in [model for model in recognition_models['gen1']]:
-                model = recognition_models['gen1'][recog_network]
-                recog_network = 'generation1'
-                self.model_lang = model['model_script']
-            elif recog_network in [model for model in recognition_models['gen2']]:
-                model = recognition_models['gen2'][recog_network]
-                recog_network = 'generation2'
-                self.model_lang = model['model_script']
-            else: # auto-detect
-                unknown_lang = set(lang_list) - set(all_lang_list)
-                if unknown_lang != set():
-                    raise ValueError(unknown_lang, 'is not supported')
-                # choose recognition model
-                if lang_list == ['en']:
-                    self.setModelLanguage('english', lang_list, ['en'], '["en"]')
-                    model = recognition_models['gen2']['english_g2']
-                    recog_network = 'generation2'
-                elif 'th' in lang_list:
-                    self.setModelLanguage('thai', lang_list, ['th','en'], '["th","en"]')
-                    model = recognition_models['gen1']['thai_g1']
-                    recog_network = 'generation1'
-                elif 'ch_tra' in lang_list:
-                    self.setModelLanguage('chinese_tra', lang_list, ['ch_tra','en'], '["ch_tra","en"]')
-                    model = recognition_models['gen1']['zh_tra_g1']
-                    recog_network = 'generation1'
-                elif 'ch_sim' in lang_list:
-                    self.setModelLanguage('chinese_sim', lang_list, ['ch_sim','en'], '["ch_sim","en"]')
-                    model = recognition_models['gen2']['zh_sim_g2']
-                    recog_network = 'generation2'
-                elif 'ja' in lang_list:
-                    self.setModelLanguage('japanese', lang_list, ['ja','en'], '["ja","en"]')
-                    model = recognition_models['gen2']['japanese_g2']
-                    recog_network = 'generation2'
-                elif 'ko' in lang_list:
-                    self.setModelLanguage('korean', lang_list, ['ko','en'], '["ko","en"]')
-                    model = recognition_models['gen2']['korean_g2']
-                    recog_network = 'generation2'
-                elif 'ta' in lang_list:
-                    self.setModelLanguage('tamil', lang_list, ['ta','en'], '["ta","en"]')
-                    model = recognition_models['gen1']['tamil_g1']
-                    recog_network = 'generation1'
-                elif 'te' in lang_list:
-                    self.setModelLanguage('telugu', lang_list, ['te','en'], '["te","en"]')
-                    model = recognition_models['gen2']['telugu_g2']
-                    recog_network = 'generation2'
-                elif 'kn' in lang_list:
-                    self.setModelLanguage('kannada', lang_list, ['kn','en'], '["kn","en"]')
-                    model = recognition_models['gen2']['kannada_g2']
-                    recog_network = 'generation2'
-                elif set(lang_list) & set(bengali_lang_list):
-                    self.setModelLanguage('bengali', lang_list, bengali_lang_list+['en'], '["bn","as","en"]')
-                    model = recognition_models['gen1']['bengali_g1']
-                    recog_network = 'generation1'
-                elif set(lang_list) & set(arabic_lang_list):
-                    self.setModelLanguage('arabic', lang_list, arabic_lang_list+['en'], '["ar","fa","ur","ug","en"]')
-                    model = recognition_models['gen1']['arabic_g1']
-                    recog_network = 'generation1'
-                elif set(lang_list) & set(devanagari_lang_list):
-                    self.setModelLanguage('devanagari', lang_list, devanagari_lang_list+['en'], '["hi","mr","ne","en"]')
-                    model = recognition_models['gen1']['devanagari_g1']
-                    recog_network = 'generation1'
-                elif set(lang_list) & set(cyrillic_lang_list):
-                    self.setModelLanguage('cyrillic', lang_list, cyrillic_lang_list+['en'],
-                                          '["ru","rs_cyrillic","be","bg","uk","mn","en"]')
-                    model = recognition_models['gen2']['cyrillic_g2']
-                    recog_network = 'generation2'
-                else:
-                    self.model_lang = 'latin'
-                    model = recognition_models['gen2']['latin_g2']
-                    recog_network = 'generation2'
-            self.character = model['characters']
-
-            # model_path = os.path.join(self.model_storage_directory, model['filename'])
-            # check recognition model file
-
-
-        else: # user-defined model
+        try: # user-defined model
             with open(yaml_path, encoding='utf8') as file:
                 recog_config = yaml.load(file, Loader=yaml.FullLoader)
             
@@ -735,13 +640,12 @@ class Custom_Reader(object):
             # model_file = recog_network+ '.pth'
             # model_path = 
             self.setLanguageList(lang_list, recog_config)
+        except:
+            print('user-defined model is not provided')
 
         dict_list = {}
         for lang in lang_list:
             dict_list[lang] = os.path.join(BASE_PATH, 'dict', lang + ".txt")
-
-        if detector:
-            self.detector = self.initDetector(detector_path)
             
         if recognizer:
             if recog_network == 'generation1':
@@ -766,51 +670,7 @@ class Custom_Reader(object):
                                                          self.character, separator_list,\
                                                          dict_list,model_path=model_path, device = device, quantize=quantize)
 
-    def getDetectorPath(self, detect_network):
-        if detect_network in self.support_detection_network:
-            self.detect_network = detect_network
-            if self.detect_network == 'craft':
-                from .detection import get_detector, get_textbox
-            elif self.detect_network in ['dbnet18']:
-                from .detection_db import get_detector, get_textbox
-            else:
-                raise RuntimeError("Unsupport detector network. Support networks are craft and dbnet18.")
-            self.get_textbox = get_textbox
-            self.get_detector = get_detector
-            corrupt_msg = 'MD5 hash mismatch, possible file corruption'
-            detector_path = os.path.join(self.model_storage_directory, self.detection_models[self.detect_network]['filename'])
-            if os.path.isfile(detector_path) == False:
-                if not self.download_enabled:
-                    raise FileNotFoundError("Missing %s and downloads disabled" % detector_path)
-                LOGGER.warning('Downloading detection model, please wait. '
-                               'This may take several minutes depending upon your network connection.')
-                download_and_unzip(self.detection_models[self.detect_network]['url'], self.detection_models[self.detect_network]['filename'], self.model_storage_directory, self.verbose)
-                assert calculate_md5(detector_path) == self.detection_models[self.detect_network]['md5sum'], corrupt_msg
-                LOGGER.info('Download complete')
-            elif calculate_md5(detector_path) != self.detection_models[self.detect_network]['md5sum']:
-                if not self.download_enabled:
-                    raise FileNotFoundError("MD5 mismatch for %s and downloads disabled" % detector_path)
-                LOGGER.warning(corrupt_msg)
-                os.remove(detector_path)
-                LOGGER.warning('Re-downloading the detection model, please wait. '
-                               'This may take several minutes depending upon your network connection.')
-                download_and_unzip(self.detection_models[self.detect_network]['url'], self.detection_models[self.detect_network]['filename'], self.model_storage_directory, self.verbose)
-                assert calculate_md5(detector_path) == self.detection_models[self.detect_network]['md5sum'], corrupt_msg
-        else:
-            raise RuntimeError("Unsupport detector network. Support networks are {}.".format(', '.join(self.support_detection_network)))
-        
-        return detector_path
 
-    def initDetector(self, detector_path):
-        return self.get_detector(detector_path, 
-                                 device = self.device, 
-                                 quantize = self.quantize, 
-                                 cudnn_benchmark = self.cudnn_benchmark
-                                 )
-    
-    def setDetector(self, detect_network):
-        detector_path = self.getDetectorPath(detect_network)
-        self.detector = self.initDetector(detector_path)
     
     def setModelLanguage(self, language, lang_list, list_lang, list_lang_string):
         self.model_lang = language
@@ -842,47 +702,6 @@ class Custom_Reader(object):
         self.lang_char = set(self.lang_char).union(set(symbol))
         self.lang_char = ''.join(self.lang_char)
 
-    def detect(self, img, min_size = 20, text_threshold = 0.7, low_text = 0.4,\
-               link_threshold = 0.4,canvas_size = 2560, mag_ratio = 1.,\
-               slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-               width_ths = 0.5, add_margin = 0.1, reformat=True, optimal_num_chars=None,
-               threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
-               ):
-
-        if reformat:
-            img, img_cv_grey = reformat_input(img)
-
-        text_box_list = self.get_textbox(self.detector, 
-                                    img, 
-                                    canvas_size = canvas_size, 
-                                    mag_ratio = mag_ratio,
-                                    text_threshold = text_threshold, 
-                                    link_threshold = link_threshold, 
-                                    low_text = low_text,
-                                    poly = False, 
-                                    device = self.device, 
-                                    optimal_num_chars = optimal_num_chars,
-                                    threshold = threshold, 
-                                    bbox_min_score = bbox_min_score, 
-                                    bbox_min_size = bbox_min_size, 
-                                    max_candidates = max_candidates,
-                                    )
-
-        horizontal_list_agg, free_list_agg = [], []
-        for text_box in text_box_list:
-            horizontal_list, free_list = group_text_box(text_box, slope_ths,
-                                                        ycenter_ths, height_ths,
-                                                        width_ths, add_margin,
-                                                        (optimal_num_chars is None))
-            if min_size:
-                horizontal_list = [i for i in horizontal_list if max(
-                    i[1] - i[0], i[3] - i[2]) > min_size]
-                free_list = [i for i in free_list if max(
-                    diff([c[0] for c in i]), diff([c[1] for c in i])) > min_size]
-            horizontal_list_agg.append(horizontal_list)
-            free_list_agg.append(free_list)
-
-        return horizontal_list_agg, free_list_agg
 
     def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
                   decoder = 'greedy', beamWidth= 5, batch_size = 1,\
@@ -945,12 +764,6 @@ class Custom_Reader(object):
                 result = set_result_with_confidence(
                     [result[image_len*i:image_len*(i+1)] for i in range(len(rotation_info) + 1)])
 
-        if self.model_lang == 'arabic':
-            direction_mode = 'rtl'
-            result = [list(item) for item in result]
-            for item in result:
-                item[1] = get_display(item[1])
-        else:
             direction_mode = 'ltr'
 
         if paragraph:
@@ -962,144 +775,3 @@ class Custom_Reader(object):
             return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
         else:
             return result
-
-    def readtext(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                 rotation_info = None, paragraph = False, min_size = 20,\
-                 contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
-                 canvas_size = 2560, mag_ratio = 1.,\
-                 slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
-                 threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
-                 output_format='standard'):
-        '''
-        Parameters:
-        image: file path or numpy-array or a byte stream object
-        '''
-        img, img_cv_grey = reformat_input(image)
-
-        horizontal_list, free_list = self.detect(img, 
-                                                 min_size = min_size, text_threshold = text_threshold,\
-                                                 low_text = low_text, link_threshold = link_threshold,\
-                                                 canvas_size = canvas_size, mag_ratio = mag_ratio,\
-                                                 slope_ths = slope_ths, ycenter_ths = ycenter_ths,\
-                                                 height_ths = height_ths, width_ths= width_ths,\
-                                                 add_margin = add_margin, reformat = False,\
-                                                 threshold = threshold, bbox_min_score = bbox_min_score,\
-                                                 bbox_min_size = bbox_min_size, max_candidates = max_candidates
-                                                 )
-        # get the 1st result from hor & free list as self.detect returns a list of depth 3
-        horizontal_list, free_list = horizontal_list[0], free_list[0]
-        result = self.recognize(img_cv_grey, horizontal_list, free_list,\
-                                decoder, beamWidth, batch_size,\
-                                workers, allowlist, blocklist, detail, rotation_info,\
-                                paragraph, contrast_ths, adjust_contrast,\
-                                filter_ths, y_ths, x_ths, False, output_format)
-
-        return result
-    
-    def readtextlang(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                 workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                 rotation_info = None, paragraph = False, min_size = 20,\
-                 contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                 text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
-                 canvas_size = 2560, mag_ratio = 1.,\
-                 slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
-                 threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
-                 output_format='standard'):
-        '''
-        Parameters:
-        image: file path or numpy-array or a byte stream object
-        '''
-        img, img_cv_grey = reformat_input(image)
-
-        horizontal_list, free_list = self.detect(img, 
-                                                 min_size = min_size, text_threshold = text_threshold,\
-                                                 low_text = low_text, link_threshold = link_threshold,\
-                                                 canvas_size = canvas_size, mag_ratio = mag_ratio,\
-                                                 slope_ths = slope_ths, ycenter_ths = ycenter_ths,\
-                                                 height_ths = height_ths, width_ths= width_ths,\
-                                                 add_margin = add_margin, reformat = False,\
-                                                 threshold = threshold, bbox_min_score = bbox_min_score,\
-                                                 bbox_min_size = bbox_min_size, max_candidates = max_candidates
-                                                 )
-        # get the 1st result from hor & free list as self.detect returns a list of depth 3
-        horizontal_list, free_list = horizontal_list[0], free_list[0]
-        result = self.recognize(img_cv_grey, horizontal_list, free_list,\
-                                decoder, beamWidth, batch_size,\
-                                workers, allowlist, blocklist, detail, rotation_info,\
-                                paragraph, contrast_ths, adjust_contrast,\
-                                filter_ths, y_ths, x_ths, False, output_format)
-       
-        char = []
-        directory = 'characters/'
-        for i in range(len(result)):
-            char.append(result[i][1])
-        
-        def search(arr,x):
-            g = False
-            for i in range(len(arr)):
-                if arr[i]==x:
-                    g = True
-                    return 1
-            if g == False:
-                return -1
-        def tupleadd(i):
-            a = result[i]
-            b = a + (filename[0:2],)
-            return b
-        
-        for filename in os.listdir(directory):
-            if filename.endswith(".txt"):
-                with open ('characters/'+ filename,'rt',encoding="utf8") as myfile:  
-                    chartrs = str(myfile.read().splitlines()).replace('\n','') 
-                    for i in range(len(char)):
-                        res = search(chartrs,char[i])
-                        if res != -1:
-                            if filename[0:2]=="en" or filename[0:2]=="ch":
-                                print(tupleadd(i))
-
-    def readtext_batched(self, image, n_width=None, n_height=None,\
-                         decoder = 'greedy', beamWidth= 5, batch_size = 1,\
-                         workers = 0, allowlist = None, blocklist = None, detail = 1,\
-                         rotation_info = None, paragraph = False, min_size = 20,\
-                         contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                         text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
-                         canvas_size = 2560, mag_ratio = 1.,\
-                         slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                         width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
-                         threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
-                         output_format='standard'):
-        '''
-        Parameters:
-        image: file path or numpy-array or a byte stream object
-        When sending a list of images, they all must of the same size,
-        the following parameters will automatically resize if they are not None
-        n_width: int, new width
-        n_height: int, new height
-        '''
-        img, img_cv_grey = reformat_input_batched(image, n_width, n_height)
-
-        horizontal_list_agg, free_list_agg = self.detect(img, 
-                                                 min_size = min_size, text_threshold = text_threshold,\
-                                                 low_text = low_text, link_threshold = link_threshold,\
-                                                 canvas_size = canvas_size, mag_ratio = mag_ratio,\
-                                                 slope_ths = slope_ths, ycenter_ths = ycenter_ths,\
-                                                 height_ths = height_ths, width_ths= width_ths,\
-                                                 add_margin = add_margin, reformat = False,\
-                                                 threshold = threshold, bbox_min_score = bbox_min_score,\
-                                                 bbox_min_size = bbox_min_size, max_candidates = max_candidates
-                                                 )
-        result_agg = []
-        # put img_cv_grey in a list if its a single img
-        img_cv_grey = [img_cv_grey] if len(img_cv_grey.shape) == 2 else img_cv_grey
-        for grey_img, horizontal_list, free_list in zip(img_cv_grey, horizontal_list_agg, free_list_agg):
-            result_agg.append(self.recognize(grey_img, horizontal_list, free_list,\
-                                            decoder, beamWidth, batch_size,\
-                                            workers, allowlist, blocklist, detail, rotation_info,\
-                                            paragraph, contrast_ths, adjust_contrast,\
-                                            filter_ths, y_ths, x_ths, False, output_format))
-
-        return result_agg
