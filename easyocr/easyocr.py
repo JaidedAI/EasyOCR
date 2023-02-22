@@ -228,6 +228,8 @@ class Reader(object):
             self.recognizer, self.converter = get_recognizer(recog_network, network_params,\
                                                          self.character, separator_list,\
                                                          dict_list, model_path, device = self.device, quantize=quantize)
+        self.detector_text_box_indices = None
+        self.detector_text_box_list = None
 
     def getDetectorPath(self, detect_network):
         if detect_network in self.support_detection_network:
@@ -332,8 +334,10 @@ class Reader(object):
                                     )
 
         horizontal_list_agg, free_list_agg = [], []
+        horizontal_list_agg_idx, free_list_agg_idx = [], []
+        
         for text_box in text_box_list:
-            horizontal_list, free_list = group_text_box(text_box, slope_ths,
+            horizontal_list, free_list, craft_list_idx, free_idx = group_text_box(text_box, slope_ths,
                                                         ycenter_ths, height_ths,
                                                         width_ths, add_margin,
                                                         (optimal_num_chars is None))
@@ -342,8 +346,18 @@ class Reader(object):
                     i[1] - i[0], i[3] - i[2]) > min_size]
                 free_list = [i for i in free_list if max(
                     diff([c[0] for c in i]), diff([c[1] for c in i])) > min_size]
+                
+                craft_list_idx = [idx for i, idx in zip(horizontal_list, craft_list_idx) if max(
+                    i[1] - i[0], i[3] - i[2]) > min_size]
+                free_idx = [idx for i, idx in zip(free_list, free_idx) if max(
+                    diff([c[0] for c in i]), diff([c[1] for c in i])) > min_size]
             horizontal_list_agg.append(horizontal_list)
             free_list_agg.append(free_list)
+            horizontal_list_agg_idx.append(craft_list_idx)
+            free_list_agg_idx.append(free_idx)
+
+        self.detector_text_box_list = text_box_list
+        self.detector_text_box_indices = horizontal_list_agg_idx + free_list_agg_idx
 
         return horizontal_list_agg, free_list_agg
 
