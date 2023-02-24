@@ -1,0 +1,41 @@
+name: code_unit_test
+
+on: 
+  push:
+    branches:
+      - Majid-dev
+
+permissions:
+  contents: read
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Install Python
+        uses: actions/setup-python@v2
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+              
+      - name: Install black
+        run: pip install black
+        
+      - name: Run black
+        run: python -m black --include "\\.py" ./
+        
+      - name: Install flake8
+        run: pip install flake8
+        
+      - name: Run Flake8
+        run: flake8 ./
+        
+      - name: Install Package
+        run: pip install pytest
+        
+      - name: Run tests
+        run: pytest unit_test/run_unit_test.py
+        
