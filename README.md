@@ -80,9 +80,21 @@ im = Image.open(image, formats=['png'])
 draw = ImageDraw.Draw(im)
 for batch, textBoxIndices in enumerate(batchTextBoxIndices):
     for i, bboxCharacterIndices in enumerate(textBoxIndices):
-        for bboxCharacterIndex in indices:
-            
-            box = textBoxList[batch][bboxCharacterIndex]
+        if type(indices) == list:
+            for bboxCharacterIndex in indices:
+                
+                if type(indices) == list:
+                    # this is horizontal list
+                    box = textBoxList[batch][bboxCharacterIndex]
+                    x_min = np.min(box[::2])
+                    x_max = np.max(box[::2])
+                    y_min = np.min(box[1::2])
+                    y_max = np.max(box[1::2])
+                    
+                    draw.rectangle([x_min, y_min, x_max, y_max], width=2, outline=(255,0,0))
+        elif type(indices) == int:
+            # this is free idx
+            box = textBoxList[batch][indices]
             x_min = np.min(box[::2])
             x_max = np.max(box[::2])
             y_min = np.min(box[1::2])
