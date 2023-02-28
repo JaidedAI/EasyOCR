@@ -357,8 +357,8 @@ class Reader(object):
             free_list_agg_idx.append(free_idx)
 
         self.detector_text_box_list = text_box_list
-        self.detector_text_box_indices = horizontal_list_agg_idx + free_list_agg_idx
-
+        self.detector_text_box_indices = [hori + free for hori, free in zip(horizontal_list_agg_idx, free_list_agg_idx)]
+        
         return horizontal_list_agg, free_list_agg
 
     def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
