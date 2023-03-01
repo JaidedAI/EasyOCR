@@ -474,15 +474,15 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
     combined_idx.append(new_box_idx)
 
     # merge list use sort again
-    for boxes, indices in zip(combined_list, combined_idx):
+    for boxes, index in zip(combined_list, combined_idx):
         if len(boxes) == 1: # one box per line
             box = boxes[0]
             margin = int(add_margin*min(box[1]-box[0],box[5]))
             merged_list.append([box[0]-margin,box[1]+margin,box[2]-margin,box[3]+margin])
-            merged_idx.append(indices)
+            merged_idx.append(index)
         else: # multiple boxes per line
             boxes = sorted(boxes, key=lambda item: item[0])
-            indices = [x for _,x in sorted(zip(boxes,indices), key=lambda pair: pair[0][0])]
+            indices = [x for _,x in sorted(zip(boxes,index), key=lambda pair: pair[0][0])]
 
             merged_box, new_box = [],[]
             merged_box_idx, new_box_idx = [],[]
@@ -559,7 +559,7 @@ def compute_ratio_and_resize(img,width,height,model_height):
     return img,ratio
 
 
-def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_output = True):
+def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_output = False):
     image_list = []
     maximum_y,maximum_x = img.shape
 
@@ -812,6 +812,7 @@ def set_result_with_confidence(results):
         best_row = max(
             [(row_ix, results[row_ix][col_ix][2]) for row_ix in range(len(results))],
             key=lambda x: x[1])[0]
-        final_result.append(results[best_row][col_ix])
+        result_angle = results[best_row][col_ix] + (best_row, )
+        final_result.append(result_angle)
 
     return final_result
