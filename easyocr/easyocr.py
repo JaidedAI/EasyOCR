@@ -432,13 +432,21 @@ class Reader(object):
 
         if paragraph:
             result = get_paragraph(result, x_ths=x_ths, y_ths=y_ths, mode = direction_mode)
+        
+        if rotation_info is not None:
+            # added rotation info that gives the best result
+            result = [item[:3] + (rotation_info[item[3]], ) for item in result]
 
         if detail == 0:
             return [item[1] for item in result]
         elif output_format == 'dict':
-            return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
+            if rotation_info is not None:
+                return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
+            return [ {'boxes':item[0],'text':item[1],'confident':item[2], 'rotation_idx': item[3]} for item in result]
         elif output_format == 'json':
-            return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
+            if rotation_info is not None:
+                return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
+            return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2], 'rotation_idx': item[3]}, ensure_ascii=False) for item in result]
         else:
             return result
 
