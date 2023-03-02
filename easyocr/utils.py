@@ -439,11 +439,11 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             x4 = poly[6] - np.cos(theta24)*margin
             y4 = poly[7] + np.sin(theta24)*margin
 
-            free_list.append([[x1,y1],[x2,y2],[x3,y3],[x4,y4]])
             free_idx.append(i)
+            free_list.append([[x1,y1],[x2,y2],[x3,y3],[x4,y4]])
     if sort_output:
-        horizontal_list = sorted(horizontal_list, key=lambda item: item[4])
         horizontal_idx = [x for _,x in sorted(zip(horizontal_list,horizontal_idx), key=lambda pair: pair[0][4])]
+        horizontal_list = sorted(horizontal_list, key=lambda item: item[4])
 
     # combine box
     # this part combine boxes based on horizontal lines
@@ -461,54 +461,54 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
             if abs(np.mean(b_ycenter) - poly[4]) < ycenter_ths*np.mean(b_height):
                 b_height.append(poly[5])
                 b_ycenter.append(poly[4])
-                new_box.append(poly)
                 new_box_idx.append(idx)
+                new_box.append(poly)
             else:
                 b_height = [poly[5]]
                 b_ycenter = [poly[4]]
                 combined_list.append(new_box)
                 combined_idx.append(new_box_idx)
-                new_box = [poly]
                 new_box_idx = [idx]
-    combined_list.append(new_box)
+                new_box = [poly]
     combined_idx.append(new_box_idx)
+    combined_list.append(new_box)
 
     # merge list use sort again
     for boxes, index in zip(combined_list, combined_idx):
         if len(boxes) == 1: # one box per line
             box = boxes[0]
             margin = int(add_margin*min(box[1]-box[0],box[5]))
-            merged_list.append([box[0]-margin,box[1]+margin,box[2]-margin,box[3]+margin])
             merged_idx.append(index)
+            merged_list.append([box[0]-margin,box[1]+margin,box[2]-margin,box[3]+margin])
         else: # multiple boxes per line
+            index = [x for _,x in sorted(zip(boxes,index), key=lambda pair: pair[0][0])]
             boxes = sorted(boxes, key=lambda item: item[0])
-            indices = [x for _,x in sorted(zip(boxes,index), key=lambda pair: pair[0][0])]
 
             merged_box, new_box = [],[]
             merged_box_idx, new_box_idx = [],[]
-            assert len(boxes) == len(indices)
-            for box, idx in zip(boxes, indices):
+            assert len(boxes) == len(index)
+            for box, idx in zip(boxes, index):
                 if len(new_box) == 0:
                     b_height = [box[5]]
                     x_max = box[1]
-                    new_box.append(box)
                     new_box_idx.append(idx)
+                    new_box.append(box)
                 else:
                     if (abs(np.mean(b_height) - box[5]) < height_ths*np.mean(b_height)) and ((box[0]-x_max) < width_ths *(box[3]-box[2])): # merge boxes
                         b_height.append(box[5])
                         x_max = box[1]
-                        new_box.append(box)
                         new_box_idx.append(idx)
+                        new_box.append(box)
                     else:
                         b_height = [box[5]]
                         x_max = box[1]
-                        merged_box.append(new_box)
                         merged_box_idx.append(new_box_idx)
-                        new_box = [box]
+                        merged_box.append(new_box)
                         new_box_idx = [idx]
+                        new_box = [box]
             if len(new_box) >0: 
-                merged_box.append(new_box)
                 merged_box_idx.append(new_box_idx)
+                merged_box.append(new_box)
             for mbox, mbox_idx in zip(merged_box, merged_box_idx):
                 if len(mbox) != 1: # adjacent box in same line
                     # do I need to add margin here?
@@ -521,8 +521,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
                     box_height = y_max - y_min
                     margin = int(add_margin * (min(box_width, box_height)))
 
-                    merged_list.append([x_min-margin, x_max+margin, y_min-margin, y_max+margin])
                     merged_idx.append(mbox_idx)
+                    merged_list.append([x_min-margin, x_max+margin, y_min-margin, y_max+margin])
                 else: # non adjacent box in same line
                     box = mbox[0]
 
@@ -530,8 +530,8 @@ def group_text_box(polys, slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5, 
                     box_height = box[3] - box[2]
                     margin = int(add_margin * (min(box_width, box_height)))
 
-                    merged_list.append([box[0]-margin,box[1]+margin,box[2]-margin,box[3]+margin])
                     merged_idx.append(mbox_idx)
+                    merged_list.append([box[0]-margin,box[1]+margin,box[2]-margin,box[3]+margin])
                     
     # may need to check if box is really in image
     return merged_list, free_list, merged_idx, free_idx
@@ -559,9 +559,11 @@ def compute_ratio_and_resize(img,width,height,model_height):
     return img,ratio
 
 
-def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_output = False):
+def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_output = True, textbox_indices=None):
     image_list = []
     maximum_y,maximum_x = img.shape
+
+    print(f"{len(free_list)=} {len(horizontal_list)=} {len(textbox_indices)=}")
 
     max_ratio_hori, max_ratio_free = 1,1
     for box in free_list:
@@ -601,7 +603,10 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     max_width = math.ceil(max_ratio)*model_height
 
     if sort_output:
+        if textbox_indices is not None:
+            textbox_indices[:] = [x for _,x in sorted(zip(image_list, textbox_indices), key= lambda pair: pair[0][0][0][1])]
         image_list = sorted(image_list, key=lambda item: item[0][0][1]) # sort by vertical position
+
     return image_list, max_width
 
 def download_and_unzip(url, filename, model_storage_directory, verbose=True):
