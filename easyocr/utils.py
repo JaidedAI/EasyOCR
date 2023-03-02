@@ -563,8 +563,6 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     image_list = []
     maximum_y,maximum_x = img.shape
 
-    print(f"{len(free_list)=} {len(horizontal_list)=} {len(textbox_indices)=}")
-
     max_ratio_hori, max_ratio_free = 1,1
     for box in free_list:
         rect = np.array(box, dtype = "float32")
