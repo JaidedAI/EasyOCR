@@ -436,7 +436,7 @@ class Reader(object):
         
         if rotation_info is not None:
             # added rotation info that gives the best result
-            result = [item[:3] + (rotation_info[item[3]], ) for item in result]
+            result = [item[:3] + (([0]+rotation_info)[item[3]], ) for item in result]
 
         if detail == 0:
             return [item[1] for item in result]
