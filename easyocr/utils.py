@@ -701,7 +701,7 @@ def reformat_input(image):
         nparr = np.frombuffer(image, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img_cv_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_cv_grey = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
     elif type(image) == np.ndarray:
         if len(image.shape) == 2: # grayscale
