@@ -228,6 +228,8 @@ class Reader(object):
             self.recognizer, self.converter = get_recognizer(recog_network, network_params,\
                                                          self.character, separator_list,\
                                                          dict_list, model_path, device = self.device, quantize=quantize)
+        self.detector_text_box_indices = None
+        self.detector_text_box_list = None
 
     def getDetectorPath(self, detect_network):
         if detect_network in self.support_detection_network:
@@ -332,19 +334,31 @@ class Reader(object):
                                     )
 
         horizontal_list_agg, free_list_agg = [], []
+        horizontal_list_agg_idx, free_list_agg_idx = [], []
+        
         for text_box in text_box_list:
-            horizontal_list, free_list = group_text_box(text_box, slope_ths,
+            horizontal_list, free_list, craft_list_idx, free_idx = group_text_box(text_box, slope_ths,
                                                         ycenter_ths, height_ths,
                                                         width_ths, add_margin,
                                                         (optimal_num_chars is None))
             if min_size:
+                craft_list_idx = [idx for i, idx in zip(horizontal_list, craft_list_idx) if max(
+                    i[1] - i[0], i[3] - i[2]) > min_size]
+                free_idx = [idx for i, idx in zip(free_list, free_idx) if max(
+                    diff([c[0] for c in i]), diff([c[1] for c in i])) > min_size]
                 horizontal_list = [i for i in horizontal_list if max(
                     i[1] - i[0], i[3] - i[2]) > min_size]
                 free_list = [i for i in free_list if max(
                     diff([c[0] for c in i]), diff([c[1] for c in i])) > min_size]
+                
             horizontal_list_agg.append(horizontal_list)
             free_list_agg.append(free_list)
+            horizontal_list_agg_idx.append(craft_list_idx)
+            free_list_agg_idx.append(free_idx)
 
+        self.detector_text_box_list = text_box_list
+        self.detector_text_box_indices = [free + hori  for hori, free in zip(horizontal_list_agg_idx, free_list_agg_idx)]
+        
         return horizontal_list_agg, free_list_agg
 
     def recognize(self, img_cv_grey, horizontal_list=None, free_list=None,\
@@ -352,7 +366,8 @@ class Reader(object):
                   workers = 0, allowlist = None, blocklist = None, detail = 1,\
                   rotation_info = None,paragraph = False,\
                   contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                  y_ths = 0.5, x_ths = 1.0, reformat=True, output_format='standard'):
+                  y_ths = 0.5, x_ths = 1.0, reformat=True, output_format='standard',\
+                  textbox_indices=None ):
 
         if reformat:
             img, img_cv_grey = reformat_input(img_cv_grey)
@@ -374,25 +389,25 @@ class Reader(object):
         # without gpu/parallelization, it is faster to process image one by one
         if ((batch_size == 1) or (self.device == 'cpu')) and not rotation_info:
             result = []
-            for bbox in horizontal_list:
+            for i, bbox in enumerate(horizontal_list):
                 h_list = [bbox]
                 f_list = []
-                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
+                image_list, max_width, = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH, textbox_indices=textbox_indices[len(free_list)+i: len(free_list)+i+1])
                 result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                               workers, self.device)
                 result += result0
-            for bbox in free_list:
+            for i, bbox in enumerate(free_list):
                 h_list = []
                 f_list = [bbox]
-                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
+                image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH, textbox_indices=textbox_indices[i:i+1])
                 result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
                               workers, self.device)
                 result += result0
         # default mode will try to process multiple boxes at the same time
         else:
-            image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH)
+            image_list, max_width = get_image_list(horizontal_list, free_list, img_cv_grey, model_height = imgH, textbox_indices=textbox_indices)
             image_len = len(image_list)
             if rotation_info and image_list:
                 image_list = make_rotated_img_list(rotation_info, image_list)
@@ -418,13 +433,21 @@ class Reader(object):
 
         if paragraph:
             result = get_paragraph(result, x_ths=x_ths, y_ths=y_ths, mode = direction_mode)
+        
+        if rotation_info is not None:
+            # added rotation info that gives the best result
+            result = [item[:3] + (([0]+rotation_info)[item[3]], ) for item in result]
 
         if detail == 0:
             return [item[1] for item in result]
         elif output_format == 'dict':
-            return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
+            if rotation_info is not None:
+                return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
+            return [ {'boxes':item[0],'text':item[1],'confident':item[2], 'rotation_idx': item[3]} for item in result]
         elif output_format == 'json':
-            return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
+            if rotation_info is not None:
+                return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
+            return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2], 'rotation_idx': item[3]}, ensure_ascii=False) for item in result]
         else:
             return result
 
@@ -455,12 +478,12 @@ class Reader(object):
                                                  bbox_min_size = bbox_min_size, max_candidates = max_candidates
                                                  )
         # get the 1st result from hor & free list as self.detect returns a list of depth 3
-        horizontal_list, free_list = horizontal_list[0], free_list[0]
+        horizontal_list, free_list, textbox_indices = horizontal_list[0], free_list[0], self.detector_text_box_indices[0]
         result = self.recognize(img_cv_grey, horizontal_list, free_list,\
                                 decoder, beamWidth, batch_size,\
                                 workers, allowlist, blocklist, detail, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
-                                filter_ths, y_ths, x_ths, False, output_format)
+                                filter_ths, y_ths, x_ths, False, output_format, textbox_indices)
 
         return result
     

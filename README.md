@@ -65,6 +65,46 @@ Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [
 ![example3](examples/example3.png)
 
 
+## Getting character level detector bounding box results:
+The number of character detection might be different with result, but it should be close or the same.
+```python
+# increasing the link_threshold can break bbox detection into character level bboxes
+result = ocr.readtext(image, link_threshold=1-1e-100)
+
+# increasing the link_threshold can break bbox detection into character level bboxes
+textBoxList = ocr.detector_text_box_list
+batchTextBoxIndices = ocr.detector_text_box_indices
+
+
+im = Image.open(image, formats=['png'])
+draw = ImageDraw.Draw(im)
+for batch, textBoxIndices in enumerate(batchTextBoxIndices):
+    for i, bboxCharacterIndices in enumerate(textBoxIndices):
+        if type(indices) == list:
+            for bboxCharacterIndex in indices:
+                
+                if type(indices) == list:
+                    # this is horizontal list
+                    box = textBoxList[batch][bboxCharacterIndex]
+                    x_min = np.min(box[::2])
+                    x_max = np.max(box[::2])
+                    y_min = np.min(box[1::2])
+                    y_max = np.max(box[1::2])
+                    
+                    draw.rectangle([x_min, y_min, x_max, y_max], width=2, outline=(255,0,0))
+        elif type(indices) == int:
+            # this is free idx
+            box = textBoxList[batch][indices]
+            x_min = np.min(box[::2])
+            x_max = np.max(box[::2])
+            y_min = np.min(box[1::2])
+            y_max = np.max(box[1::2])
+            
+            draw.rectangle([x_min, y_min, x_max, y_max], width=2, outline=(255,0,0))
+im.save('characterBox.png')
+```
+
+
 ## Installation
 
 Install using `pip`
