@@ -57,7 +57,6 @@ class Reader(object):
         self.model_storage_directory = MODULE_PATH + '/model'
         if model_storage_directory:
             self.model_storage_directory = model_storage_directory
-            self.download_enabled = False  # Explicitly disable downloads as soon as model path is specified
         Path(self.model_storage_directory).mkdir(parents=True, exist_ok=True)
 
         self.user_network_directory = MODULE_PATH + '/user_network'
