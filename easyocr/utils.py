@@ -31,7 +31,8 @@ def word_segmentation(mat, separator_idx =  {'th': [1,2],'en': [3,4]}, separator
     start_idx = 0
     sep_lang = ''
     for sep_idx in separator_idx_list:
-        mode = 'first' if not sep_idx % 2 else 'last'
+        if sep_idx % 2 == 0: mode ='first'
+        else: mode ='last'
         a = consecutive( np.argwhere(mat == sep_idx).flatten(), mode)
         new_sep = [ [item, sep_idx] for item in a]
         sep_list += new_sep
