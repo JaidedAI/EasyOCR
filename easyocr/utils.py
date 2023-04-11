@@ -19,10 +19,11 @@ else:
 
 def consecutive(data, mode ='first', stepsize=1):
     group = np.split(data, np.where(np.diff(data) != stepsize)[0]+1)
-    group = (item for item in group if len(item)>0)
-    
-    consecutive_index = 0 if mode == 'first' else -1
-    return (l[consecutive_index] for l in group)
+    group = [item for item in group if len(item)>0]
+
+    if mode == 'first': result = [l[0] for l in group]
+    elif mode == 'last': result = [l[-1] for l in group]
+    return result
 
 def word_segmentation(mat, separator_idx =  {'th': [1,2],'en': [3,4]}, separator_idx_list = [1,2,3,4]):
     result = []
