@@ -12,7 +12,6 @@ Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) a
 
 Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [Gradio](https://github.com/gradio-app/gradio). Try out the Web Demo: [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/tomofi/EasyOCR)
 
-
 ## What's new
 - 25 May 2023 - Version 1.7.0
     - Add Apple Silicon support (thanks[@rayeesoft](https://github.com/rayeesoft) and [@ArtemBernatskyy](https://github.com/ArtemBernatskyy), see [PR](https://github.com/JaidedAI/EasyOCR/pull/1004))
@@ -66,6 +65,24 @@ Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [
 ![example2](examples/example2.png)
 
 ![example3](examples/example3.png)
+
+## Building
+
+Multiple variants of the project can be built. You **must** include a choice of opencv and
+a choice of torch, but only a single one. If you are including this project as a dependency
+within a poetry project, you must specify which variant through the `extras` field.
+
+| **OpenCV Variant**             | **Command**                 |
+|--------------------------------|-----------------------------|
+| opencv-python                  | --with cv2                  |
+| opencv-python-headless         | --with cv2_headless         |
+| opencv-contrib-python          | --with cv2_contrib          |
+| opencv-contrib-python-headless | --with cv2_contrib_headless |
+
+| **Torch Variant**  | **Command**      |
+|--------------------|------------------|
+| Base torch install | --with torch     |
+| CPU-Only torch     | --with torch_cpu |
 
 
 ## Installation
