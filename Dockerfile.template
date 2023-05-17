@@ -5,6 +5,10 @@ FROM pytorch/pytorch
 ARG gh_username=JaidedAI
 ARG service_home="/home/EasyOCR"
 
+# argument for building with poetry
+ARG cv2="cv2"
+ARG torch="torch"
+
 # Configure apt and install packages
 RUN apt-get update -y && \
     apt-get install -y \

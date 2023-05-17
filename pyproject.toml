@@ -1,0 +1,85 @@
+[tool.poetry]
+name = "easyocr"
+version = "1.6.2"
+description = "End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution"
+license="Apache-2.0"
+authors = ["Rakpong Kittinaradorn <r.kittinaradorn@gmail.com>"]
+readme = "README.md"
+repository="https://github.com/jaidedai/easyocr"
+packages = [{include = "easyocr"}]
+keywords=['ocr', 'optical', 'character', 'recognition', 'deep', 'learning', 'neural', 'network']
+classifiers=[
+    'Development Status :: 5 - Production/Stable'
+]
+
+[[tool.poetry.source]]
+name = "torch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+default = false
+secondary = false
+
+[tool.poetry.dependencies]
+python=">3.8"
+scipy={version="^1.8.0", source="pypi"}
+numpy={version="^1.23.0", source="pypi"}
+Pillow={version="^9.5.0", source="pypi"}
+scikit-image={version="^0.19.0", source="pypi"}
+python-bidi={version="^0.4.2", source="pypi"}
+PyYAML={version="^6.0", source="pypi"}
+Shapely={version="^2.0.1", source="pypi"}
+pyclipper={version="1.3.0.post4", source="pypi"}
+ninja={version="^1.11.1", source="pypi"}
+
+
+#=============================================================
+#                    Torch dependencies
+#=============================================================
+
+[tool.poetry.group.torch_cpu]
+optional = true
+
+[tool.poetry.group.torch_cpu.dependencies]
+torch = { version = "^2.0.0", source = "torch_cpu" }
+torchvision = { version = "^0.15.0", source = "torch_cpu" }
+
+[tool.poetry.group.torch]
+optional = true
+
+[tool.poetry.group.torch.dependencies]
+torch = { version = "^2.0.0", source = "pypi" }
+torchvision = { version = "^0.15.0", source = "pypi" }
+
+#=============================================================
+#                    CV2 dependencies
+#=============================================================
+
+[tool.poetry.group.cv2]
+optional = true
+
+[tool.poetry.group.cv2.dependencies]
+opencv-python = "^4.7.0.72"
+
+[tool.poetry.group.cv2_headless]
+optional = true
+
+[tool.poetry.group.cv2_headless.dependencies]
+opencv-python-headless = "^4.7.0.72"
+
+[tool.poetry.group.cv2_contrib]
+optional = true
+
+[tool.poetry.group.cv2_contrib.dependencies]
+opencv-contrib-python = "^4.7.0.72"
+
+[tool.poetry.group.cv2_contrib_headless]
+optional = true
+
+[tool.poetry.group.cv2_contrib_headless.dependencies]
+opencv-contrib-python-headless = "^4.7.0.72"
+
+[tool.poetry.scripts]
+easyocr = "easyocr.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
