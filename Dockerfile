@@ -12,6 +12,8 @@ ARG POETRY_VERSION=1.4.2
 ENV POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_CREATE=false
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Configure apt and install packages
 RUN apt-get update -y && \
     apt-get install -y \
@@ -34,9 +36,7 @@ RUN python -m venv "${POETRY_HOME}" && \
 # Clone EasyOCR repo
 RUN mkdir "$service_home" \
     && git clone "https://github.com/$gh_username/EasyOCR.git" "$service_home" \
-    && cd "$service_home" \
-    && git remote add upstream "https://github.com/JaidedAI/EasyOCR.git" \
-    && git pull upstream master
+    && cd "$service_home"
 
 # Build
 RUN cd "$service_home" && poetry install --with "$cv2" --with "$torch"
