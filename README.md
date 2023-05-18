@@ -84,6 +84,12 @@ within a poetry project, you must specify which variant through the `extras` fie
 | Base torch install | --with torch     |
 | CPU-Only torch     | --with torch_cpu |
 
+The default version, available on pypi, is built with
+
+```shell
+poetry build --with torch --with cv2_headless
+```
+
 
 ## Installation
 
