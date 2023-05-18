@@ -383,6 +383,48 @@ class CTCLabelConverter(object):
             texts.append(string)
         return texts
 
+def merge_to_free(merge_result, free_list):
+    merge_result_buf, mr_buf = [], []
+
+    if not free_list:
+        return merge_result
+
+    free_list_buf = merge_result[-len(free_list):]
+    merge_result = merge_result[:-len(free_list)]
+
+    for idx, r in enumerate(merge_result):
+        if idx == len(merge_result)-1:
+            mr_buf.append(r)
+            merge_result_buf.append(mr_buf)
+            mr_buf=[]
+            continue
+
+        if (mr_buf == []) or (mr_buf[-1][0] < r[0]):
+            mr_buf.append(r)
+        else:
+            merge_result_buf.append(mr_buf)
+            mr_buf=[]
+            mr_buf.append(r)
+
+    for free_pos in free_list_buf:
+        y_pos = len(merge_result_buf)
+        x_pos = len(merge_result_buf[y_pos-1])
+        for i, result_pos in enumerate(merge_result_buf[1:]):
+            if free_pos[0][0][1] < result_pos[0][0][0][1]:
+                y_pos = i
+                break
+
+        for i, result_pos in enumerate(merge_result_buf[y_pos]):
+            if free_pos[0][0][0] < result_pos[0][0][0]:
+                x_pos = i
+                break
+                
+        merge_result_buf[y_pos].insert(x_pos, free_pos)
+
+    merge_result = []
+    [merge_result.extend(r) for r in merge_result_buf]
+    return merge_result
+
 def four_point_transform(image, rect):
     (tl, tr, br, bl) = rect
 
