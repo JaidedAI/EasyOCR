@@ -4,7 +4,7 @@ from .recognition import get_recognizer, get_text
 from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
                    download_and_unzip, printProgressBar, diff, reformat_input,\
                    make_rotated_img_list, set_result_with_confidence,\
-                   reformat_input_batched
+                   reformat_input_batched, merge_to_free
 from .config import *
 from bidi.algorithm import get_display
 import numpy as np
@@ -70,12 +70,15 @@ class Reader(object):
             self.device = 'cpu'
             if verbose:
                 LOGGER.warning('Using CPU. Note: This module is much faster with a GPU.')
-        elif not torch.cuda.is_available():
-            self.device = 'cpu'
-            if verbose:
-                LOGGER.warning('CUDA not available - defaulting to CPU. Note: This module is much faster with a GPU.')
         elif gpu is True:
-            self.device = 'cuda'
+            if torch.cuda.is_available():
+                self.device = 'cuda'
+            elif torch.backends.mps.is_available():
+                self.device = 'mps'
+            else:
+                self.device = 'cpu'
+                if verbose:
+                    LOGGER.warning('Neither CUDA nor MPS are available - defaulting to CPU. Note: This module is much faster with a GPU.')
         else:
             self.device = gpu
 
@@ -426,6 +429,8 @@ class Reader(object):
             return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
         elif output_format == 'json':
             return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
+        elif output_format == 'free_merge':
+            return merge_to_free(result, free_list)
         else:
             return result
 

@@ -212,7 +212,7 @@ def parse_args():
         "--y_ths",
         type=float,
         default=0.5,
-        help="Maximum horizontal distance to merge boxes (when paragraph = True).",
+        help="Maximum vertical distance to merge boxes (when paragraph = True).",
     )
     parser.add_argument(
         "--x_ths",
