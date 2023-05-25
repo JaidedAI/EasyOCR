@@ -1,3 +1,6 @@
+- 25 May 2023 - Version 1.7.0
+    - Add Apple Silicon support (thanks[@rayeesoft](https://github.com/rayeesoft) and [@ArtemBernatskyy](https://github.com/ArtemBernatskyy), see [PR](https://github.com/JaidedAI/EasyOCR/pull/1004))
+    - Fix several compatibilities
 - 15 September 2022 - Version 1.6.2
     - Add CPU support for DBnet
     - DBNet will only be compiled when users initialize DBnet detector.  
