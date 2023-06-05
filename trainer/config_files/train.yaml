@@ -1,0 +1,45 @@
+number: '0123456789'
+symbol: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ €"
+lang_char: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+experiment_name: 'custom_model'
+train_data: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/all_data'
+valid_data: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/all_data/val'
+manualSeed: 1111
+workers: 10
+batch_size: 32
+num_iter: 200000
+valInterval: 1000
+saved_model: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/saved_models/iter_130000.pth'
+FT: False
+optim: False # default is Adadelta
+lr: 0.1
+beta1: 0.9
+rho: 0.95
+eps: 0.00000001
+grad_clip: 5
+# Data processing
+select_data: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/all_data/train' # veri kümesi adı
+batch_ratio: '876-443'
+total_data_usage_ratio: 0.15
+batch_max_length: 6 # sayıların toplam hanesi + nokta + virgül
+imgH: 72
+imgW: 400
+rgb: False
+sensitive: True
+PAD: True
+contrast_adjust: 0.0
+data_filtering_off: False
+# Model Architecture
+Transformation: 'None'
+FeatureExtraction: 'VGG'
+SequenceModeling: 'BiLSTM'
+Prediction: 'CTC'
+num_fiducial: 16
+input_channel: 1
+output_channel: 256
+hidden_size: 256
+decode: 'greedy'
+new_prediction: False
+freeze_FeatureFxtraction: False
+freeze_SequenceModeling: False
+
