@@ -1,72 +1,9 @@
 # EasyOCR
-
-[![PyPI Status](https://badge.fury.io/py/easyocr.svg)](https://badge.fury.io/py/easyocr)
-[![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/JaidedAI/EasyOCR/blob/master/LICENSE)
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.to/easyocr)
-[![Tweet](https://img.shields.io/twitter/url/https/github.com/JaidedAI/EasyOCR.svg?style=social)](https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20library:%20EasyOCR%20https://github.com/JaidedAI/EasyOCR)
-[![Twitter](https://img.shields.io/badge/twitter-@JaidedAI-blue.svg?style=flat)](https://twitter.com/JaidedAI)
-
-Ready-to-use OCR with 80+ [supported languages](https://www.jaided.ai/easyocr) and all popular writing scripts including: Latin, Chinese, Arabic, Devanagari, Cyrillic, etc.
-
-[Try Demo on our website](https://www.jaided.ai/easyocr)
-
-Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [Gradio](https://github.com/gradio-app/gradio). Try out the Web Demo: [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/tomofi/EasyOCR)
-
-
+- This repository is forked from JaidedAI/EasyOCR in order to use it for custom training purposes
 ## What's new
-- 25 May 2023 - Version 1.7.0
-    - Add Apple Silicon support (thanks[@rayeesoft](https://github.com/rayeesoft) and [@ArtemBernatskyy](https://github.com/ArtemBernatskyy), see [PR](https://github.com/JaidedAI/EasyOCR/pull/1004))
-    - Fix several compatibilities
-- 15 September 2022 - Version 1.6.2
-    - Add CPU support for DBnet
-    - DBnet will only be compiled when users initialize DBnet detector.  
-- 1 September 2022 - Version 1.6.1
-    - Fix DBnet path bug for Windows
-    - Add new built-in model `cyrillic_g2`. This model is a new default for Cyrillic script.
-- 24 August 2022 - Version 1.6.0
-    - Restructure code to support alternative text detectors.
-    - Add detector `DBnet`, see [paper](https://arxiv.org/abs/2202.10304v1). It can be used by initializing like this `reader = easyocr.Reader(['en'], detect_network = 'dbnet18')`.
-- 2 June 2022 - Version 1.5.0
-    - Add trainer for CRAFT detection model (thanks[@gmuffiness](https://github.com/gmuffiness), see [PR](https://github.com/JaidedAI/EasyOCR/pull/739))
-- 9 April 2022 - Version 1.4.2
-    - Update dependencies (opencv and pillow issues)
-- 11 September 2021 - Version 1.4.1
-    - Add trainer folder
-    - Add `readtextlang` method (thanks[@arkya-art](https://github.com/arkya-art), see [PR](https://github.com/JaidedAI/EasyOCR/pull/525))
-    - Extend `rotation_info` argument to support all possible angles (thanks[abde0103](https://github.com/abde0103), see [PR](https://github.com/JaidedAI/EasyOCR/pull/515))
-- 29 June 2021 - Version 1.4
-    - [Instructions](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md) on training/using custom recognition models
-    - Example [dataset](https://www.jaided.ai/easyocr/modelhub) for model training
-    - Batched image inference for GPUs (thanks [@SamSamhuns](https://github.com/SamSamhuns), see [PR](https://github.com/JaidedAI/EasyOCR/pull/458))
-    - Vertical text support (thanks [@interactivetech](https://github.com/interactivetech)). This is for rotated text, not to be confused with vertical Chinese or Japanese text. (see [PR](https://github.com/JaidedAI/EasyOCR/pull/450))
-    - Output in dictionary format (thanks [@A2va](https://github.com/A2va), see [PR](https://github.com/JaidedAI/EasyOCR/pull/441))
-- 30 May 2021 - Version 1.3.2
-    - Faster greedy decoder (thanks [@samayala22](https://github.com/samayala22))
-    - Fix bug when a text box's aspect ratio is disproportional (thanks [iQuartic](https://iquartic.com/) for bug report)
-- 20 April 2021 - Version 1.3.1
-    - Add support for PIL image (thanks [@prays](https://github.com/prays))
-    - Add Tajik language (tjk)
-    - Update argument setting for command line
-    - Add `x_ths` and `y_ths` to control merging behavior when `paragraph=True`
-- 21 March 2021 - Version 1.3
-    - Second-generation models: multiple times smaller size, multiple times faster inference, additional characters and comparable accuracy to the first generation models.
-    EasyOCR will choose the latest model by default but you can also specify which model to use by passing `recog_network` argument when creating a `Reader` instance.
-    For example, `reader = easyocr.Reader(['en','fr'], recog_network='latin_g1')` will use the 1st generation Latin model
-    - List of all models: [Model hub](https://www.jaided.ai/easyocr/modelhub)
-
-- [Read all release notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
-
-## What's coming next
-- Handwritten text support
-
-## Examples
-
-![example](examples/example.png)
-
-![example2](examples/example2.png)
-
-![example3](examples/example3.png)
-
+- trainer.py and trainer.ipynb created/modified for custom training
+- there will be a detailed description .txt file for dataset usage
+- preprocess and usage of EasyOCR scripts has been added to the scripts folder
 
 ## Installation
 
