@@ -18,12 +18,12 @@ pip install easyocr
 For the latest development release:
 
 ``` bash
-pip install git+https://github.com/JaidedAI/EasyOCR.git
+pip install git+https://github.com/yilmazmusa08/EasyOCR.git
 ```
 
 Note 1: For Windows, please install torch and torchvision first by following the official instructions here https://pytorch.org. On the pytorch website, be sure to select the right CUDA version you have. If you intend to run on CPU mode only, select `CUDA = None`.
 
-Note 2: We also provide a Dockerfile [here](https://github.com/JaidedAI/EasyOCR/blob/master/Dockerfile).
+Note 2: We also provide a Dockerfile [here](https://github.com/yilmazmusa08/EasyOCR/blob/master/Dockerfile).
 
 ## Usage
 
@@ -80,11 +80,6 @@ For more information, read the [tutorial](https://www.jaided.ai/easyocr/tutorial
 $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
 ```
 
-## Train/use your own model
-
-For recognition model, [Read here](https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md).
-
-For detection model (CRAFT), [Read here](https://github.com/JaidedAI/EasyOCR/blob/master/trainer/craft/README.md).
 
 ## Implementation Roadmap
 
