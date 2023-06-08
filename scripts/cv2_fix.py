@@ -9,8 +9,8 @@ angle_zero = 0.16
 target_size = (400, 72)
 
 # Path to the directory containing image files
-dir_path = 'C:/Users/yilma/OneDrive/Desktop/Work/Project3/EasyOCR-master/tests/inputs'
-out_dir = 'C:/Users/yilma/OneDrive/Desktop/Work/Project3/EasyOCR-master/tests/outputs'
+dir_path = './EasyOCR-master/tests/inputs'
+out_dir = './EasyOCR-master/tests/outputs'
 
 def rotate(
         image: np.ndarray, angle: float, background: Union[int, Tuple[int, int, int]]
