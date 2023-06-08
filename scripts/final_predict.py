@@ -15,7 +15,7 @@ target_size = (400, 72)
 # Initialize the Reader object with the languages you want to recognize and the desired parameters
 reader = easyocr.Reader(['en', 'tr'], gpu=True)
 
-reader.model_path = './EasyOCR-master/trainer/saved_models/custom_model/best_model.pth'
+reader.model_path = './EasyOCR-master/trainer/saved_models/custom_model/best_accuracy.pth'
 
 # Path to the directory containing image files
 dir_path = './EasyOCR-master/tests/inputs'
