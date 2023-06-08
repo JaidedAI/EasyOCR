@@ -2,14 +2,14 @@ number: '0123456789'
 symbol: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ €"
 lang_char: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 experiment_name: 'custom_model'
-train_data: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/all_data'
-valid_data: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/all_data/val'
+train_data: './EasyOCR-master/trainer/all_data'
+valid_data: './EasyOCR-master/trainer/all_data/val'
 manualSeed: 1111
 workers: 10
 batch_size: 32
 num_iter: 200000
 valInterval: 1000
-saved_model: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/saved_models/iter_130000.pth'
+saved_model: '.EasyOCR-master/trainer/saved_models/best_accuracy.pth'
 FT: False
 optim: False # default is Adadelta
 lr: 0.1
@@ -18,7 +18,7 @@ rho: 0.95
 eps: 0.00000001
 grad_clip: 5
 # Data processing
-select_data: '/home/musa/Desktop/Work/Mina/Project3/EasyOCR-master/trainer/all_data/train' # veri kümesi adı
+select_data: '.EasyOCR-master/trainer/all_data/train' # veri kümesi adı
 batch_ratio: '876-443'
 total_data_usage_ratio: 0.15
 batch_max_length: 6 # sayıların toplam hanesi + nokta + virgül
