@@ -9,8 +9,15 @@ angle_zero = 0.16
 target_size = (400, 72)
 
 # Path to the directory containing image files
-dir_path = './EasyOCR-master/tests/inputs'
-out_dir = './EasyOCR-master/tests/outputs'
+dir_path = os.path.join("..", "tests/inputs")
+out_dir = os.path.join("..", "tests/outputs")
+
+# Create the directories if they do not exist
+if not os.path.exists(dir_path):
+    os.makedirs(dir_path)
+
+if not os.path.exists(out_dir):
+    os.makedirs(out_dir)
 
 def rotate(
         image: np.ndarray, angle: float, background: Union[int, Tuple[int, int, int]]
