@@ -137,6 +137,31 @@ reader = easyocr.Reader(['ch_sim','en'], gpu=False)
 
 For more information, read the [tutorial](https://www.jaided.ai/easyocr/tutorial) and [API Documentation](https://www.jaided.ai/easyocr/documentation).
 
+#### Mark result on the image
+
+``` python
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from PIL import Image
+import requests
+from io import BytesIO
+
+url = 'https://github.com/JaidedAI/EasyOCR/blob/master/examples/chinese.jpg?raw=true'
+result = reader.readtext(url)
+response = requests.get(url)
+im = Image.open(BytesIO(response.content))
+
+fig, ax = plt.subplots()
+ax.imshow(im)
+
+for i in result:
+    ax.add_patch(patches.Polygon(i[0], linewidth=1, edgecolor='r', facecolor='none'))
+
+plt.show()
+result
+```
+![example4](examples/example4.png)
+
 #### Run on command line
 
 ```shell
