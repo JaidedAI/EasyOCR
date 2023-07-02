@@ -11,6 +11,7 @@ import hashlib
 import sys, os
 from zipfile import ZipFile
 from .imgproc import loadImage
+from pathlib import Path
 
 if sys.version_info[0] == 2:
     from six.moves.urllib.request import urlretrieve
@@ -730,12 +731,14 @@ def printProgressBar(prefix='', suffix='', decimals=1, length=100, fill='█'):
     return progress_hook
 
 def reformat_input(image):
-    if type(image) == str:
+    if type(image) == str or isinstance(image,Path):
         if image.startswith('http://') or image.startswith('https://'):
             tmp, _ = urlretrieve(image , reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
             img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
             os.remove(tmp)
         else:
+            if isinstance(image,Path):
+                image = str(image)
             img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
             image = os.path.expanduser(image)
         img = loadImage(image)  # can accept URL
