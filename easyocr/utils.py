@@ -582,7 +582,12 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     maximum_y,maximum_x = img.shape
 
     max_ratio_hori, max_ratio_free = 1,1
-    for box in free_list:
+    
+    ## If free_list set to its default value 'None' in recognize function, following loop will raise an exception 
+    ## Can't iterate through NoneType
+    ## NoneType check is required prior loop
+    ## if free_list is not None:
+    for box in free_list: 
         rect = np.array(box, dtype = "float32")
         transformed_img = four_point_transform(img, rect)
         ratio = calculate_ratio(transformed_img.shape[1],transformed_img.shape[0])
