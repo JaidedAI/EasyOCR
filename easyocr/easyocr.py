@@ -573,3 +573,6 @@ class Reader(object):
                                             filter_ths, y_ths, x_ths, False, output_format))
 
         return result_agg
+
+def get_available_langs():
+  return all_lang_list
