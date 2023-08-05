@@ -240,15 +240,15 @@ def parse_args():
 
 def main():
     args = parse_args()
-    reader = easyocr.Reader(lang_list=args.lang,\
-                            gpu=args.gpu,\
-                            model_storage_directory=args.model_storage_directory,\
-                            user_network_directory=args.user_network_directory,\
-                            recog_network=args.recog_network,\
-                            download_enabled=args.download_enabled,\
-                            detector=args.detector,\
-                            recognizer=args.recognizer,\
-                            verbose=args.verbose,\
+    reader = easyocr.Reader(lang_list=args.lang, \
+                            gpu=args.gpu, \
+                            model_storage_directory=args.model_storage_directory, \
+                            user_network_directory=args.user_network_directory, \
+                            recog_network=args.recog_network, \
+                            download_enabled=args.download_enabled, \
+                            detector=args.detector, \
+                            recognizer=args.recognizer, \
+                            verbose=args.verbose, \
                             quantize=args.quantize)
     for line in reader.readtext(args.file,\
                                 decoder=args.decoder,\

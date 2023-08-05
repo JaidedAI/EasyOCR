@@ -124,9 +124,9 @@ def get_detector(trained_model, backbone = 'resnet18', device='cpu', quantize=Tr
     dbnet : obj
         DBNet text detection object.
     '''
-    dbnet = DBNet(initialize_model = False, 
+    dbnet = DBNet(initialize_model = False,
                   dynamic_import_relative_path = os.path.join("easyocr", "DBNet"),
-                  device = device, 
+                  device = device,
                   verbose = 0)
     if backbone not in ['resnet18', 'resnet50']:
         raise ValueError("Invalid backbone. Options are 'resnet18' or 'resnet50'.")
