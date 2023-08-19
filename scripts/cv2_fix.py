@@ -76,8 +76,6 @@ for filename in os.listdir(dir_path):
             image_np = image_rot1
         else:
             print(f"{filename}: top and bottom halves have similar brightness")
-
-
     # Save the resized image to a file
     out_path = os.path.join(out_dir, f'{filename}_processed.jpg')
     Image.fromarray(image_np).save(out_path)
