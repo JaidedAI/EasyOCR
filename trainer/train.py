@@ -271,8 +271,8 @@ def train(opt, show_number = 2, amp=False):
                 log.write(predicted_result_log + '\n')
                 print('validation time: ', time.time()-t1)
                 t1=time.time()
-        # save model per 1e+4 iter.
-        if (i + 1) % 1e+4 == 0:
+        # save model per 1e+3 iter.
+        if (i + 1) % 1e+3 == 0:
             torch.save(
                 model.state_dict(), f'./saved_models/{opt.experiment_name}/iter_{i+1}.pth')
 

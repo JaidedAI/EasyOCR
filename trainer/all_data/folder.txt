@@ -1,1 +1,1 @@
-place dataset folder here
+there should be a "train" and "val" folder that should both contain images and "labels.csv". "labels.csv" should have "filename" as image file names and "labels" as corresponding label. 
