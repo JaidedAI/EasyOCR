@@ -8,7 +8,7 @@ ARG service_home="/home/EasyOCR"
 # argument for building with poetry
 ARG cv2="cv2"
 ARG torch="torch"
-ARG POETRY_VERSION=1.4.2
+ARG POETRY_VERSION=1.5.1
 ENV POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_CREATE=false
 
