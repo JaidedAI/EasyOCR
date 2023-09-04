@@ -425,8 +425,12 @@ class Reader(object):
         if detail == 0:
             return [item[1] for item in result]
         elif output_format == 'dict':
+            if paragraph:
+                return [ {'boxes':item[0],'text':item[1]} for item in result]    
             return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
         elif output_format == 'json':
+            if paragraph:
+                return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1]}, ensure_ascii=False) for item in result]
             return [json.dumps({'boxes':[list(map(int, lst)) for lst in item[0]],'text':item[1],'confident':item[2]}, ensure_ascii=False) for item in result]
         elif output_format == 'free_merge':
             return merge_to_free(result, free_list)
