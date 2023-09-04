@@ -2,28 +2,24 @@
 name = "easyocr"
 version = "1.7.1"
 description = "End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution"
-authors = [
-  {name="Rakpong Kittinaradorn", email="r.kittinaradorn@gmail.com"},
-]
+authors = [{name="Rakpong Kittinaradorn", email="r.kittinaradorn@gmail.com"}]
 license = {text = "Apache-2.0"}
 readme = "README.md"
-classifiers = [
-    "Development Status :: 5 - Production/Stable"
-]
+classifiers = ["Development Status :: 5 - Production/Stable"]
 keywords = ["ocr", "optical character recognition", "deep learning", "neural network"]
 dependencies = [
+    "ninja",
+    "numpy",
+    "opencv-python-headless",
+    "Pillow",
+    "pyclipper",
+    "PyYAML",
+    "python-bidi",
+    "scikit-image",
+    "scipy",
+    "Shapely",
     "torch",
     "torchvision >= 0.5",
-    "opencv-python-headless",
-    "scipy",
-    "numpy",
-    "Pillow",
-    "scikit-image",
-    "python-bidi",
-    "PyYAML",
-    "Shapely",
-    "pyclipper",
-    "ninja",
 ]
 scripts = {easyocr="easyocr.cli:main"}
 
@@ -38,5 +34,4 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-exclude = ["trainer*"]
-namespaces = false
+exclude = ["build*", "trainer*", "unit_test*"]
