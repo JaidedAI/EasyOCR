@@ -1,0 +1,42 @@
+[project]
+name = "easyocr"
+version = "1.7.1"
+description = "End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution"
+authors = [
+  {name="Rakpong Kittinaradorn", email="r.kittinaradorn@gmail.com"},
+]
+license = {text = "Apache-2.0"}
+readme = "README.md"
+classifiers = [
+    "Development Status :: 5 - Production/Stable"
+]
+keywords = ["ocr", "optical character recognition", "deep learning", "neural network"]
+dependencies = [
+    "torch",
+    "torchvision >= 0.5",
+    "opencv-python-headless",
+    "scipy",
+    "numpy",
+    "Pillow",
+    "scikit-image",
+    "python-bidi",
+    "PyYAML",
+    "Shapely",
+    "pyclipper",
+    "ninja",
+]
+scripts = {easyocr="easyocr.cli:main"}
+
+[project.urls]
+Homepage = "https://github.com/JaidedAI/EasyOCR"
+Documentation = "https://www.jaided.ai/easyocr/documentation/"
+Repository = "https://github.com/JaidedAI/EasyOCR.git"
+Changelog = "https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude = ["trainer*"]
+namespaces = false
