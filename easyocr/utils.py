@@ -733,10 +733,10 @@ def reformat_input(image):
     if type(image) == str:
         if image.startswith('http://') or image.startswith('https://'):
             tmp, _ = urlretrieve(image , reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
-            img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
+            img_cv_grey = cv2.imdecode(np.fromfile(tmp, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
             os.remove(tmp)
         else:
-            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+            img_cv_grey = cv2.imdecode(np.fromfile(image, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
             image = os.path.expanduser(image)
         img = loadImage(image)  # can accept URL
     elif type(image) == bytes:
