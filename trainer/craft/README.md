@@ -61,7 +61,7 @@ pip install -r requirements.txt
         ├── ch4_test_images
         │   ├── img_1.jpg
         │   └── img_2.jpg
-        └── ch4_training_localization_transcription_gt
+        └── ch4_test_localization_transcription_gt
             ├── gt_img_1.txt
             └── gt_img_2.txt
     ```
