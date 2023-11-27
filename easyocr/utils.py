@@ -707,7 +707,7 @@ def get_paragraph(raw_result, x_ths=1, y_ths=0.5, mode = 'ltr'):
             current_box_group.remove(best_box)
 
         result.append([ [[min_gx,min_gy],[max_gx,min_gy],[max_gx,max_gy],[min_gx,max_gy]], text[1:],group_confidence])
-    print("Returning results",result)
+
     return result
 
 
