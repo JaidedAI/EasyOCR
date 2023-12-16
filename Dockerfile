@@ -1,5 +1,8 @@
 FROM docker.io/pytorch/pytorch
 
+# to disable interactive mode: https://askubuntu.com/questions/909277/avoiding-user-interaction-with-tzdata-when-installing-certbot-in-a-docker-contai
+ENV DEBIAN_FRONTEND=noninteractive
+
 # if you forked EasyOCR, you can pass in your own GitHub username to use your fork
 # i.e. gh_username=myname
 ARG gh_username=JaidedAI
