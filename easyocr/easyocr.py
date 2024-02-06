@@ -373,6 +373,11 @@ class Reader(object):
             y_max, x_max = img_cv_grey.shape
             horizontal_list = [[0, x_max, 0, y_max]]
             free_list = []
+            
+        if (horizontal_list==[]) and (free_list==[]):
+            y_max, x_max = img_cv_grey.shape
+            horizontal_list = [[0, x_max, 0, y_max]]
+            free_list = []
 
         # without gpu/parallelization, it is faster to process image one by one
         if ((batch_size == 1) or (self.device == 'cpu')) and not rotation_info:
