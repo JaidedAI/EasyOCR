@@ -99,6 +99,13 @@ class AlignCollate(object):
         image_tensors = torch.cat([t.unsqueeze(0) for t in resized_images], 0)
         return image_tensors
 
+def copyStateDict(state_dict):
+    new_state_dict = OrderedDict()
+    for key, value in state_dict.items():
+        new_key = key[7:]
+        new_state_dict[new_key] = value
+    return new_state_dict
+
 def recognizer_predict(model, converter, test_loader, batch_max_length,\
                        ignore_idx, char_group_idx, decoder = 'greedy', beamWidth= 5, device = 'cpu'):
     ov_device=''
@@ -180,10 +187,7 @@ def get_recognizer(recog_network, network_params, character,\
 
     if device == 'cpu':
         state_dict = torch.load(model_path, map_location=device)
-        new_state_dict = OrderedDict()
-        for key, value in state_dict.items():
-            new_key = key[7:]
-            new_state_dict[new_key] = value
+        new_state_dict = copyStateDict(state_dict)
         model.load_state_dict(new_state_dict)
         if quantize:
             try:
@@ -191,13 +195,16 @@ def get_recognizer(recog_network, network_params, character,\
             except:
                 pass
     elif 'ov_' in device:
-        ov_device=re.sub('ov_','',device).upper()
+        state_dict = torch.load(model_path, map_location="cpu")
+        new_state_dict = copyStateDict(state_dict)
+        model.load_state_dict(new_state_dict)
+        ov_device = re.sub('ov_','',device).upper()
         core = ov.Core()
         if 'GPU' in ov_device:
-            cache_dir=os.path.expanduser('~/.EasyOCR/cache')
+            cache_dir = os.path.expanduser('~/.EasyOCR/cache')
             core.set_property({'CACHE_DIR': cache_dir})
-        ov_model_path=os.path.expanduser('~/.EasyOCR/openvino_model/1_recognition_model.onnx')
-        model_ov = core.read_model(ov_model_path)
+        dummy_inp = torch.zeros(1, 1, 64, 320),torch.zeros(1,33)
+        model_ov = ov.convert_model(model,example_input=dummy_inp)
         model = core.compile_model(model_ov, ov_device)
         print('Text recognition model is running with OpenVINO on Intel ', ov_device)
     else:
