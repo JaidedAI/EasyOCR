@@ -114,10 +114,37 @@ reader = easyocr.Reader(['ch_sim','en'], gpu=False)
 
 For more information, read the [tutorial](https://www.jaided.ai/easyocr/tutorial) and [API Documentation](https://www.jaided.ai/easyocr/documentation).
 
+#### Run with [OpenVINO(TM) Toolkit](https://github.com/openvinotoolkit/openvino) backend 
+To run EasyOCR with OpenVINO(TM) Toolkit on on Intel(R) CPU, Intel(R) Processor Graphics or Intel(R) Discrete Graphics, pass the inference device name as a Reader input argument. Choose between ‘ov_cpu’, ‘ov_gpu.<Intel GPU#>’ or 'ov_auto' (ov_+ device/plugin name as it's called in [OpenVINO](https://docs.openvino.ai/2024/about-openvino/compatibility-and-support/supported-devices.html))
+
+The following example sets up model inference to OpenVINO+Intel(R) CPU:
+
+```python
+reader = easyocr.Reader(['ch_sim','en'], 'ov_cpu')
+```
+Example of running inference on OpenVINO+Intel(R) Processor Graphics:
+
+```python
+reader = easyocr.Reader(['ch_sim','en'], 'ov_gpu')
+```
+Running inference on OpenVINO+Intel(R) Discrete Graphics:
+
+```python
+reader = easyocr.Reader(['ch_sim','en'], 'ov_gpu.1')
+```
+
 #### Run on command line
 
 ```shell
 $ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=True
+```
+
+#### Run on command line with [OpenVINO(TM) Toolkit](https://github.com/openvinotoolkit/openvino) backend 
+
+Choose target device (--gpu) from ov_cpu, ov_gpu, ov_gpu.0, ov_gpu.1, ov_gpu.2,ov_gpu.3, ov_auto.
+
+```shell
+$ easyocr -l ch_sim en -f chinese.jpg --detail=1 --gpu=ov_cpu
 ```
 
 ## Train/use your own model

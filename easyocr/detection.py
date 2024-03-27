@@ -10,6 +10,10 @@ from .craft_utils import getDetBoxes, adjustResultCoordinates
 from .imgproc import resize_aspect_ratio, normalizeMeanVariance
 from .craft import CRAFT
 
+import openvino as ov
+import re
+import os
+
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
         start_idx = 1
@@ -39,11 +43,18 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     x = [np.transpose(normalizeMeanVariance(n_img), (2, 0, 1))
          for n_img in img_resized_list]
     x = torch.from_numpy(np.array(x))
-    x = x.to(device)
+    if 'ov_' in device:
+        x=x.to('cpu')
+    else:
+        x = x.to(device)
 
     # forward pass
-    with torch.no_grad():
-        y, feature = net(x)
+    if 'ov_' in device:
+        res=net.infer_new_request({0: x})
+        y=torch.tensor(res[0])
+    else:
+        with torch.no_grad():
+            y, feature = net(x)
 
     boxes_list, polys_list = [], []
     for out in y:
@@ -81,12 +92,24 @@ def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=Fal
                 torch.quantization.quantize_dynamic(net, dtype=torch.qint8, inplace=True)
             except:
                 pass
+        net.eval()
+    elif 'ov_' in device:
+        ov_device=re.sub('ov_','',device).upper()
+        net.load_state_dict(copyStateDict(torch.load(trained_model, map_location='cpu')))
+        dummy_inp = torch.rand(1, 3, 608, 800)
+        net_ov = ov.convert_model(net, example_input=dummy_inp)
+        core = ov.Core()
+        if 'GPU' in ov_device:
+            cache_dir=os.path.expanduser('~/.EasyOCR/cache')
+            core.set_property({'CACHE_DIR': cache_dir})
+        net=core.compile_model(net_ov, ov_device)
+        print("Text detection model is running with OpenVINO on Intel", ov_device)
     else:
         net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device)))
         net = torch.nn.DataParallel(net).to(device)
         cudnn.benchmark = cudnn_benchmark
-
-    net.eval()
+        net.eval()
+    
     return net
 
 def get_textbox(detector, image, canvas_size, mag_ratio, text_threshold, link_threshold, low_text, poly, device, optimal_num_chars=None, **kwargs):

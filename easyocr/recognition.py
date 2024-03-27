@@ -9,6 +9,9 @@ from collections import OrderedDict
 import importlib
 from .utils import CTCLabelConverter
 import math
+import openvino as ov
+import os
+import re
 
 def custom_mean(x):
     return x.prod()**(2.0/np.sqrt(len(x)))
@@ -96,9 +99,21 @@ class AlignCollate(object):
         image_tensors = torch.cat([t.unsqueeze(0) for t in resized_images], 0)
         return image_tensors
 
+def copyStateDict(state_dict):
+    new_state_dict = OrderedDict()
+    for key, value in state_dict.items():
+        new_key = key[7:]
+        new_state_dict[new_key] = value
+    return new_state_dict
+
 def recognizer_predict(model, converter, test_loader, batch_max_length,\
                        ignore_idx, char_group_idx, decoder = 'greedy', beamWidth= 5, device = 'cpu'):
-    model.eval()
+    ov_device=''
+    if 'ov_' not in device:
+        model.eval()
+    else:
+        ov_device=device
+        device='cpu'
     result = []
     with torch.no_grad():
         for image_tensors in test_loader:
@@ -108,7 +123,12 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             length_for_pred = torch.IntTensor([batch_max_length] * batch_size).to(device)
             text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
 
-            preds = model(image, text_for_pred)
+            if ov_device!='':
+                res = model.infer_new_request({0: image})
+                preds = next(iter(res.values()))
+                preds=torch.tensor(preds)
+            else:
+                preds = model(image, text_for_pred)
 
             # Select max probabilty (greedy decoding) then decode index to character
             preds_size = torch.IntTensor([preds.size(1)] * batch_size)
@@ -167,16 +187,26 @@ def get_recognizer(recog_network, network_params, character,\
 
     if device == 'cpu':
         state_dict = torch.load(model_path, map_location=device)
-        new_state_dict = OrderedDict()
-        for key, value in state_dict.items():
-            new_key = key[7:]
-            new_state_dict[new_key] = value
+        new_state_dict = copyStateDict(state_dict)
         model.load_state_dict(new_state_dict)
         if quantize:
             try:
                 torch.quantization.quantize_dynamic(model, dtype=torch.qint8, inplace=True)
             except:
                 pass
+    elif 'ov_' in device:
+        state_dict = torch.load(model_path, map_location="cpu")
+        new_state_dict = copyStateDict(state_dict)
+        model.load_state_dict(new_state_dict)
+        ov_device = re.sub('ov_','',device).upper()
+        core = ov.Core()
+        if 'GPU' in ov_device:
+            cache_dir = os.path.expanduser('~/.EasyOCR/cache')
+            core.set_property({'CACHE_DIR': cache_dir})
+        dummy_inp = torch.zeros(1, 1, 64, 320),torch.zeros(1,33)
+        model_ov = ov.convert_model(model,example_input=dummy_inp)
+        model = core.compile_model(model_ov, ov_device)
+        print('Text recognition model is running with OpenVINO on Intel ', ov_device)
     else:
         model = torch.nn.DataParallel(model).to(device)
         model.load_state_dict(torch.load(model_path, map_location=device))
