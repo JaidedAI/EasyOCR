@@ -3,6 +3,7 @@ import os
 import cv2
 import numpy as np
 from easyocr.easyocr import Reader
+from easyocr.trainer.utils import AttnLabelConverter
 
 def recognize_text_from_images(image_pieces, models_directory, recog_network='best_accuracy', gpu=False):
     """
@@ -24,13 +25,17 @@ def recognize_text_from_images(image_pieces, models_directory, recog_network='be
     reader = Reader(['ru'], recog_network=recog_network, gpu=gpu,
                             model_storage_directory=model_storage_directory,
                             user_network_directory=user_network_directory)
+    
 
     recognized_texts = []
     for image_piece in image_pieces:
         # Convert PIL Image to OpenCV format
         image_cv = cv2.cvtColor(np.array(image_piece), cv2.COLOR_RGB2BGR)
         # Perform text recognition
-        result = reader.readtext(image_cv, detail=0)
+        if isinstance(reader.converter, AttnLabelConverter):
+            result = reader.readtext(image_cv, detail=0, decoder="beamsearch")
+        else:
+            result = reader.readtext(image_cv, detail=0)
         recognized_texts.append(" ".join(result))
     
     return recognized_texts

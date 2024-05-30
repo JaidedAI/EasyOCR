@@ -8,6 +8,7 @@ import numpy as np
 from collections import OrderedDict
 import importlib
 from .utils import CTCLabelConverter
+from ..trainer.utils import AttnLabelConverter
 import math
 
 def custom_mean(x):
@@ -121,21 +122,26 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             preds_prob = preds_prob/np.expand_dims(pred_norm, axis=-1)
             preds_prob = torch.from_numpy(preds_prob).float().to(device)
 
-            if decoder == 'greedy':
-                # Select max probabilty (greedy decoding) then decode index to character
+            if isinstance(converter, AttnLabelConverter):
                 _, preds_index = preds_prob.max(2)
-                preds_index = preds_index.view(-1)
-                preds_str = converter.decode_greedy(preds_index.data.cpu().detach().numpy(), preds_size.data)
-            elif decoder == 'beamsearch':
-                k = preds_prob.cpu().detach().numpy()
-                preds_str = converter.decode_beamsearch(k, beamWidth=beamWidth)
-            elif decoder == 'wordbeamsearch':
-                k = preds_prob.cpu().detach().numpy()
-                preds_str = converter.decode_wordbeamsearch(k, beamWidth=beamWidth)
+                preds_str = converter.decode(preds_index, preds_size.data)
+            else:
+                if decoder == 'greedy':
+                    # Select max probabilty (greedy decoding) then decode index to character
+                    _, preds_index = preds_prob.max(2)
+                    preds_index = preds_index.view(-1)
+                    preds_str = converter.decode_greedy(preds_index.data.cpu().detach().numpy(), preds_size.data)
+                elif decoder == 'beamsearch':
+                    k = preds_prob.cpu().detach().numpy()
+                    preds_str = converter.decode_beamsearch(k, beamWidth=beamWidth)
+                elif decoder == 'wordbeamsearch':
+                    k = preds_prob.cpu().detach().numpy()
+                    preds_str = converter.decode_wordbeamsearch(k, beamWidth=beamWidth)
 
             preds_prob = preds_prob.cpu().detach().numpy()
             values = preds_prob.max(axis=2)
             indices = preds_prob.argmax(axis=2)
+
             preds_max_prob = []
             for v,i in zip(values, indices):
                 max_probs = v[i!=0]
@@ -145,7 +151,15 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
                     preds_max_prob.append(np.array([0]))
 
             for pred, pred_max_prob in zip(preds_str, preds_max_prob):
-                confidence_score = custom_mean(pred_max_prob)
+                
+
+                if isinstance(converter, AttnLabelConverter):
+                    pred_EOS = pred.find('[s]')
+                    pred = pred[:pred_EOS]
+                    confidence_score = custom_mean(pred_max_prob[:pred_EOS])
+                else:
+                    confidence_score = custom_mean(pred_max_prob)
+
                 result.append([pred, confidence_score])
 
     return result
@@ -153,8 +167,39 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
 def get_recognizer(recog_network, network_params, character,\
                    separator_list, dict_list, model_path,\
                    device = 'cpu', quantize = True):
-    print(network_params)
     converter = CTCLabelConverter(character, separator_list, dict_list)
+    num_class = len(converter.character)
+
+    if recog_network == 'generation1':
+        model_pkg = importlib.import_module("easyocr.model.model")
+    elif recog_network == 'generation2':
+        model_pkg = importlib.import_module("easyocr.model.vgg_model")
+    else:
+        model_pkg = importlib.import_module(recog_network)
+    model = model_pkg.Model(num_class=num_class, **network_params)
+
+    if device == 'cpu':
+        state_dict = torch.load(model_path, map_location=device)
+        new_state_dict = OrderedDict()
+        for key, value in state_dict.items():
+            new_key = key[7:]
+            new_state_dict[new_key] = value
+        model.load_state_dict(new_state_dict)
+        if quantize:
+            try:
+                torch.quantization.quantize_dynamic(model, dtype=torch.qint8, inplace=True)
+            except:
+                pass
+    else:
+        model = torch.nn.DataParallel(model).to(device)
+        model.load_state_dict(torch.load(model_path, map_location=device))
+
+    return model, converter
+
+def get_recognizer_attn(recog_network, network_params, character,\
+                   separator_list, dict_list, model_path,\
+                   device = 'cpu', quantize = True):
+    converter = AttnLabelConverter(character, device)
     num_class = len(converter.character)
 
     if recog_network == 'generation1':
