@@ -72,9 +72,9 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
         boxes_list.append(boxes)
         polys_list.append(polys)
     
-    # remove y from device, whether GPU or CPU, and call empty_cache() to clean up
+    # remove y from device, whether GPU or CPU, and check if cuda was used before calling empty_cache() to clean up
     del y
-    if cuda:
+    if device == 'cuda':
         torch.cuda.empty_cache()
 
     return boxes_list, polys_list
