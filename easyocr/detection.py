@@ -74,7 +74,8 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     
     # remove y from device, whether GPU or CPU, and call empty_cache() to clean up
     del y
-    torch.cuda.empty_cache()
+    if cuda:
+        torch.cuda.empty_cache()
 
     return boxes_list, polys_list
 
