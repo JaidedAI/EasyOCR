@@ -5,7 +5,7 @@ scipy
 numpy
 Pillow
 scikit-image
-python-bidi
+python-bidi==0.4.2
 PyYAML
 Shapely
 pyclipper
