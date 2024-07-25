@@ -2,7 +2,7 @@ torch
 torchvision>=0.5
 opencv-python-headless
 scipy
-numpy
+numpy==1.24.3
 Pillow
 scikit-image
 python-bidi
