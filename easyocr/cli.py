@@ -14,10 +14,9 @@ def parse_args():
     )
     parser.add_argument(
         "--gpu",
-        type=bool,
-        choices=[True, False],
+        choices=[True, False, 'ov_cpu', 'ov_gpu', 'ov_gpu.0', 'ov_gpu.1', 'ov_gpu.2', 'ov_gpu.3', 'ov_auto'],
         default=True,
-        help="Using GPU (default: True)",
+        help="Using GPU (default: True) or OpenVINO(TM) Toolkit on Intel(R) CPU, Intel(R) Processor Graphics or Intel(R) Discrete Graphics. Choose from True, False, ov_cpu, ov_gpu, ov_gpu.0, ov_gpu.1, ov_gpu.2, ov_gpu.3, ov_auto" ,
     )
     parser.add_argument(
         "--model_storage_directory",
