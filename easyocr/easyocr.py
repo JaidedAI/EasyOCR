@@ -1,38 +1,54 @@
 # -*- coding: utf-8 -*-
 
-from .recognition import get_recognizer, get_text
-from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
-                   download_and_unzip, printProgressBar, diff, reformat_input,\
-                   make_rotated_img_list, set_result_with_confidence,\
-                   reformat_input_batched, merge_to_free
-from .config import *
-from bidi import get_display
-import numpy as np
-import cv2
-import torch
+import json
 import os
 import sys
-from PIL import Image
 from logging import getLogger
+
+import cv2
+import numpy as np
+import torch
 import yaml
-import json
+from bidi import get_display
+from PIL import Image
+
+from .config import *
+from .recognition import get_recognizer, get_text
+from .utils import (
+    calculate_md5,
+    diff,
+    download_and_unzip,
+    get_image_list,
+    get_paragraph,
+    group_text_box,
+    make_rotated_img_list,
+    merge_to_free,
+    printProgressBar,
+    reformat_input,
+    reformat_input_batched,
+    set_result_with_confidence,
+)
 
 if sys.version_info[0] == 2:
     from io import open
-    from six.moves.urllib.request import urlretrieve
+
     from pathlib2 import Path
+    from six.moves.urllib.request import urlretrieve
 else:
-    from urllib.request import urlretrieve
     from pathlib import Path
+    from urllib.request import urlretrieve
+else:
+    from pathlib import Path
+    from urllib.request import urlretrieve
 
 LOGGER = getLogger(__name__)
 
 class Reader(object):
 
     def __init__(self, lang_list, gpu=True, model_storage_directory=None,
-                 user_network_directory=None, detect_network="craft", 
-                 recog_network='standard', download_enabled=True, 
-                 detector=True, recognizer=True, verbose=True, 
+                 user_network_directory=None, detect_network="craft",
+                 recog_network='standard', download_enabled=True,
+                 detector=True, recognizer=True, verbose=True,
                  quantize=True, cudnn_benchmark=False):
         """Create an EasyOCR Reader
 
@@ -86,11 +102,11 @@ class Reader(object):
 
         # check and download detection model
         self.support_detection_network = ['craft', 'dbnet18']
-        self.quantize=quantize, 
+        self.quantize=quantize,
         self.cudnn_benchmark=cudnn_benchmark
         if detector:
             detector_path = self.getDetectorPath(detect_network)
-        
+
         # recognition model
         separator_list = {}
 
@@ -193,11 +209,11 @@ class Reader(object):
         else: # user-defined model
             with open(os.path.join(self.user_network_directory, recog_network+ '.yaml'), encoding='utf8') as file:
                 recog_config = yaml.load(file, Loader=yaml.FullLoader)
-            
+
             global imgH # if custom model, save this variable. (from *.yaml)
             if recog_config['imgH']:
                 imgH = recog_config['imgH']
-                
+
             available_lang = recog_config['lang_list']
             self.setModelLanguage(recog_network, lang_list, available_lang, str(available_lang))
             #char_file = os.path.join(self.user_network_directory, recog_network+ '.txt')
@@ -212,7 +228,7 @@ class Reader(object):
 
         if detector:
             self.detector = self.initDetector(detector_path)
-            
+
         if recognizer:
             if recog_network == 'generation1':
                 network_params = {
@@ -264,20 +280,20 @@ class Reader(object):
                 assert calculate_md5(detector_path) == self.detection_models[self.detect_network]['md5sum'], corrupt_msg
         else:
             raise RuntimeError("Unsupport detector network. Support networks are {}.".format(', '.join(self.support_detection_network)))
-        
+
         return detector_path
 
     def initDetector(self, detector_path):
-        return self.get_detector(detector_path, 
-                                 device = self.device, 
-                                 quantize = self.quantize, 
+        return self.get_detector(detector_path,
+                                 device = self.device,
+                                 quantize = self.quantize,
                                  cudnn_benchmark = self.cudnn_benchmark
                                  )
-    
+
     def setDetector(self, detect_network):
         detector_path = self.getDetectorPath(detect_network)
         self.detector = self.initDetector(detector_path)
-    
+
     def setModelLanguage(self, language, lang_list, list_lang, list_lang_string):
         self.model_lang = language
         if set(lang_list) - set(list_lang) != set():
@@ -318,19 +334,19 @@ class Reader(object):
         if reformat:
             img, img_cv_grey = reformat_input(img)
 
-        text_box_list = self.get_textbox(self.detector, 
-                                    img, 
-                                    canvas_size = canvas_size, 
+        text_box_list = self.get_textbox(self.detector,
+                                    img,
+                                    canvas_size = canvas_size,
                                     mag_ratio = mag_ratio,
-                                    text_threshold = text_threshold, 
-                                    link_threshold = link_threshold, 
+                                    text_threshold = text_threshold,
+                                    link_threshold = link_threshold,
                                     low_text = low_text,
-                                    poly = False, 
-                                    device = self.device, 
+                                    poly = False,
+                                    device = self.device,
                                     optimal_num_chars = optimal_num_chars,
-                                    threshold = threshold, 
-                                    bbox_min_score = bbox_min_score, 
-                                    bbox_min_size = bbox_min_size, 
+                                    threshold = threshold,
+                                    bbox_min_score = bbox_min_score,
+                                    bbox_min_size = bbox_min_size,
                                     max_candidates = max_candidates,
                                     )
 
@@ -406,7 +422,7 @@ class Reader(object):
                           workers, self.device)
 
             if rotation_info and (horizontal_list+free_list):
-                # Reshape result to be a list of lists, each row being for 
+                # Reshape result to be a list of lists, each row being for
                 # one of the rotations (first row being no rotation)
                 result = set_result_with_confidence(
                     [result[image_len*i:image_len*(i+1)] for i in range(len(rotation_info) + 1)])
@@ -426,7 +442,7 @@ class Reader(object):
             return [item[1] for item in result]
         elif output_format == 'dict':
             if paragraph:
-                return [ {'boxes':item[0],'text':item[1]} for item in result]    
+                return [ {'boxes':item[0],'text':item[1]} for item in result]
             return [ {'boxes':item[0],'text':item[1],'confident':item[2]} for item in result]
         elif output_format == 'json':
             if paragraph:
@@ -444,7 +460,7 @@ class Reader(object):
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
                  slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
+                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1,
                  threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
                  output_format='standard'):
         '''
@@ -453,7 +469,7 @@ class Reader(object):
         '''
         img, img_cv_grey = reformat_input(image)
 
-        horizontal_list, free_list = self.detect(img, 
+        horizontal_list, free_list = self.detect(img,
                                                  min_size = min_size, text_threshold = text_threshold,\
                                                  low_text = low_text, link_threshold = link_threshold,\
                                                  canvas_size = canvas_size, mag_ratio = mag_ratio,\
@@ -472,7 +488,7 @@ class Reader(object):
                                 filter_ths, y_ths, x_ths, False, output_format)
 
         return result
-    
+
     def readtextlang(self, image, decoder = 'greedy', beamWidth= 5, batch_size = 1,\
                  workers = 0, allowlist = None, blocklist = None, detail = 1,\
                  rotation_info = None, paragraph = False, min_size = 20,\
@@ -480,7 +496,7 @@ class Reader(object):
                  text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                  canvas_size = 2560, mag_ratio = 1.,\
                  slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
+                 width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1,
                  threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
                  output_format='standard'):
         '''
@@ -489,7 +505,7 @@ class Reader(object):
         '''
         img, img_cv_grey = reformat_input(image)
 
-        horizontal_list, free_list = self.detect(img, 
+        horizontal_list, free_list = self.detect(img,
                                                  min_size = min_size, text_threshold = text_threshold,\
                                                  low_text = low_text, link_threshold = link_threshold,\
                                                  canvas_size = canvas_size, mag_ratio = mag_ratio,\
@@ -506,12 +522,12 @@ class Reader(object):
                                 workers, allowlist, blocklist, detail, rotation_info,\
                                 paragraph, contrast_ths, adjust_contrast,\
                                 filter_ths, y_ths, x_ths, False, output_format)
-       
+
         char = []
         directory = 'characters/'
         for i in range(len(result)):
             char.append(result[i][1])
-        
+
         def search(arr,x):
             g = False
             for i in range(len(arr)):
@@ -524,11 +540,11 @@ class Reader(object):
             a = result[i]
             b = a + (filename[0:2],)
             return b
-        
+
         for filename in os.listdir(directory):
             if filename.endswith(".txt"):
-                with open ('characters/'+ filename,'rt',encoding="utf8") as myfile:  
-                    chartrs = str(myfile.read().splitlines()).replace('\n','') 
+                with open ('characters/'+ filename,'rt',encoding="utf8") as myfile:
+                    chartrs = str(myfile.read().splitlines()).replace('\n','')
                     for i in range(len(char)):
                         res = search(chartrs,char[i])
                         if res != -1:
@@ -543,7 +559,7 @@ class Reader(object):
                          text_threshold = 0.7, low_text = 0.4, link_threshold = 0.4,\
                          canvas_size = 2560, mag_ratio = 1.,\
                          slope_ths = 0.1, ycenter_ths = 0.5, height_ths = 0.5,\
-                         width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1, 
+                         width_ths = 0.5, y_ths = 0.5, x_ths = 1.0, add_margin = 0.1,
                          threshold = 0.2, bbox_min_score = 0.2, bbox_min_size = 3, max_candidates = 0,
                          output_format='standard'):
         '''
@@ -556,7 +572,7 @@ class Reader(object):
         '''
         img, img_cv_grey = reformat_input_batched(image, n_width, n_height)
 
-        horizontal_list_agg, free_list_agg = self.detect(img, 
+        horizontal_list_agg, free_list_agg = self.detect(img,
                                                  min_size = min_size, text_threshold = text_threshold,\
                                                  low_text = low_text, link_threshold = link_threshold,\
                                                  canvas_size = canvas_size, mag_ratio = mag_ratio,\
