@@ -9,7 +9,7 @@ This module can be used as a typical python module. One python wrapper script an
 ### Python script (*recommneded*)
 The script can be called with (assuming calling from `EasyOCR/`);
 ```
-python ./unit_test/run_unit_test.py --easyocr ./easyocr --verbose 2 --test ./unit_test/EasyOcrUnitTestPackage.pickle --data_dir ./examples 
+python ./unit_test/run_unit_test.py --easyocr ./easyocr --verbose 2 --test_data ./unit_test/data/EasyOcrUnitTestPackage.pickle --image_data_dir ./examples 
 ```
 
 #### Script arguments
