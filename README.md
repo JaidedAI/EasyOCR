@@ -14,22 +14,8 @@ Integrated into [Huggingface Spaces 🤗](https://huggingface.co/spaces) using [
 
 
 ## What's new
-- 4 September 2023 - Version 1.7.1
+- 24 September 2024 - Version 1.7.2
     - Fix several compatibilities
-- 25 May 2023 - Version 1.7.0
-    - Add Apple Silicon support (thanks[@rayeesoft](https://github.com/rayeesoft) and [@ArtemBernatskyy](https://github.com/ArtemBernatskyy), see [PR](https://github.com/JaidedAI/EasyOCR/pull/1004))
-    - Fix several compatibilities
-- 15 September 2022 - Version 1.6.2
-    - Add CPU support for DBnet
-    - DBnet will only be compiled when users initialize DBnet detector.  
-- 1 September 2022 - Version 1.6.1
-    - Fix DBnet path bug for Windows
-    - Add new built-in model `cyrillic_g2`. This model is a new default for Cyrillic script.
-- 24 August 2022 - Version 1.6.0
-    - Restructure code to support alternative text detectors.
-    - Add detector `DBnet`, see [paper](https://arxiv.org/abs/2202.10304v1). It can be used by initializing like this `reader = easyocr.Reader(['en'], detect_network = 'dbnet18')`.
-- 2 June 2022 - Version 1.5.0
-    - Add trainer for CRAFT detection model (thanks[@gmuffiness](https://github.com/gmuffiness), see [PR](https://github.com/JaidedAI/EasyOCR/pull/739))
 
 - [Read all release notes](https://github.com/JaidedAI/EasyOCR/blob/master/releasenotes.md)
 
