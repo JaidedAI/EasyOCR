@@ -45,6 +45,9 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     with torch.no_grad():
         y, feature = net(x)
 
+    # remove x and feature from device, whether GPU or CPU
+    del x, feature
+
     boxes_list, polys_list = [], []
     for out in y:
         # make score and link map
@@ -68,6 +71,11 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
                 polys[k] = boxes[k]
         boxes_list.append(boxes)
         polys_list.append(polys)
+    
+    # remove y from device, whether GPU or CPU, and check if cuda was used before calling empty_cache() to clean up
+    del y
+    if device == 'cuda':
+        torch.cuda.empty_cache()
 
     return boxes_list, polys_list
 
