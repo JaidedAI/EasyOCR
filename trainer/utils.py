@@ -1,7 +1,7 @@
 import torch
 import pickle
 import numpy as np
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
@@ -298,12 +298,13 @@ class CTCLabelConverter(object):
 class AttnLabelConverter(object):
     """ Convert between text-label and text-index """
 
-    def __init__(self, character):
+    def __init__(self, character, device):
         # character (str): set of the possible characters.
         # [GO] for the start token of the attention decoder. [s] for end-of-sentence token.
         list_token = ['[GO]', '[s]']  # ['[s]','[UNK]','[PAD]','[GO]']
         list_character = list(character)
         self.character = list_token + list_character
+        self.device = device
 
         self.dict = {}
         for i, char in enumerate(self.character):
@@ -331,7 +332,7 @@ class AttnLabelConverter(object):
             text.append('[s]')
             text = [self.dict[char] for char in text]
             batch_text[i][1:1 + len(text)] = torch.LongTensor(text)  # batch_text[:, 0] = [GO] token
-        return (batch_text.to(device), torch.IntTensor(length).to(device))
+        return (batch_text.to(self.device), torch.IntTensor(length).to(self.device))
 
     def decode(self, text_index, length):
         """ convert text-index into text-label. """
