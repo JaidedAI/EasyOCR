@@ -779,6 +779,8 @@ def reformat_input_batched(image, n_width=None, n_height=None):
         list of byte stream objects]
     """
     if ((isinstance(image, np.ndarray) and len(image.shape) == 4) or isinstance(image, list)):
+        if len(image) == 0:
+            raise ValueError("The input image array is empty.")
         # process image batches if image is list of image np arr, paths, bytes
         img, img_cv_grey = [], []
         for single_img in image:
