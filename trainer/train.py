@@ -14,7 +14,7 @@ import numpy as np
 from utils import CTCLabelConverter, AttnLabelConverter, Averager
 from dataset import hierarchical_dataset, AlignCollate, Batch_Balanced_Dataset
 from model import Model
-from test import validation
+from validate import validation
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def count_parameters(model):
