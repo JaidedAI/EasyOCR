@@ -97,7 +97,7 @@ class AlignCollate(object):
         return image_tensors
 
 def recognizer_predict(model, converter, test_loader, batch_max_length,\
-                       ignore_idx, char_group_idx, decoder = 'greedy', beamWidth= 5, device = 'cpu'):
+                       ignore_idx, char_group_idx, decoder = 'greedy', beamWidth= 5, device = 'cpu', temperature=1.0):
     model.eval()
     result = []
     with torch.no_grad():
@@ -109,6 +109,9 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
 
             preds = model(image, text_for_pred)
+
+            # Apply Temperature Scaling
+            preds = preds / temperature
 
             # Select max probabilty (greedy decoding) then decode index to character
             preds_size = torch.IntTensor([preds.size(1)] * batch_size)
@@ -145,7 +148,11 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
                     preds_max_prob.append(np.array([0]))
 
             for pred, pred_max_prob in zip(preds_str, preds_max_prob):
-                confidence_score = custom_mean(pred_max_prob)
+                # Replaced custom_mean with a standard average of probabilities
+                if len(pred_max_prob) == 0:
+                    confidence_score = 0.0
+                else:
+                    confidence_score = pred_max_prob.mean()
                 result.append([pred, confidence_score])
 
     return result
@@ -185,7 +192,7 @@ def get_recognizer(recog_network, network_params, character,\
 
 def get_text(character, imgH, imgW, recognizer, converter, image_list,\
              ignore_char = '',decoder = 'greedy', beamWidth =5, batch_size=1, contrast_ths=0.1,\
-             adjust_contrast=0.5, filter_ths = 0.003, workers = 1, device = 'cpu'):
+             adjust_contrast=0.5, filter_ths = 0.003, workers = 1, device = 'cpu', temperature=1.0):
     batch_max_length = int(imgW/10)
 
     char_group_idx = {}
@@ -204,7 +211,7 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
 
     # predict first round
     result1 = recognizer_predict(recognizer, converter, test_loader,batch_max_length,\
-                                 ignore_idx, char_group_idx, decoder, beamWidth, device = device)
+                                 ignore_idx, char_group_idx, decoder, beamWidth, device=device, temperature=temperature)
 
     # predict second round
     low_confident_idx = [i for i,item in enumerate(result1) if (item[1] < contrast_ths)]
@@ -216,7 +223,7 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
                         test_data, batch_size=batch_size, shuffle=False,
                         num_workers=int(workers), collate_fn=AlignCollate_contrast, pin_memory=True)
         result2 = recognizer_predict(recognizer, converter, test_loader, batch_max_length,\
-                                     ignore_idx, char_group_idx, decoder, beamWidth, device = device)
+                                     ignore_idx, char_group_idx, decoder, beamWidth, device=device, temperature=temperature)
 
     result = []
     for i, zipped in enumerate(zip(coord, result1)):
