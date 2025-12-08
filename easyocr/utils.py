@@ -561,6 +561,8 @@ def calculate_ratio(width,height):
     ratio = width/height
     if ratio<1.0:
         ratio = 1./ratio
+    #set to 2 decimal places, to avoid OverflowError(cannot convert float infinity to integer) while other methods covert this ratio to int
+    ratio = round(ratio,3)
     return ratio
 
 def compute_ratio_and_resize(img,width,height,model_height):
