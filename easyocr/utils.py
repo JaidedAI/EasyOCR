@@ -8,6 +8,7 @@ import cv2
 from PIL import Image, JpegImagePlugin
 from scipy import ndimage
 import hashlib
+import html
 import sys, os
 from zipfile import ZipFile
 from .imgproc import loadImage
@@ -382,6 +383,49 @@ class CTCLabelConverter(object):
                     string += t
             texts.append(string)
         return texts
+
+OCR_PREAMBLE = """
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta name='ocr-system' content='EasyOCR' />
+    <meta name='ocr-capabilities' content='ocrx_word'/>
+  </head>
+  <body>
+    <div class="ocr_page" id="page_1" title="image 'image.png'; bbox {x0} {y0} {x1} {y1}; ppageno 0">
+""".strip()
+
+
+# In order to get a browser-renderable HTML file, you can add this before the closing </body> tag:
+#
+# <script src="https://unpkg.com/hocrjs"></script>
+
+OCR_POSTAMBLE = """    </div>
+  </body>
+</html>
+""".splitlines()
+
+def to_hocr(result):
+    content = []
+    min_x0, min_y0, max_x1, max_y1 = 1e9, 1e9, 0, 0
+    for box, text, confidence in result:
+        # We have the corners of the box, clockwise from top-left
+        c1, _, c3, _ = [[int(x) for x in c] for c in box]
+        x0, y0 = c1
+        x1, y1 = c3
+        min_x0 = min(min_x0, x0)
+        min_y0 = min(min_y0, y0)
+        max_x1 = max(max_x1, x1)
+        max_y1 = max(max_y1, y1)
+        content.append('      <span class="ocrx_word" title="bbox {x0} {y0} {x1} {y1}">{text}</span>'.format(
+            x0=x0, y0=y0, x1=x1, y1=y1, text=html.escape(text)
+        ))
+    preamble = OCR_PREAMBLE.format(x0=min_x0, y0=min_y0, x1=max_x1, y1=max_y1).splitlines()
+    return preamble + content + OCR_POSTAMBLE
 
 def merge_to_free(merge_result, free_list):
     merge_result_buf, mr_buf = [], []
