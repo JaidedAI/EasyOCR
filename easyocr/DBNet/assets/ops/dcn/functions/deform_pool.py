@@ -41,7 +41,7 @@ except:
         warnings.warn(' '.join([
             "Failed to import or compile 'deform_pool_cpu' with the following error",
             "{}".format(error),
-            "Deformable convulution and DBNet will not be able to run on CPU."
+            "Deformable convolution and DBNet will not be able to run on CPU."
             ]))
         dcn_cpu_ready = False
 
@@ -64,7 +64,7 @@ if torch.cuda.is_available():
             warnings.warn(' '.join([
                 "Failed to import or compile 'deform_pool_cuda' with the following error",
                 "{}".format(error),
-                "Deformable convulution and DBNet will not be able to run on GPU."
+                "Deformable convolution and DBNet will not be able to run on GPU."
                 ]))
             dcn_cuda_ready = False
 
