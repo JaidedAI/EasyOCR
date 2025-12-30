@@ -7,7 +7,7 @@ ARG service_home="/home/EasyOCR"
 
 # Configure apt and install packages
 RUN apt-get update -y && \
-    apt-get install -y \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
