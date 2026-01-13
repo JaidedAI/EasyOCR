@@ -451,7 +451,7 @@ class Reader(object):
         Parameters:
         image: file path or numpy-array or a byte stream object
         '''
-        img, img_cv_grey = reformat_input(image)
+        img, img_cv_grey = reformat_input(image, verbose=self.verbose)
 
         horizontal_list, free_list = self.detect(img, 
                                                  min_size = min_size, text_threshold = text_threshold,\

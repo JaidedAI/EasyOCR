@@ -729,10 +729,14 @@ def printProgressBar(prefix='', suffix='', decimals=1, length=100, fill='█'):
 
     return progress_hook
 
-def reformat_input(image):
+def reformat_input(image, verbose=True):
     if type(image) == str:
         if image.startswith('http://') or image.startswith('https://'):
-            tmp, _ = urlretrieve(image , reporthook=printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50))
+            reportHook = printProgressBar(prefix = 'Progress:', suffix = 'Complete', length = 50)
+            if not verbose:
+                reportHook = None
+
+            tmp, _ = urlretrieve(image , reporthook=reportHook)
             img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
             os.remove(tmp)
         else:
