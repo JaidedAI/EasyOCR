@@ -736,7 +736,7 @@ def reformat_input(image):
             img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
             os.remove(tmp)
         else:
-            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+            img_cv_grey = cv2.imdecode(np.fromfile(image.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_GRAYSCALE) # numpy can handle non-ASCII file paths
             image = os.path.expanduser(image)
         img = loadImage(image)  # can accept URL
     elif type(image) == bytes:
