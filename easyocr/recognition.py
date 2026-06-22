@@ -165,13 +165,14 @@ def get_recognizer(recog_network, network_params, character,\
         model_pkg = importlib.import_module(recog_network)
     model = model_pkg.Model(num_class=num_class, **network_params)
 
-    if device == 'cpu':
+    if device == 'cpu'or device == 'xpu':
         state_dict = torch.load(model_path, map_location=device, weights_only=False)
         new_state_dict = OrderedDict()
         for key, value in state_dict.items():
             new_key = key[7:]
             new_state_dict[new_key] = value
         model.load_state_dict(new_state_dict)
+        model.to(device)
         if quantize:
             try:
                 torch.quantization.quantize_dynamic(model, dtype=torch.qint8, inplace=True)
