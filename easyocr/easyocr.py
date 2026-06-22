@@ -11,11 +11,6 @@ import numpy as np
 import cv2
 import torch
 
-try:
-    import intel_extension_for_pytorch as ipex
-except Exception:
-    pass
-
 import os
 import sys
 from PIL import Image
