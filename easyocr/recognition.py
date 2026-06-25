@@ -166,7 +166,7 @@ def get_recognizer(recog_network, network_params, character,\
     model = model_pkg.Model(num_class=num_class, **network_params)
 
     if device == 'cpu':
-        state_dict = torch.load(model_path, map_location=device)
+        state_dict = torch.load(model_path, map_location=device, weights_only=False)
         new_state_dict = OrderedDict()
         for key, value in state_dict.items():
             new_key = key[7:]
@@ -179,7 +179,7 @@ def get_recognizer(recog_network, network_params, character,\
                 pass
     else:
         model = torch.nn.DataParallel(model).to(device)
-        model.load_state_dict(torch.load(model_path, map_location=device))
+        model.load_state_dict(torch.load(model_path, map_location=device, weights_only=False))
 
     return model, converter
 
