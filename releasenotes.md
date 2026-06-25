@@ -1,3 +1,5 @@
+- 24 September 2024 - Version 1.7.2
+    - Fix several compatibilities
 - 4 September 2023 - Version 1.7.1
     - Fix several compatibilities
 - 25 May 2023 - Version 1.7.0
