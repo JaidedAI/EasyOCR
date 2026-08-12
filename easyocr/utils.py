@@ -6,6 +6,10 @@ import numpy as np
 import math
 import cv2
 from PIL import Image, JpegImagePlugin
+try:
+    from PIL import get_display
+except ImportError:
+    get_display = None
 from scipy import ndimage
 import hashlib
 import sys, os
@@ -571,9 +575,9 @@ def compute_ratio_and_resize(img,width,height,model_height):
     ratio = width/height
     if ratio<1.0:
         ratio = calculate_ratio(width,height)
-        img = cv2.resize(img,(model_height,int(model_height*ratio)), interpolation=Image.Resampling.LANCZOS)
+        img = cv2.resize(img,(model_height,int(model_height*ratio)), interpolation=Image.LANCZOS)
     else:
-        img = cv2.resize(img,(int(model_height*ratio),model_height),interpolation=Image.Resampling.LANCZOS)
+        img = cv2.resize(img,(int(model_height*ratio),model_height),interpolation=Image.LANCZOS)
     return img,ratio
 
 

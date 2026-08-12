@@ -75,7 +75,7 @@ def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=Fal
     net = CRAFT()
 
     if device == 'cpu':
-        net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device, weights_only=False)))
+        net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device)))
         if quantize:
             try:
                 torch.quantization.quantize_dynamic(net, dtype=torch.qint8, inplace=True)
