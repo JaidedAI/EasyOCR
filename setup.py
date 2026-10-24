@@ -18,6 +18,7 @@ setup(
     include_package_data=True,
     version='1.7.2',
     install_requires=requirements,
+    extras_require={'dbnet': ['ninja']},
     entry_points={"console_scripts": ["easyocr= easyocr.cli:main"]},
     license='Apache License 2.0',
     description='End-to-End Multi-Lingual Optical Character Recognition (OCR) Solution',

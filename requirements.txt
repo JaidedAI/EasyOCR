@@ -9,4 +9,3 @@ python-bidi
 PyYAML
 Shapely
 pyclipper
-ninja
