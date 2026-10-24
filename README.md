@@ -50,6 +50,8 @@ Note 1: For Windows, please install torch and torchvision first by following the
 
 Note 2: We also provide a Dockerfile [here](https://github.com/JaidedAI/EasyOCR/blob/master/Dockerfile).
 
+Note 3: The optional DBNet detector (`detect_network='dbnet18'`) compiles its C++/CUDA ops on first use, which needs the Ninja build tool. To install it along with EasyOCR, use `pip install "easyocr[dbnet]"`.
+
 ## Usage
 
 ``` python

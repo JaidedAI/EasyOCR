@@ -29,4 +29,4 @@ RUN mkdir "$service_home" \
 # Build
 RUN cd "$service_home" \
     && python setup.py build_ext --inplace -j 4 \
-    && python -m pip install -e .
+    && python -m pip install -e ".[dbnet]"
