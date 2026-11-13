@@ -40,6 +40,7 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
          for n_img in img_resized_list]
     x = torch.from_numpy(np.array(x))
     x = x.to(device)
+    net = net.to(device)
 
     # forward pass
     with torch.no_grad():
@@ -74,8 +75,9 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
 def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=False):
     net = CRAFT()
 
-    if device == 'cpu':
+    if device == 'cpu'or device == 'xpu':
         net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device, weights_only=False)))
+        net.to(device)
         if quantize:
             try:
                 torch.quantization.quantize_dynamic(net, dtype=torch.qint8, inplace=True)
