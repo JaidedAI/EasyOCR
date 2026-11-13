@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 import numpy as np
 from collections import OrderedDict
 import importlib
-from .utils import CTCLabelConverter
+from .utils import CTCLabelConverter, wrap_data_parallel
 import math
 
 def custom_mean(x):
@@ -178,8 +178,11 @@ def get_recognizer(recog_network, network_params, character,\
             except:
                 pass
     else:
-        model = torch.nn.DataParallel(model).to(device)
-        model.load_state_dict(torch.load(model_path, map_location=device, weights_only=False))
+        state_dict = torch.load(model_path, map_location=device, weights_only=False)
+        if list(state_dict.keys())[0].startswith("module"):
+            state_dict = OrderedDict((k[7:], v) for k, v in state_dict.items())
+        model.load_state_dict(state_dict)
+        model = wrap_data_parallel(model, device)
 
     return model, converter
 
