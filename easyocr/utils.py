@@ -833,3 +833,22 @@ def set_result_with_confidence(results):
         final_result.append(results[best_row][col_ix])
 
     return final_result
+
+
+def wrap_data_parallel(module, device):
+    '''
+    Wrap a module in torch.nn.DataParallel pinned to the requested CUDA device.
+
+    Without an explicit device_ids list, DataParallel assumes
+    range(torch.cuda.device_count()) and pins the primary replica to cuda:0,
+    which breaks any host process whose current device is not cuda:0
+    (e.g. multi-rank DDP/FSDP training with local_rank != 0). Non-CUDA
+    devices (e.g. mps) or single-GPU hosts are moved without the
+    DataParallel wrapper; a single-device wrap has no parallelism benefit
+    and DataParallel only supports CUDA.
+    '''
+    device = torch.device(device)
+    if device.type == 'cuda' and torch.cuda.device_count() > 1:
+        device_ids = [device.index if device.index is not None else torch.cuda.current_device()]
+        return torch.nn.DataParallel(module, device_ids=device_ids).to(device)
+    return module.to(device)

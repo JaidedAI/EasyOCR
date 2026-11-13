@@ -11,6 +11,7 @@ import torch
 import torch.backends.cudnn as cudnn
 
 from .DBNet.DBNet import DBNet
+from .utils import wrap_data_parallel
 
 def test_net(image, 
              detector, 
@@ -139,7 +140,7 @@ def get_detector(trained_model, backbone = 'resnet18', device='cpu', quantize=Tr
             except:
                 pass
     else:
-        dbnet.model = torch.nn.DataParallel(dbnet.model).to(device)
+        dbnet.model = wrap_data_parallel(dbnet.model, device)
         cudnn.benchmark = cudnn_benchmark
     
     dbnet.model.eval()

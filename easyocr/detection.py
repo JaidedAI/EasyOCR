@@ -9,6 +9,7 @@ import numpy as np
 from .craft_utils import getDetBoxes, adjustResultCoordinates
 from .imgproc import resize_aspect_ratio, normalizeMeanVariance
 from .craft import CRAFT
+from .utils import wrap_data_parallel
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -83,7 +84,7 @@ def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=Fal
                 pass
     else:
         net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device, weights_only=False)))
-        net = torch.nn.DataParallel(net).to(device)
+        net = wrap_data_parallel(net, device)
         cudnn.benchmark = cudnn_benchmark
 
     net.eval()
