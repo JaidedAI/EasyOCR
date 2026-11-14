@@ -263,7 +263,7 @@ class SynthTextDataSet(CraftBaseDataset):
 
     def make_gt_score(self, index):
         img_path = os.path.join(self.data_dir, self.img_names[index][0])
-        image = cv2.imread(img_path, cv2.IMREAD_COLOR)
+        image = cv2.imdecode(np.fromfile(img_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_COLOR)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         all_char_bbox = self.char_bbox[index].transpose(
             (2, 1, 0)
@@ -388,7 +388,7 @@ class CustomDataset(CraftBaseDataset):
     def load_data(self, index):
         img_name = self.img_names[index]
         img_path = os.path.join(self.img_dir, img_name)
-        image = cv2.imread(img_path)
+        image = cv2.imdecode(np.fromfile(img_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_COLOR)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         img_gt_box_path = os.path.join(
@@ -491,7 +491,7 @@ class CustomDataset(CraftBaseDataset):
         """
         img_name = self.img_names[index]
         img_path = os.path.join(self.img_dir, img_name)
-        image = cv2.imread(img_path)
+        image = cv2.imdecode(np.fromfile(img_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_COLOR)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         img_gt_box_path = os.path.join(
@@ -512,9 +512,9 @@ class CustomDataset(CraftBaseDataset):
         saved_cf_mask_path = os.path.join(
             self.saved_gt_dir, f"res_img_{query_idx}_cf_mask_thresh_0.6.jpg"
         )
-        region_score = cv2.imread(saved_region_scores_path, cv2.IMREAD_GRAYSCALE)
-        affinity_score = cv2.imread(saved_affi_scores_path, cv2.IMREAD_GRAYSCALE)
-        confidence_mask = cv2.imread(saved_cf_mask_path, cv2.IMREAD_GRAYSCALE)
+        region_score = cv2.imdecode(np.fromfile(saved_region_scores_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+        affinity_score = cv2.imdecode(np.fromfile(saved_affi_scores_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
+        confidence_mask = cv2.imdecode(np.fromfile(saved_cf_mask_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
 
         region_score = cv2.resize(region_score, (img_w, img_h))
         affinity_score = cv2.resize(affinity_score, (img_w, img_h))

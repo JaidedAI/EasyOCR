@@ -217,7 +217,7 @@ class DBNet:
         '''
         if isinstance(image, str):
             if os.path.isfile(image):
-                image = cv2.imread(image, cv2.IMREAD_COLOR).astype('float32')
+                image = cv2.imdecode(np.fromfile(image.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_COLOR).astype('float32')
             else:
                 raise FileNotFoundError("Cannot find {}".format(image))
         elif isinstance(image, np.ndarray):

@@ -279,7 +279,7 @@ def main_eval(model_path, backbone, config, evaluator, result_dir, buffer, model
     # -----------------------------------------------------------------------------------------------------------------#
     total_imgs_bboxes_pre = []
     for k, img_path in enumerate(tqdm(piece_imgs_path)):
-        image = cv2.imread(img_path)
+        image = cv2.imdecode(np.fromfile(img_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_COLOR)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         single_img_bbox = []
         bboxes, polys, score_text = test_net(

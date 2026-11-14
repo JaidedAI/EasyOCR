@@ -222,7 +222,7 @@ def load_icdar2015_gt(dataFolder, isTraing=False):
             .replace(".txt", ".jpg")
             .replace("gt_", "")
         )
-        image = cv2.imread(img_path)
+        image = cv2.imdecode(np.fromfile(img_path.replace('\\','/'), dtype=np.uint8), cv2.IMREAD_COLOR)
         lines = open(gt_path, encoding="utf-8").readlines()
         single_img_bboxes = []
         for line in lines:
@@ -270,7 +270,6 @@ def load_icdar2013_gt(dataFolder, isTraing=False):
             .replace(".txt", ".jpg")
             .replace("gt_", "")
         )
-        image = cv2.imread(img_path)
         lines = open(gt_path, encoding="utf-8").readlines()
         single_img_bboxes = []
         for line in lines:
