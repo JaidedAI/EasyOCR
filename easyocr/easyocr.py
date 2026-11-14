@@ -54,16 +54,13 @@ class Reader(object):
         self.verbose = verbose
         self.download_enabled = download_enabled
 
-        self.model_storage_directory = MODULE_PATH + '/model'
-        if model_storage_directory:
-            self.model_storage_directory = model_storage_directory
+        self.model_storage_directory = model_storage_directory or os.path.join(MODULE_PATH, 'model')
         Path(self.model_storage_directory).mkdir(parents=True, exist_ok=True)
 
-        self.user_network_directory = MODULE_PATH + '/user_network'
-        if user_network_directory:
-            self.user_network_directory = user_network_directory
+        self.user_network_directory = user_network_directory or os.path.join(MODULE_PATH, 'user_network')
         Path(self.user_network_directory).mkdir(parents=True, exist_ok=True)
         sys.path.append(self.user_network_directory)
+
 
         if gpu is False:
             self.device = 'cpu'
