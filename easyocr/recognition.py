@@ -200,7 +200,7 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
     test_data = ListDataset(img_list)
     test_loader = torch.utils.data.DataLoader(
         test_data, batch_size=batch_size, shuffle=False,
-        num_workers=int(workers), collate_fn=AlignCollate_normal, pin_memory=True)
+        num_workers=int(workers), collate_fn=AlignCollate_normal, pin_memory=device != 'cpu')
 
     # predict first round
     result1 = recognizer_predict(recognizer, converter, test_loader,batch_max_length,\
@@ -214,7 +214,7 @@ def get_text(character, imgH, imgW, recognizer, converter, image_list,\
         test_data = ListDataset(img_list2)
         test_loader = torch.utils.data.DataLoader(
                         test_data, batch_size=batch_size, shuffle=False,
-                        num_workers=int(workers), collate_fn=AlignCollate_contrast, pin_memory=True)
+                        num_workers=int(workers), collate_fn=AlignCollate_contrast, pin_memory=device != 'cpu')
         result2 = recognizer_predict(recognizer, converter, test_loader, batch_max_length,\
                                      ignore_idx, char_group_idx, decoder, beamWidth, device = device)
 
