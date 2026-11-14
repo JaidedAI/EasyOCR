@@ -1,6 +1,8 @@
 import argparse
 import easyocr
 
+def list_of_ints(arg):
+    return list(map(int, arg.split(',')))
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Process EasyOCR.")
@@ -125,7 +127,7 @@ def parse_args():
     )
     parser.add_argument(
         "--rotation_info",
-        type=list,
+        type=list_of_ints,
         default=None,
         help="Allow EasyOCR to rotate each text box and return the one with the best confident score. Eligible values are 90, 180 and 270. For example, try [90, 180 ,270] for all possible text orientations.",
     )
