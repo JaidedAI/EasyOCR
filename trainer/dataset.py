@@ -150,7 +150,7 @@ class OCRDataset(Dataset):
         self.nSamples = len(self.df)
 
         if self.opt.data_filtering_off:
-            self.filtered_index_list = [index + 1 for index in range(self.nSamples)]
+            self.filtered_index_list = [index for index in range(self.nSamples)]
         else:
             self.filtered_index_list = []
             for index in range(self.nSamples):
