@@ -355,7 +355,7 @@ class Reader(object):
                   workers = 0, allowlist = None, blocklist = None, detail = 1,\
                   rotation_info = None,paragraph = False,\
                   contrast_ths = 0.1,adjust_contrast = 0.5, filter_ths = 0.003,\
-                  y_ths = 0.5, x_ths = 1.0, reformat=True, output_format='standard'):
+                  y_ths = 0.5, x_ths = 1.0, reformat=True, output_format='standard',temperature=1.0):
 
         if reformat:
             img, img_cv_grey = reformat_input(img_cv_grey)
@@ -383,7 +383,7 @@ class Reader(object):
                 image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
                 result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
-                              workers, self.device)
+                              workers, self.device,temperature)
                 result += result0
             for bbox in free_list:
                 h_list = []
@@ -391,7 +391,7 @@ class Reader(object):
                 image_list, max_width = get_image_list(h_list, f_list, img_cv_grey, model_height = imgH)
                 result0 = get_text(self.character, imgH, int(max_width), self.recognizer, self.converter, image_list,\
                               ignore_char, decoder, beamWidth, batch_size, contrast_ths, adjust_contrast, filter_ths,\
-                              workers, self.device)
+                              workers, self.device,temperature)
                 result += result0
         # default mode will try to process multiple boxes at the same time
         else:
