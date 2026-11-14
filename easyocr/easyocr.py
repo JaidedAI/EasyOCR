@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .recognition import get_recognizer, get_text
+from .recognition import get_recognizer, get_text, get_recognizer_attn
 from .utils import group_text_box, get_image_list, calculate_md5, get_paragraph,\
                    download_and_unzip, printProgressBar, diff, reformat_input,\
                    make_rotated_img_list, set_result_with_confidence,\
@@ -228,9 +228,15 @@ class Reader(object):
                     }
             else:
                 network_params = recog_config['network_params']
-            self.recognizer, self.converter = get_recognizer(recog_network, network_params,\
+            if "Prediction" in recog_config:
+                if recog_config["Prediction"] == "Attn":
+                    self.recognizer, self.converter = get_recognizer_attn(recog_network, network_params,\
                                                          self.character, separator_list,\
                                                          dict_list, model_path, device = self.device, quantize=quantize)
+            else:
+                self.recognizer, self.converter = get_recognizer(recog_network, network_params,\
+                                                            self.character, separator_list,\
+                                                            dict_list, model_path, device = self.device, quantize=quantize)
 
     def getDetectorPath(self, detect_network):
         if detect_network in self.support_detection_network:
