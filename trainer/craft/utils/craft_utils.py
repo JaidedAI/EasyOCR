@@ -36,6 +36,8 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
     nLabels, labels, stats, centroids = \
         cv2.connectedComponentsWithStats(text_score_comb.astype(np.uint8), connectivity=4)
 
+    link_area = np.logical_and(link_score==1, text_score==0)
+
     det = []
     mapper = []
     for k in range(1,nLabels):
@@ -43,13 +45,8 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
         size = stats[k, cv2.CC_STAT_AREA]
         if size < 10: continue
 
-        # thresholding
-        if np.max(textmap[labels==k]) < text_threshold: continue
-
-        # make segmentation map
-        segmap = np.zeros(textmap.shape, dtype=np.uint8)
-        segmap[labels==k] = 255
-        segmap[np.logical_and(link_score==1, text_score==0)] = 0   # remove link area
+        # the component plus its dilation margin; work on this region only
+        # instead of the whole map, which is slow for images with many words
         x, y = stats[k, cv2.CC_STAT_LEFT], stats[k, cv2.CC_STAT_TOP]
         w, h = stats[k, cv2.CC_STAT_WIDTH], stats[k, cv2.CC_STAT_HEIGHT]
         niter = int(math.sqrt(size * min(w, h) / (w * h)) * 2)
@@ -59,14 +56,24 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
         if sy < 0 : sy = 0
         if ex >= img_w: ex = img_w
         if ey >= img_h: ey = img_h
+        label_roi = labels[sy:ey, sx:ex] == k
+
+        # thresholding
+        if np.max(textmap[sy:ey, sx:ex][label_roi]) < text_threshold: continue
+
+        # make segmentation map
+        segmap = np.zeros(label_roi.shape, dtype=np.uint8)
+        segmap[label_roi] = 255
+        segmap[link_area[sy:ey, sx:ex]] = 0   # remove link area
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(1 + niter, 1 + niter))
-        segmap[sy:ey, sx:ex] = cv2.dilate(segmap[sy:ey, sx:ex], kernel, iterations=1)
+        segmap = cv2.dilate(segmap, kernel, iterations=1)
         #kernel1 = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 5))
-        #segmap[sy:ey, sx:ex] = cv2.dilate(segmap[sy:ey, sx:ex], kernel1, iterations=1)
+        #segmap = cv2.dilate(segmap, kernel1, iterations=1)
 
 
         # make box
         np_contours = np.roll(np.array(np.where(segmap!=0)),1,axis=0).transpose().reshape(-1,2)
+        np_contours += (sx, sy)   # back to full map coordinates
         rectangle = cv2.minAreaRect(np_contours)
         box = cv2.boxPoints(rectangle)
 
