@@ -720,6 +720,13 @@ def printProgressBar(prefix='', suffix='', decimals=1, length=100, fill='█'):
         fill        - Optional  : bar fill character (Str)
         printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
     """
+    # stdout may not be able to encode the fill character, e.g. a redirected
+    # or IDE console using cp1252 or cp932 on Windows; fall back to '#'
+    try:
+        fill.encode(getattr(sys.stdout, 'encoding', None) or 'ascii')
+    except (UnicodeEncodeError, LookupError):
+        fill = '#'
+
     def progress_hook(count, blockSize, totalSize):
         progress = count * blockSize / totalSize
         percent = ("{0:." + str(decimals) + "f}").format(progress * 100)
