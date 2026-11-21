@@ -585,6 +585,8 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
     for box in free_list:
         rect = np.array(box, dtype = "float32")
         transformed_img = four_point_transform(img, rect)
+        if transformed_img.shape[0] <= 0 or transformed_img.shape[1] <= 0:
+            continue
         ratio = calculate_ratio(transformed_img.shape[1],transformed_img.shape[0])
         new_width = int(model_height*ratio)
         if new_width == 0:
@@ -605,6 +607,8 @@ def get_image_list(horizontal_list, free_list, img, model_height = 64, sort_outp
         crop_img = img[y_min : y_max, x_min:x_max]
         width = x_max - x_min
         height = y_max - y_min
+        if width <= 0 or height <= 0:
+            continue
         ratio = calculate_ratio(width,height)
         new_width = int(model_height*ratio)
         if new_width == 0:
