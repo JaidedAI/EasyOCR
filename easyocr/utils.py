@@ -164,7 +164,12 @@ def fast_simplify_label(labeling, c, blankIdx=0):
         newLabeling = labeling + (c,)
 
     elif labeling and c != blankIdx:
-        newLabeling = labeling + (c,)
+        # a repeated character must keep a blank between the two copies,
+        # otherwise the final decode collapses it into a single character
+        if labeling[-1] == c:
+            newLabeling = labeling + (blankIdx, c)
+        else:
+            newLabeling = labeling + (c,)
 
     # Cases that might still require simplyfying
     else:
@@ -228,6 +233,9 @@ def ctcBeamSearch(mat, classes, ignore_idx, lm, beamWidth=25, dict_list = []):
             # char_highscore = np.argpartition(mat[t, :], -5)[-5:] # run through 5 highest probability
             char_highscore = np.where(mat[t, :] >= 0.5/maxC)[0] # run through all probable characters
             for c in char_highscore:
+                # the blank is already handled by the copy step above
+                if c == blankIdx:
+                    continue
             #for c in range(maxC - 1):
                 # add new char to current beam-labeling
                 # newLabeling = labeling + (c,)
