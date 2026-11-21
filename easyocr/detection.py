@@ -71,17 +71,30 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
 
     return boxes_list, polys_list
 
-def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=False):
-    net = CRAFT()
+def _cpu_craft_for_checkpoint(state_dict):
+    if hasattr(torch.device, '__enter__'):  # PyTorch 2.0+
+        with torch.device('meta'):
+            net = CRAFT()
+        if net.state_dict().keys() <= state_dict.keys():
+            # Allocate the retained layers in their usual dtype. The checkpoint
+            # supplies every value, including BatchNorm's running statistics.
+            return net.to_empty(device='cpu')
+    # Older checkpoints rely on BatchNorm's initialized batch counters.
+    return CRAFT()
 
+def get_detector(trained_model, device='cpu', quantize=True, cudnn_benchmark=False):
     if device == 'cpu':
-        net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device, weights_only=False)))
+        state_dict = copyStateDict(torch.load(trained_model, map_location=device, weights_only=False))
+        net = _cpu_craft_for_checkpoint(state_dict)
+        net.load_state_dict(state_dict)
+        del state_dict
         if quantize:
             try:
                 torch.quantization.quantize_dynamic(net, dtype=torch.qint8, inplace=True)
             except:
                 pass
     else:
+        net = CRAFT()
         net.load_state_dict(copyStateDict(torch.load(trained_model, map_location=device, weights_only=False)))
         net = torch.nn.DataParallel(net).to(device)
         cudnn.benchmark = cudnn_benchmark
