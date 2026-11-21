@@ -736,8 +736,8 @@ def reformat_input(image):
             img_cv_grey = cv2.imread(tmp, cv2.IMREAD_GRAYSCALE)
             os.remove(tmp)
         else:
-            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
             image = os.path.expanduser(image)
+            img_cv_grey = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
         img = loadImage(image)  # can accept URL
     elif type(image) == bytes:
         nparr = np.frombuffer(image, np.uint8)
