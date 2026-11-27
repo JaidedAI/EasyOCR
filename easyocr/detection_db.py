@@ -74,7 +74,7 @@ def test_net(image,
     images, original_shapes = zip(*[detector.resize_image(img, canvas_size) for img in image_arrs])
     # preprocessing
     images = [np.transpose(detector.normalize_image(n_img), (2, 0, 1)) for n_img in images]
-    image_tensor = torch.from_numpy(np.array(images)).to(device)
+    image_tensor = torch.from_numpy(np.array(images)).float().to(device)
     # forward pass
     with torch.no_grad():
         hmap = detector.image2hmap(image_tensor.to(device))

@@ -99,7 +99,7 @@ class DBNet:
         else:
             self.model = None
 
-        self.BGR_MEAN = np.array(self.configs['BGR_MEAN'])
+        self.BGR_MEAN = np.array(self.configs['BGR_MEAN'], dtype=np.float32)
         self.min_detection_size = self.configs['min_detection_size']
         self.max_detection_size = self.configs['max_detection_size']
 
@@ -295,7 +295,7 @@ class DBNet:
         np.ndarray
             OpenCV BGR image.
         '''
-        return (image - self.BGR_MEAN)/255.0    
+        return (image.astype(np.float32, copy=False) - self.BGR_MEAN) / np.float32(255.0)
        
     def load_image(self, image_path, detection_size = 0):
         '''
