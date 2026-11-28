@@ -86,7 +86,7 @@ class Reader(object):
 
         # check and download detection model
         self.support_detection_network = ['craft', 'dbnet18']
-        self.quantize=quantize, 
+        self.quantize = quantize
         self.cudnn_benchmark=cudnn_benchmark
         if detector:
             detector_path = self.getDetectorPath(detect_network)
