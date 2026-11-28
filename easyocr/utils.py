@@ -750,7 +750,7 @@ def reformat_input(image):
             img_cv_grey = image
             img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         elif len(image.shape) == 3 and image.shape[2] == 1:
-            img_cv_grey = np.squeeze(image)
+            img_cv_grey = np.squeeze(image, axis=2)
             img = cv2.cvtColor(img_cv_grey, cv2.COLOR_GRAY2BGR)
         elif len(image.shape) == 3 and image.shape[2] == 3: # BGRscale
             img = image
